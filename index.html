@@ -595,6 +595,13 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
 .share-help summary{cursor:pointer;font-weight:600;color:var(--text)}
 .share-help p{margin:8px 0 0;line-height:1.55}
 
+.review-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+  padding:14px 16px;margin-bottom:18px;border:1px solid var(--accent);border-radius:var(--r);
+  background:var(--accent-wash)}
+.review-bar b{display:block;font-size:15px;margin-bottom:2px}
+.review-bar span{font-size:13px;color:var(--muted);line-height:1.5}
+.review-actions{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0}
+
 /* Mike is not in any deck. Mike simply is. */
 .mike-row .num{color:var(--star)}
 .mike-row b{font-family:var(--display);font-size:17px}
@@ -1251,16 +1258,62 @@ function mergeTermLines(lines,medH){
    picture pushed to the top of the next page, above that page's first term —
    then reads as an unbroken block, because the dead paper margins that would
    otherwise look like a huge row gap are removed from the axis entirely. */
+/* A gutter only counts when it is genuinely empty and genuinely divides the
+   text. A narrow gap, or one with almost nothing on one side of it, means the
+   page is a single column and must not be cut down the middle. */
+function assessColumns(words,width){
+  const split=detectColumnSplit(words,width);
+  const left=words.filter(w=>w.x0<split).length;
+  const right=words.length-left;
+  const BIN=4,bins=new Uint8Array(Math.max(1,Math.ceil(width/BIN)));
+  for(const w of words){
+    const a=Math.max(0,Math.floor(w.x0/BIN)),b=Math.min(bins.length-1,Math.ceil(w.x1/BIN));
+    for(let i=a;i<=b;i++)bins[i]=1;
+  }
+  let gutter=0,run=0;
+  for(let i=0;i<bins.length;i++){
+    if(bins[i]){run=0;continue}
+    run++;
+    const centre=(i-run/2)*BIN;
+    if(centre>width*0.3&&centre<width*0.7)gutter=Math.max(gutter,run*BIN);
+  }
+  const share=Math.min(left,right)/Math.max(1,words.length);
+  return {split,twoColumn:gutter>=width*0.03&&share>=0.15,gutter,share};
+}
+// Hebrew, Arabic and friends: the term sits on the right of the page.
+function isRightToLeft(words){
+  const text=words.map(w=>w.t).join('');
+    const RTL=new RegExp('[\u0590-\u08FF\uFB1D-\uFDFF\uFE70-\uFEFF]','g');
+  const rtl=(text.match(RTL)||[]).length;
+  const ltr=(text.match(/[A-Za-z]/g)||[]).length;
+  return rtl>ltr&&rtl>20;
+}
+/* One column: no left/right relationship to exploit, so read the lines in order
+   and pair them the way a text file would be paired. */
+function layoutSingleColumn(pages){
+  const lines=[];
+  for(const pg of pages){
+    for(const l of groupPDFLines(pg.words))lines.push(l.text);
+  }
+  return parseTermRows(lines.join(String.fromCharCode(10))).map(r=>({
+    term:clean(r[0]),def:clean(r.slice(1).join(' ')),termImages:[],defImages:[]
+  })).filter(r=>r.term&&r.def);
+}
 function layoutPDFRows(pages){
   const allWords=pages.flatMap(p=>p.words);
   if(!allWords.length)return [];
-  const split=detectColumnSplit(allWords,pages[0].width);
+  const cols=assessColumns(allWords,pages[0].width);
+  if(!cols.twoColumn)return layoutSingleColumn(pages);
+  const rtl=isRightToLeft(allWords);
+  const split=cols.split;
   const medH=median(allWords.map(w=>w.h))||10;
 
+  const isTermSide=w=>rtl?w.x0>=split:w.x0<split;
+  const isDefSide=w=>!isTermSide(w);
   const perPage=pages.map(pg=>({
-    terms:mergeTermLines(groupPDFLines(pg.words.filter(w=>w.x0<split)),medH),
+    terms:mergeTermLines(groupPDFLines(pg.words.filter(isTermSide)),medH),
     items:[
-      ...groupPDFLines(pg.words.filter(w=>w.x0>=split)).map(l=>({kind:'text',top:l.top,bottom:l.bottom,text:l.text})),
+      ...groupPDFLines(pg.words.filter(isDefSide)).map(l=>({kind:'text',top:l.top,bottom:l.bottom,text:l.text})),
       ...pg.images.map(im=>({kind:'image',top:im.y0,bottom:im.y1,cx:im.cx,ref:im.ref}))
     ].sort((a,b)=>a.top-b.top)
   }));
@@ -1298,7 +1351,7 @@ function layoutPDFRows(pages){
   for(const it of items){
     const r=rows[rowFor(it.fTop)];
     if(it.kind==='text')r.defs.push(it);
-    else (it.cx<split?r.termImages:r.defImages).push(it.ref);
+    else ((rtl?it.cx>=split:it.cx<split)?r.termImages:r.defImages).push(it.ref);
   }
   return rows.map(r=>({term:r.term,def:clean(r.defs.map(d=>d.text).join(' ')),termImages:r.termImages,defImages:r.defImages}));
 }
@@ -2282,6 +2335,46 @@ function renderEditor(){
   document.querySelectorAll('[data-picdown]').forEach(b=>b.onclick=()=>moveCardPictures(+b.dataset.picdown,1));
   document.querySelectorAll('[data-edit]').forEach(el=>el.addEventListener('blur',()=>commitEditable(el)));
   wireEditorDrops();
+  renderReviewBar();
+}
+/* The damaging import is not the one that fails loudly; it is the one that
+   looks fine with pictures on the wrong cards. This puts the parsed result in
+   front of you with everything needed to fix or reject it. */
+let reviewingImport=false;
+function openImportReview(){
+  reviewingImport=true;
+  openEditor();
+}
+function renderReviewBar(){
+  const host=$('view-editor');
+  if(!host)return;
+  let bar=$('importReviewBar');
+  if(!bar){
+    bar=document.createElement('div');
+    bar.id='importReviewBar';bar.className='review-bar';
+    host.insertBefore(bar,host.firstChild);
+  }
+  bar.hidden=!reviewingImport;
+  if(!reviewingImport)return;
+  const d=lastImport||{};
+  const bits=[state.deck.length+' cards'];
+  if(withPicsCount())bits.push(withPicsCount()+' with pictures');
+  if(d.imagesFound!=null)bits.push(d.imagesFound+' pictures found, '+d.imagesPlaced+' placed');
+  if(d.route)bits.push('from '+d.route);
+  bar.innerHTML='<div><b>Does this look right?</b><span>'+esc(bits.join(' · '))+
+    '. Fix anything below, then keep it.</span></div>'+
+    '<div class="review-actions">'+
+      '<button class="btn secondary" id="reviewDiscard">Discard import</button>'+
+      '<button class="btn" id="reviewKeep">Looks right</button>'+
+    '</div>';
+  $('reviewKeep').onclick=()=>{reviewingImport=false;renderReviewBar();hideImportBanner();showDeck();toast('Kept — happy studying')};
+  $('reviewDiscard').onclick=async()=>{
+    if(!confirm('Discard this import? The deck will be deleted.'))return;
+    reviewingImport=false;renderReviewBar();
+    const id=state.deckId;
+    if(id)await deleteDeckById(id); else newDeck();
+    toast('Import discarded');
+  };
 }
 function openEditor(){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('view-editor').classList.add('active');document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));renderEditor()}
 function showDeckJSON(json){
@@ -2709,8 +2802,8 @@ function showImportBanner(cards,pics){
     '<button class="smallbtn" id="bannerFix">Fix pictures</button>'+
     '<button class="smallbtn" id="bannerHide">Dismiss</button></span>';
   b.hidden=false;
-  $('bannerCheck').onclick=()=>switchMode('browse');
-  $('bannerFix').onclick=openEditor;
+  $('bannerCheck').onclick=openImportReview;
+  $('bannerFix').onclick=openImportReview;
   $('bannerHide').onclick=()=>{b.hidden=true};
 }
 function hideImportBanner(){const b=$('importBanner');if(b)b.hidden=true}
@@ -2729,7 +2822,7 @@ function saveSettings(){state.settings.direction=$('direction').value;state.sett
 $('chooseBtn').onclick=e=>{e.stopPropagation();$('file').click()};$('file').addEventListener('change',e=>importFiles([...e.target.files]));$('drop').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click()});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('drag')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('drag'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files])});const bind=(id,fn)=>{const el=$(id);if(el)el.onclick=fn};
 bind('settingsBtn',openSettings);bind('settingsBtn2',openSettings);
 bind('moreBtn',e=>{toggleMore()});$('closeSettings').onclick=closeSettings;$('saveSettings').onclick=saveSettings;bind('newBtn',newDeck);bind('newBtn2',newDeck);
-if($('moreMenu'))$('moreMenu').addEventListener('click',()=>toggleMore(false));bind('exportBtn',exportDeck);bind('libraryBtn',openLibrary);bind('shareBtn',openShare);bind('reportBtn',openReport);bind('editBtn',openEditor);$('doneEdit').onclick=()=>{showDeck();saveLocal()};$('addCard').onclick=()=>{state.deck.push(makeCard('<span>New term</span>','<span>New definition</span>'));saveLocal();renderEditor()};$('dedupe').onclick=()=>{state.deck=finalizeCards(state.deck);saveLocal();renderEditor();toast('Duplicates removed')};$('shiftAllUp').onclick=()=>shiftAllPictures(-1);$('shiftAllDown').onclick=()=>shiftAllPictures(1);$('flashWrap').onclick=flip;$('next').onclick=nextCard;$('prev').onclick=prevCard;$('shuffle').onclick=shuffleDeck;$('starBtn').onclick=e=>{e.stopPropagation();starCurrent()};$('speakBtn').onclick=e=>{e.stopPropagation();speakCurrent()};document.querySelectorAll('[data-crate]').forEach(b=>b.onclick=()=>recordCurrent(+b.dataset.crate));
+if($('moreMenu'))$('moreMenu').addEventListener('click',()=>toggleMore(false));bind('exportBtn',exportDeck);bind('libraryBtn',openLibrary);bind('shareBtn',openShare);bind('reportBtn',openReport);bind('editBtn',openEditor);$('doneEdit').onclick=()=>{reviewingImport=false;renderReviewBar();showDeck();saveLocal()};$('addCard').onclick=()=>{state.deck.push(makeCard('<span>New term</span>','<span>New definition</span>'));saveLocal();renderEditor()};$('dedupe').onclick=()=>{state.deck=finalizeCards(state.deck);saveLocal();renderEditor();toast('Duplicates removed')};$('shiftAllUp').onclick=()=>shiftAllPictures(-1);$('shiftAllDown').onclick=()=>shiftAllPictures(1);$('flashWrap').onclick=flip;$('next').onclick=nextCard;$('prev').onclick=prevCard;$('shuffle').onclick=shuffleDeck;$('starBtn').onclick=e=>{e.stopPropagation();starCurrent()};$('speakBtn').onclick=e=>{e.stopPropagation();speakCurrent()};document.querySelectorAll('[data-crate]').forEach(b=>b.onclick=()=>recordCurrent(+b.dataset.crate));
 $('revealBtn').onclick=revealReview;
 document.querySelectorAll('[data-rate]').forEach(b=>b.onclick=()=>answerReview(+b.dataset.rate));$('learnContinue').onclick=()=>{cancelAdvance();renderLearn()};$('writeCheck').onclick=checkWrite;$('writeInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkWrite()});$('writeContinue').onclick=()=>{cancelAdvance();renderWrite()};$('matchRestart').onclick=initMatch;$('testAgain').onclick=initTest;$('browseSearch').addEventListener('input',renderBrowse);document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)||document.activeElement.isContentEditable)return;
   if(e.key.length===1){mikeBuf=(mikeBuf+e.key.toLowerCase()).slice(-4);if(mikeBuf==='mike'){mikeBuf='';toast(mikeLine());return}}
