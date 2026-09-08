@@ -195,6 +195,16 @@ button,input,select,textarea{font:inherit;color:inherit}
 .toast.show{display:block}
 .notice{padding:13px;border:1px solid var(--star);background:color-mix(in srgb,var(--star) 10%,transparent);border-radius:var(--r);font-size:13px;line-height:1.5;margin-top:12px}
 
+[hidden]{display:none!important}
+.loading{display:grid;gap:12px;padding:20px;margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg)}
+.loading-joke{font-family:var(--display);font-size:18px;font-weight:500;line-height:1.35;text-wrap:balance;min-height:1.4em}
+.loading-bar{height:5px;background:var(--surface-2);border-radius:99px;overflow:hidden}
+.loading-bar>div{height:100%;width:6%;background:var(--accent);border-radius:99px;transition:width .35s ease}
+.loading-bar>div.indeterminate{width:32%;animation:slide 1.15s ease-in-out infinite}
+@keyframes slide{from{transform:translateX(-115%)}to{transform:translateX(420%)}}
+.loading-status{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
+@media (prefers-reduced-motion:reduce){.loading-bar>div.indeterminate{width:100%;animation:none}}
+
 /* Mike is not in any deck. Mike simply is. */
 .mike-row .num{color:var(--star)}
 .mike-row b{font-family:var(--display);font-size:17px}
@@ -235,6 +245,11 @@ button,input,select,textarea{font:inherit;color:inherit}
     <button class="btn" id="chooseBtn">Choose files</button>
     <input class="file-input" id="file" type="file" multiple accept=".html,.htm,.zip,.pdf,.txt,.tsv,.csv,.json,.png,.jpg,.jpeg,.gif,.webp,.svg,application/pdf,text/html,text/plain,application/json,application/zip,image/*">
     <div class="hint">For a saved HTML page with local pictures: select the HTML and all its image files at the same time, or put them in a ZIP. External image URLs and data URLs are supported too.</div>
+  </div>
+  <div class="loading" id="loading" hidden>
+    <div class="loading-joke" id="loadingJoke"></div>
+    <div class="loading-bar"><div id="loadingBar"></div></div>
+    <div class="loading-status" id="loadingStatus"></div>
   </div>
   <div class="status" id="status"></div>
 </section>
@@ -293,7 +308,14 @@ function ensurePDFWorker(){
   })().catch(e=>{pdfWorkerReady=null;throw e});
   return pdfWorkerReady;
 }
-function setStatus(msg){const el=$('status');if(el)el.textContent=msg}
+function setStatus(msg,frac){
+  const el=$('status');if(el)el.textContent=msg;
+  const ls=$('loadingStatus');if(ls)ls.textContent=msg;
+  const bar=$('loadingBar');
+  if(!bar)return;
+  if(typeof frac==='number'){bar.classList.remove('indeterminate');bar.style.width=Math.max(5,Math.min(100,frac*100))+'%'}
+  else bar.classList.add('indeterminate');
+}
 function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>$('toast').classList.remove('show'),2600)}
 function clean(s){return String(s??'').replace(/\s+/g,' ').trim()}
 function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
@@ -583,7 +605,7 @@ function layoutPDFRows(pages){
 
 async function parsePDF(file){
   await ensurePDFWorker();
-  setStatus('Opening PDF…');
+  setStatus('Opening PDF…',0.04);
   const task=pdfjsLib.getDocument({data:await file.arrayBuffer()});
   const pdf=await Promise.race([
     task.promise,
@@ -607,7 +629,8 @@ async function parsePDF(file){
       !/^\d+\s*\/\s*\d+$/.test(w.t)
     );
     raw.push({page,vp,words,boxes:await scanPDFImages(page,vp)});
-    setStatus(`Reading page ${p} of ${pdf.numPages}…`);
+    setStatus(`Reading page ${p} of ${pdf.numPages}…`,0.05+0.45*(p/pdf.numPages));
+    await yieldToPaint();
   }
   if(!raw.length)throw new Error('The PDF appears to be empty.');
   if(!raw.some(r=>r.words.length))throw new Error('No selectable text found — this PDF looks like a scan. Quizlet\'s own export or a saved HTML page will import far better.');
@@ -620,7 +643,8 @@ async function parsePDF(file){
   const pages=[];
   for(let i=0;i<raw.length;i++){
     const r=raw[i];
-    setStatus(`Extracting pictures from page ${i+1} of ${raw.length}…`);
+    setStatus(`Extracting pictures from page ${i+1} of ${raw.length}…`,0.5+0.48*((i+1)/raw.length));
+    await yieldToPaint();
     const crops=await extractPageImages(r.page,r.vp,r.boxes.filter(b=>!(b.id&&templateIds.has(b.id))));
     pages.push({words:r.words,width:r.vp.width,height:r.vp.height,images:crops});
   }
@@ -641,7 +665,9 @@ async function readAssets(files){const map={};for(const f of files){if(!/^image\
 async function parseZip(file){if(!window.JSZip)throw new Error('ZIP support is unavailable. Check your internet connection.');const zip=await JSZip.loadAsync(file),names=Object.keys(zip.files),htmlName=names.find(n=>/\.html?$/i.test(n)&&!zip.files[n].dir);if(!htmlName)throw new Error('ZIP does not contain an HTML file.');const map={};for(const n of names){if(zip.files[n].dir||!/\.(png|jpe?g|gif|webp|svg)$/i.test(n))continue;const blob=await zip.files[n].async('blob'),data=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(blob)});map[n]=data;map[n.split('/').pop()]=data}return parseHTMLFile(await zip.files[htmlName].async('string'),htmlName,map)}
 async function importFiles(files){
   if(!files.length)return;
-  $('status').textContent='Reading '+files.map(f=>f.name).join(', ')+'…';
+  setStatus('Reading '+files.map(f=>f.name).join(', ')+'…');
+  startLoading(files.some(f=>/.(pdf|zip)$/i.test(f.name)||f.size>150000));
+  await yieldToPaint();
   try{
     const first=files.find(f=>/\.(html?|zip|pdf|json|txt|tsv|csv)$/i.test(f.name))||files[0];
     let result;
@@ -656,7 +682,8 @@ async function importFiles(files){
     const withPics=state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length;
     toast(`Imported ${state.deck.length} cards${withPics?` · ${withPics} with pictures`:''}`);
     if(withPics&&/\.pdf$/i.test(first.name))toast(`Imported ${state.deck.length} cards · ${withPics} with pictures. Check them in Browse — Edit cards can shift pictures if any are off.`);
-  }catch(e){console.error(e);$('status').textContent='Import failed: '+e.message}
+  }catch(e){console.error(e);setStatus('Import failed: '+e.message)}
+  finally{stopLoading()}
 }
 function showDeck(){if(!state.deck.length)return;$('uploadPanel').style.display='none';$('deckbar').style.display='flex';$('nav').style.display='flex';$('deckTitle').textContent=state.title;$('deckMeta').textContent=`${state.deck.length} cards · ${state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length} with pictures`;switchMode('cards')}
 function answerFor(c){let d=state.settings.direction;if(d==='mixed')d=Math.random()<.5?'term-def':'def-term';return d==='term-def'?{prompt:c.termHtml,answer:c.defHtml,text:c.defText}:{prompt:c.defHtml,answer:c.termHtml,text:c.termText}}
@@ -684,6 +711,38 @@ function initTest(){const pool=shuffle(state.deck),len=state.settings.testLength
 function renderTest(){const t=state.test;if(t.i>=t.queue.length)return finishTest();const c=t.queue[t.i],a=answerFor(c);t.current=c;t.answerText=a.text;t.answered=false;$('testMeta').textContent=`Question ${t.i+1} of ${t.queue.length}`;$('testBar').style.width=(t.i/t.queue.length*100)+'%';$('testPrompt').innerHTML=a.prompt;$('testOptions').innerHTML='';shuffle([c,...shuffle(state.deck.filter(x=>x!==c)).slice(0,3)]).forEach(x=>{const b=document.createElement('button');b.className='option';b.innerHTML=answerFor(x).answer;b.dataset.correct=x===c?'1':'';b.onclick=()=>testAnswer(b,x===c,c);$('testOptions').appendChild(b)})}
 function testAnswer(btn,correct,c){if(state.test.answered)return;state.test.answered=true;document.querySelectorAll('#testOptions .option').forEach(b=>b.disabled=true);if(correct){btn.classList.add('correct');state.test.score++;c.correct++}else{btn.classList.add('wrong');c.wrong++;document.querySelectorAll('#testOptions .option[data-correct="1"]').forEach(b=>b.classList.add('correct'))}saveLocal();setTimeout(()=>{state.test.i++;renderTest()},650)}
 function finishTest(){const t=state.test,pct=t.queue.length?Math.round(t.score/t.queue.length*100):0;$('testRunner').style.display='none';$('testResult').style.display='block';$('testScore').textContent=`${t.score} / ${t.queue.length}`;$('testResultText').textContent=pct+'%';$('testBar').style.width='100%'}
+const LOADING_LINES=[
+  'Consulting Mike\u2026',
+  'Mike has already finished this deck. Catching up\u2026',
+  'Asking Mike to hold the pictures steady\u2026',
+  'Cross-referencing every card against how great Mike is\u2026',
+  'Mike says this part is easy. Mike is not helping\u2026',
+  'Mike would have parsed this by hand by now\u2026',
+  'Aligning photographs to the standard set by Mike\u2026',
+  'Mike does not wait for loading screens. They wait for Mike\u2026'
+];
+const yieldToPaint=()=>new Promise(r=>setTimeout(r,0));
+let loadDelay=null,jokeTimer=null,jokeIdx=0;
+function startLoading(immediate){
+  stopLoading();
+  jokeIdx=Math.floor(Math.random()*LOADING_LINES.length);
+  const paint=()=>{const j=$('loadingJoke');if(j)j.textContent=LOADING_LINES[jokeIdx%LOADING_LINES.length]};
+  const reveal=()=>{
+    const el=$('loading');if(!el)return;
+    el.hidden=false;paint();
+    const st=$('status');if(st)st.hidden=true;
+    jokeTimer=setInterval(()=>{jokeIdx++;paint()},2600);
+  };
+  // Formats that are always slow open the panel at once. For the rest, wait a
+  // beat so an instant import does not flash it open and shut.
+  if(immediate)reveal();else loadDelay=setTimeout(reveal,120);
+}
+function stopLoading(){
+  clearTimeout(loadDelay);clearInterval(jokeTimer);loadDelay=jokeTimer=null;
+  const el=$('loading');if(el)el.hidden=true;
+  const st=$('status');if(st)st.hidden=false;
+  const bar=$('loadingBar');if(bar){bar.style.width='';bar.classList.remove('indeterminate')}
+}
 const MIKE_LINES=[
   'Mike does not use flashcards. The flashcards study Mike.',
   'Independently replicated across three labs: Mike is that guy.',
