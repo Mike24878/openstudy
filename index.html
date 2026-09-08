@@ -578,6 +578,23 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
 .lib-row.current{border-color:var(--accent);background:var(--accent-wash)}
 .lib-row.current b::after{margin-left:8px}
 
+/* The mark is the same index card the icon uses, so the tab and the page agree. */
+.brand{display:flex;align-items:center;gap:11px}
+.mark{display:flex;flex-shrink:0}
+.mark svg{display:block;border-radius:8px}
+
+.share-opt{display:flex;gap:11px;align-items:flex-start;padding:13px;margin:4px 0 12px;border:1px solid var(--border);border-radius:var(--r-in);background:var(--content-2);cursor:pointer}
+.share-opt input{margin-top:2px;accent-color:var(--accent);width:17px;height:17px;flex-shrink:0}
+.share-opt b{display:block;font-size:14px}
+.share-opt small{display:block;color:var(--muted);font-size:12.5px;line-height:1.45;margin-top:2px}
+.share-size{font-size:13px;margin:10px 0 0;font-weight:500}
+.share-size.ok{color:var(--good)}
+.share-size.warn{color:var(--star)}
+.share-size.bad{color:var(--bad)}
+.share-help{margin-top:14px;font-size:13px;color:var(--muted)}
+.share-help summary{cursor:pointer;font-weight:600;color:var(--text)}
+.share-help p{margin:8px 0 0;line-height:1.55}
+
 /* Mike is not in any deck. Mike simply is. */
 .mike-row .num{color:var(--star)}
 .mike-row b{font-family:var(--display);font-size:17px}
@@ -680,7 +697,10 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
 </head>
 <body>
 <div class="app">
-<header class="top"><div class="brand"><h1>OpenStudy</h1></div><div class="top-actions"><button class="btn secondary" id="settingsBtn">Settings</button><button class="btn secondary" id="newBtn">New deck</button></div></header>
+<header class="top"><div class="brand">
+  <span class="mark" aria-hidden="true"><svg viewBox="0 0 32 32" width="30" height="30"><rect x="1" y="1" width="30" height="30" rx="8" fill="var(--accent)"/><rect x="6.5" y="9" width="19" height="14" rx="2.4" fill="var(--content)"/><rect x="9" y="12.4" width="14" height="1.5" rx=".75" fill="var(--rule-red)"/><rect x="9" y="16.2" width="14" height="1" rx=".5" fill="var(--rule)"/><rect x="9" y="19" width="14" height="1" rx=".5" fill="var(--rule)"/></svg></span>
+  <h1>OpenStudy</h1>
+</div><div class="top-actions"><button class="btn secondary" id="settingsBtn">Settings</button><button class="btn secondary" id="newBtn">New deck</button></div></header>
 <section class="panel upload" id="uploadPanel">
   <div class="landing">
     <h2>Study your Quizlet sets for free &mdash; pictures and all.</h2>
@@ -2518,24 +2538,38 @@ async function inflate(bytes){
   const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
   return await new Response(stream).text();
 }
-async function buildShareLink(){
-  const payload={t:state.title,c:state.deck.map(c=>[c.termText,c.defText])};
+async function buildShareLink(withPictures){
+  // Pictures are data URLs of roughly 10 KB each, so including them is a real
+  // decision rather than a default: the size is shown before anything is sent.
+  const payload=withPictures
+    ? {t:state.title,v:2,c:state.deck.map(c=>[c.termHtml,c.defHtml])}
+    : {t:state.title,c:state.deck.map(c=>[c.termText,c.defText])};
   const json=JSON.stringify(payload);
   const packed=await deflate(json);
   const encoded=packed?('1'+b64urlEncode(packed)):('0'+b64urlEncode(new TextEncoder().encode(json)));
   const base=location.origin+location.pathname;
   return {url:base+'#d='+encoded,bytes:encoded.length};
 }
+// Roughly where a link stops travelling intact through ordinary apps.
+function linkVerdict(bytes){
+  const kb=bytes/1024;
+  if(bytes<8000)  return {tone:'ok',   text:'About '+kb.toFixed(1)+' KB — short enough for any chat app or email.'};
+  if(bytes<30000) return {tone:'warn', text:'About '+kb.toFixed(0)+' KB — fine by email or a note, but some chat apps shorten links this long.'};
+  return {tone:'bad', text:'About '+kb.toFixed(0)+' KB — too long for most apps to carry in one piece. Send the .json file instead.'};
+}
 async function openShare(){
-  const droppedPics=withPicsCount();
-  const {url,bytes}=await buildShareLink();
+  const picCount=withPicsCount();
   let m=$('shareModal');
   if(!m){
     m=document.createElement('div');
     m.id='shareModal';m.className='modal';
     m.innerHTML='<div class="modalbox"><h3>Share this deck</h3>'+
-      '<p class="report-why" id="shareWhy"></p>'+
+      '<p class="report-why">The cards travel inside the link itself, so nothing is uploaded and the person opening it needs no account. It opens straight into their own copy of the deck.</p>'+
+      '<label class="share-opt" id="sharePicWrap"><input type="checkbox" id="sharePics"><span><b>Include pictures</b><small>Off by default: pictures are large, and they make the link far longer.</small></span></label>'+
       '<textarea id="shareText" spellcheck="false" readonly></textarea>'+
+      '<p class="share-size" id="shareWhy"></p>'+
+      '<details class="share-help"><summary>Where do I get a deck to share?</summary>'+
+      '<p>Open your set on Quizlet and use its own Export, or print the set to PDF, then drop the file here. Pictures survive the saved-page and PDF routes; a plain text export has none. Everything is read on your own device.</p></details>'+
       '<div class="modal-actions"><button class="btn secondary" id="shareClose">Close</button>'+
       '<button class="btn" id="shareCopy">Copy link</button></div></div>';
     document.body.appendChild(m);
@@ -2547,12 +2581,20 @@ async function openShare(){
         toast(ok?'Link copied':'Press Ctrl+C to copy')}
     };
   }
-  const kb=(bytes/1024).toFixed(1);
-  let why='Anyone opening this link gets the whole deck — the cards travel inside the link itself, so nothing is uploaded anywhere.';
-  if(droppedPics)why+=' Pictures are <b>not</b> included: they are far too large for a link. Export the .json file instead if the pictures matter.';
-  if(bytes>8000)why+=' At '+kb+' KB this link is long, and some chat apps truncate long links — send it somewhere that preserves the whole thing, or share the .json file.';
-  $('shareWhy').innerHTML=why;
-  $('shareText').value=url;
+  const refresh=async()=>{
+    const withPics=picCount>0&&$('sharePics').checked;
+    const {url,bytes}=await buildShareLink(withPics);
+    const v=linkVerdict(bytes);
+    $('shareText').value=url;
+    const el=$('shareWhy');
+    el.className='share-size '+v.tone;
+    el.textContent=v.text+(picCount&&!withPics?' Pictures are left out.':'');
+  };
+  const wrap=$('sharePicWrap');
+  wrap.hidden=!picCount;
+  $('sharePics').checked=false;
+  $('sharePics').onchange=refresh;
+  await refresh();
   m.classList.add('show');
 }
 async function importFromHash(){
@@ -2563,7 +2605,8 @@ async function importFromHash(){
     const bytes=b64urlDecode(raw.slice(1));
     const json=raw[0]==='1'?await inflate(bytes):new TextDecoder().decode(bytes);
     const payload=JSON.parse(json);
-    const cards=finalizeCards((payload.c||[]).map(([t,d])=>({termText:t,defText:d})));
+    const cards=finalizeCards((payload.c||[]).map(([a,b])=>
+      payload.v===2 ? {termHtml:a,defHtml:b} : {termText:a,defText:b}));
     if(!cards.length)throw new Error('empty');
     history.replaceState(null,'',location.pathname+location.search);
     state.deckId=newDeckId();
