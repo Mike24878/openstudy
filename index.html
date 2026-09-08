@@ -7,11 +7,8 @@
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
 <link rel="apple-touch-icon" href="icon-192.png">
-<meta name="theme-color" content="#0E5C55">
+<meta name="theme-color" content="#09776F">
 <meta name="description" content="Import Quizlet exports and study them locally, pictures included. Free, no account.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
 <style>
 /* ============================================================
    Liquid Glass, per Apple's HIG.
@@ -28,61 +25,64 @@
    honoured, and every glass surface has an opaque fallback.
    ============================================================ */
 :root{
-  --paper:#E4DED0; --content:#FFFDF8; --content-2:#F3EFE4;
-  --text:#191713; --muted:#635C4F; --border:#D7D0C0; --hairline:#E6E0D2;
-  --rule:#C6D4E2; --rule-red:#C2564A;
-  --accent:#0E5C55; --accent-hover:#0B4A45; --accent-ink:#FFFDF8; --accent-wash:#0E5C5518;
-  --good:#2F7A55; --bad:#A8392C; --star:#BE8A2E;
-  --field:#FFFDF8;
+  --paper:#F2F2F7; --content:#FFFFFF; --content-2:#F5F5F9;
+  --text:#1C1C1E; --muted:#5C5C63; --border:#D8D8DE; --hairline:#E6E6EB;
+  --rule:#CFD9E6; --rule-red:#E0483C;
+  --accent:#09776F; --accent-hover:#087067; --accent-ink:#FFFFFF; --accent-wash:#09776F14;
+  --good:#248A3D; --bad:#C1352B; --star:#B07A10;
+  --field:#FFFFFF;
 
   /* glass */
-  --glass:rgba(255,253,248,.62);
-  --glass-strong:rgba(255,253,248,.80);
-  --glass-edge:rgba(255,255,255,.85);
-  --glass-edge-low:rgba(255,255,255,.30);
-  --glass-shade:rgba(25,23,19,.10);
-  --blur:20px;
-  --sat:180%;
+  /* Thin and bright rather than milky: the point of the material is that you
+     can see what is behind it. Heavy blur at high opacity hid everything and
+     read as frosted plastic. */
+  --glass:rgba(255,255,255,.44);
+  --glass-strong:rgba(255,255,255,.66);
+  --glass-edge:rgba(255,255,255,.95);
+  --glass-edge-low:rgba(255,255,255,.45);
+  --glass-shade:rgba(25,23,19,.09);
+  --blur:11px;
+  --sat:210%;
 
   --shadow:0 1px 2px rgba(25,23,19,.05),0 8px 24px rgba(25,23,19,.09);
   --lift:0 2px 6px rgba(25,23,19,.07),0 22px 48px rgba(25,23,19,.15);
-  --r-out:28px; --r:20px; --r-in:14px; --cap:999px;
+  --r-out:22px; --r:16px; --r-in:11px; --cap:999px; --ctl:36px;
   --spring:cubic-bezier(.34,1.4,.64,1);
   --ease:cubic-bezier(.32,.72,0,1);
 
-  --display:"Fraunces",Georgia,"Times New Roman",serif;
-  --sans:"IBM Plex Sans",ui-sans-serif,system-ui,-apple-system,"Segoe UI",sans-serif;
-  --mono:"IBM Plex Mono",ui-monospace,SFMono-Regular,Consolas,monospace;
+  --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","SF Pro Display","Segoe UI Variable Text","Segoe UI",system-ui,"Inter",sans-serif;
+  --display:var(--sans);
+  --mono:ui-monospace,SFMono-Regular,"SF Mono","Segoe UI Mono",Menlo,monospace;
 }
 @media (prefers-color-scheme:dark){
   :root:not([data-theme="light"]){
-    --paper:#0E1013; --content:#1A1D22; --content-2:#22262D;
-    --text:#ECE9E1; --muted:#9A968C; --border:#333842; --hairline:#282C33;
-    --rule:#2B3540; --rule-red:#B4574C;
-    --accent:#5EC8B8; --accent-hover:#7BD8C9; --accent-ink:#0C1B19; --accent-wash:#5EC8B820;
-    --good:#5FBF8C; --bad:#E0776A; --star:#E0B457;
-    --field:#0F1216;
-    --glass:rgba(38,43,52,.58);
-    --glass-strong:rgba(38,43,52,.80);
-    --glass-edge:rgba(255,255,255,.16);
-    --glass-edge-low:rgba(255,255,255,.06);
-    --glass-shade:rgba(0,0,0,.35);
+    --paper:#000000; --content:#1C1C1E; --content-2:#2C2C2E;
+    --text:#FFFFFF; --muted:#9E9EA5; --border:#3A3A3C; --hairline:#2C2C2E;
+    --rule:#31414F; --rule-red:#FF6459;
+    --accent:#3FD0C4; --accent-hover:#5FE0D5; --accent-ink:#00201D; --accent-wash:#3FD0C41F;
+    --good:#32D74B; --bad:#FF6961; --star:#FFD426;
+    --field:#1C1C1E;
+    --glass:rgba(58,58,60,.42);
+    --glass-strong:rgba(58,58,60,.64);
+    --glass-edge:rgba(255,255,255,.34);
+    --glass-edge-low:rgba(255,255,255,.14);
+    --glass-shade:rgba(0,0,0,.45);
     --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 26px rgba(0,0,0,.42);
     --lift:0 2px 8px rgba(0,0,0,.45),0 26px 56px rgba(0,0,0,.55);
   }
 }
 :root[data-theme="dark"]{
-  --paper:#0E1013; --content:#1A1D22; --content-2:#22262D;
-  --text:#ECE9E1; --muted:#9A968C; --border:#333842; --hairline:#282C33;
-  --rule:#2B3540; --rule-red:#B4574C;
-  --accent:#5EC8B8; --accent-hover:#7BD8C9; --accent-ink:#0C1B19; --accent-wash:#5EC8B820;
-  --good:#5FBF8C; --bad:#E0776A; --star:#E0B457;
-  --field:#0F1216;
-  --glass:rgba(38,43,52,.58);
-  --glass-strong:rgba(38,43,52,.80);
-  --glass-edge:rgba(255,255,255,.16);
-  --glass-edge-low:rgba(255,255,255,.06);
-  --glass-shade:rgba(0,0,0,.35);
+  --paper:#000000; --content:#1C1C1E; --content-2:#2C2C2E;
+  --text:#FFFFFF; --muted:#9E9EA5; --border:#3A3A3C; --hairline:#2C2C2E;
+  --rule:#31414F; --rule-red:#FF6459;
+  --accent:#3FD0C4; --accent-hover:#5FE0D5; --accent-ink:#00201D; --accent-wash:#3FD0C41F;
+  --good:#32D74B; --bad:#FF6961; --star:#FFD426;
+  --field:#1C1C1E;
+  --glass:rgba(58,58,60,.42);
+  --glass-strong:rgba(58,58,60,.64);
+  --glass-edge:rgba(255,255,255,.34);
+  --glass-edge-low:rgba(255,255,255,.14);
+  --glass-shade:rgba(0,0,0,.45);
   --shadow:0 1px 2px rgba(0,0,0,.35),0 8px 26px rgba(0,0,0,.42);
   --lift:0 2px 8px rgba(0,0,0,.45),0 26px 56px rgba(0,0,0,.55);
 }
@@ -98,11 +98,17 @@ body{
    put while content scrolls beneath the chrome. */
 body::before{
   content:"";position:fixed;inset:-20%;z-index:-1;pointer-events:none;
+  /* Glass with nothing behind it is just a paler rectangle. The field carries
+     real colour so the chrome has something to bend, tint and brighten. */
+  /* Weighted toward the top, because that is where the chrome sits: glass only
+     shows its character when there is colour directly behind it. */
   background:
-    radial-gradient(38% 44% at 18% 14%,color-mix(in srgb,var(--accent) 42%,transparent),transparent 70%),
-    radial-gradient(34% 40% at 84% 22%,color-mix(in srgb,var(--star) 34%,transparent),transparent 70%),
-    radial-gradient(46% 46% at 64% 88%,color-mix(in srgb,var(--accent) 30%,transparent),transparent 72%);
-  filter:blur(30px);opacity:.85;
+    radial-gradient(40% 30% at 10% 17%,color-mix(in srgb,var(--accent) 95%,transparent),transparent 62%),
+    radial-gradient(36% 26% at 55% 15%,color-mix(in srgb,var(--star) 85%,transparent),transparent 62%),
+    radial-gradient(34% 26% at 94% 19%,color-mix(in srgb,var(--accent) 78%,transparent),transparent 64%),
+    radial-gradient(42% 34% at 80% 84%,color-mix(in srgb,var(--accent) 55%,transparent),transparent 70%),
+    radial-gradient(34% 30% at 18% 80%,color-mix(in srgb,var(--rule-red) 38%,transparent),transparent 72%);
+  filter:blur(52px);opacity:.95;
   animation:drift 34s var(--ease) infinite alternate;
 }
 @keyframes drift{
@@ -114,12 +120,29 @@ button,input,select,textarea{font:inherit;color:inherit}
 .app{width:min(1120px,calc(100% - 32px));margin:0 auto;padding:20px 0 72px;display:flex;flex-direction:column;gap:18px}
 
 /* ---------- the glass material ---------- */
+/* A real edge catches light on top, loses it underneath, and casts the object
+   away from the page. One flat inset highlight read as a sticker. */
 .glass{
   background:var(--glass);
-  -webkit-backdrop-filter:blur(var(--blur)) saturate(var(--sat));
-  backdrop-filter:blur(var(--blur)) saturate(var(--sat));
+  -webkit-backdrop-filter:var(--glass-filter);
+  backdrop-filter:var(--glass-filter);
   border:1px solid var(--glass-edge-low);
-  box-shadow:var(--shadow), inset 0 1px 0 var(--glass-edge);
+  box-shadow:var(--glass-shadow);
+}
+:root{
+  --glass-filter:blur(var(--blur)) saturate(var(--sat)) brightness(1.05);
+  --glass-shadow:
+    0 1px 1px rgba(25,23,19,.05),
+    0 14px 34px rgba(25,23,19,.14),
+    inset 0 1px 0 var(--glass-edge),
+    inset 0 -1px 0 var(--glass-shade),
+    inset 1px 0 0 var(--glass-edge-low),
+    inset -1px 0 0 var(--glass-edge-low);
+}
+/* Where the engine can displace a backdrop, the rim genuinely bends what is
+   behind it. Everything still works without it; it simply looks flatter. */
+html.has-lens{
+  --glass-filter:blur(var(--blur)) saturate(var(--sat)) brightness(1.05) url(#glassLens);
 }
 @supports not ((backdrop-filter:blur(1px)) or (-webkit-backdrop-filter:blur(1px))){
   .glass{background:var(--content)}
@@ -131,18 +154,19 @@ button,input,select,textarea{font:inherit;color:inherit}
   display:flex;gap:18px;align-items:center;justify-content:space-between;flex-wrap:wrap;
   padding:12px 18px;border-radius:var(--r-out);
   background:var(--glass);
-  -webkit-backdrop-filter:blur(var(--blur)) saturate(var(--sat));
-  backdrop-filter:blur(var(--blur)) saturate(var(--sat));
+  -webkit-backdrop-filter:var(--glass-filter);backdrop-filter:var(--glass-filter);
   border:1px solid var(--glass-edge-low);
-  box-shadow:var(--shadow), inset 0 1px 0 var(--glass-edge);
+  box-shadow:var(--glass-shadow);
 }
-.brand h1{margin:0;font-family:var(--display);font-weight:700;font-size:clamp(1.5rem, calc(0.5rem + 2.24vw), 1.9375rem);letter-spacing:-.02em;line-height:1}
+.brand h1{margin:0;font-family:var(--display);font-weight:700;letter-spacing:-.022em;font-size:clamp(1.5rem, calc(0.5rem + 2.24vw), 1.9375rem);letter-spacing:-.02em;line-height:1}
 .brand p{margin:5px 0 0;color:var(--muted);font-size:0.8438rem;max-width:62ch}
 .top-actions,.deck-actions{display:flex;gap:8px;flex-wrap:wrap}
 
 /* ---------- controls: capsules that flex on press ---------- */
 .btn{
-  border:1px solid transparent;border-radius:var(--cap);padding:9px 17px;
+  border:1px solid transparent;border-radius:var(--cap);
+  padding:0 17px;min-height:var(--ctl);
+  display:inline-flex;align-items:center;justify-content:center;gap:6px;
   background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:0.875rem;cursor:pointer;
   transition:transform .22s var(--spring),background .18s var(--ease),box-shadow .18s var(--ease),color .18s var(--ease);
   box-shadow:0 1px 2px var(--glass-shade), inset 0 1px 0 rgba(255,255,255,.22);
@@ -160,8 +184,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 .btn.danger{background:transparent;border-color:var(--bad);color:var(--bad);box-shadow:none}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .smallbtn{
-  border:1px solid var(--glass-edge-low);background:var(--glass-strong);color:var(--text);
-  border-radius:var(--cap);padding:5px 11px;cursor:pointer;font-size:0.7813rem;font-weight:500;
+  border:1px solid var(--border);background:var(--content);color:var(--text);
+  border-radius:var(--cap);padding:0 13px;min-height:30px;display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:0.7813rem;font-weight:500;
   -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
   transition:transform .2s var(--spring),color .16s,border-color .16s;
 }
@@ -175,7 +199,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* ---------- import ---------- */
 .upload{padding:8px}
 .landing{text-align:center;padding:30px 20px 6px;max-width:64ch;margin-inline:auto}
-.landing h2{font-family:var(--display);font-weight:600;font-size:clamp(1.5rem, calc(0.5rem + 2.52vw), 2.125rem);line-height:1.18;margin:0 0 12px;text-wrap:balance}
+.landing h2{font-family:var(--display);font-weight:700;letter-spacing:-.024em;font-size:clamp(1.5rem, calc(0.5rem + 2.52vw), 2.125rem);line-height:1.18;margin:0 0 12px;text-wrap:balance}
 .landing p{margin:0;color:var(--muted);font-size:0.9375rem;line-height:1.6}
 .trust{
   display:inline-flex;align-items:center;gap:7px;margin-top:18px;padding:7px 15px;border-radius:var(--cap);
@@ -216,10 +240,9 @@ button,input,select,textarea{font:inherit;color:inherit}
   display:none;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
   padding:14px 18px;border-radius:var(--r-out);
   background:var(--glass);
-  -webkit-backdrop-filter:blur(var(--blur)) saturate(var(--sat));
-  backdrop-filter:blur(var(--blur)) saturate(var(--sat));
+  -webkit-backdrop-filter:var(--glass-filter);backdrop-filter:var(--glass-filter);
   border:1px solid var(--glass-edge-low);
-  box-shadow:var(--shadow), inset 0 1px 0 var(--glass-edge);
+  box-shadow:var(--glass-shadow);
 }
 .deck-info strong{font-family:var(--display);font-size:1.1875rem;font-weight:600}
 .deck-info span{color:var(--muted);font-size:0.7813rem;font-family:var(--mono)}
@@ -229,10 +252,9 @@ button,input,select,textarea{font:inherit;color:inherit}
   position:sticky;top:78px;z-index:5;
   display:none;gap:2px;flex-wrap:wrap;padding:5px;border-radius:var(--cap);width:fit-content;max-width:100%;
   background:var(--glass);
-  -webkit-backdrop-filter:blur(var(--blur)) saturate(var(--sat));
-  backdrop-filter:blur(var(--blur)) saturate(var(--sat));
+  -webkit-backdrop-filter:var(--glass-filter);backdrop-filter:var(--glass-filter);
   border:1px solid var(--glass-edge-low);
-  box-shadow:var(--shadow), inset 0 1px 0 var(--glass-edge);
+  box-shadow:var(--glass-shadow);
 }
 .nav-pill{
   position:absolute;left:0;top:0;border-radius:var(--cap);
@@ -242,7 +264,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 }
 .tab{
   position:relative;z-index:1;
-  padding:8px 16px;border-radius:var(--cap);border:0;background:transparent;color:var(--muted);
+  padding:0 16px;min-height:var(--ctl);display:inline-flex;align-items:center;border-radius:var(--cap);border:0;background:transparent;color:var(--muted);
   font-weight:600;font-size:0.8438rem;cursor:pointer;
   transition:color .22s var(--ease),transform .22s var(--spring);
 }
@@ -265,12 +287,12 @@ button,input,select,textarea{font:inherit;color:inherit}
   padding:64px 44px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;overflow:auto;
 }
-.face::after{content:"";position:absolute;left:36px;right:36px;top:60px;bottom:26px;pointer-events:none;opacity:.3;background:repeating-linear-gradient(to bottom,transparent 0 31px,var(--rule) 31px 32px)}
-.face::before{content:"";position:absolute;left:36px;right:36px;top:52px;height:1px;background:var(--rule-red);opacity:.45}
+.face::after{content:"";position:absolute;left:36px;right:36px;top:60px;bottom:26px;pointer-events:none;opacity:.16;background:repeating-linear-gradient(to bottom,transparent 0 31px,var(--rule) 31px 32px)}
+.face::before{content:"";position:absolute;left:36px;right:36px;top:52px;height:1px;background:var(--rule-red);opacity:.3}
 .face>*{position:relative;z-index:1}
 .face.back{transform:rotateY(180deg)}
 .face-label{position:absolute;top:18px;left:24px;color:var(--muted);font-size:0.6563rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-family:var(--mono)}
-.content{font-family:var(--display);font-size:clamp(1.375rem, calc(0.5rem + 2.24vw), 2rem);font-weight:500;line-height:1.35;max-width:36ch;word-break:break-word;text-wrap:balance}
+.content{font-family:var(--display);font-size:clamp(1.375rem, calc(0.5rem + 2.24vw), 2rem);font-weight:600;letter-spacing:-.02em;line-height:1.35;max-width:36ch;word-break:break-word;text-wrap:balance}
 .content.small{font-size:1.0625rem}
 .content img,.prompt img,.option img,.tile img,.row img{max-width:100%;max-height:240px;object-fit:contain;border-radius:var(--r-in);margin:12px auto;display:block}
 .content img{max-width:min(100%,480px)}
@@ -280,7 +302,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 
 /* ---------- quiz surfaces ---------- */
 .study-panel,.test,.browse,.editor,.progress-panel{padding:24px}
-.prompt{font-family:var(--display);font-size:clamp(1.3125rem, calc(0.5rem + 2.1vw), 1.8125rem);font-weight:500;line-height:1.35;margin:14px 0 22px;text-wrap:balance}
+.prompt{font-family:var(--display);font-size:clamp(1.3125rem, calc(0.5rem + 2.1vw), 1.8125rem);font-weight:600;letter-spacing:-.018em;line-height:1.35;margin:14px 0 22px;text-wrap:balance}
 .prompt img{max-height:210px}
 .options{display:grid;grid-template-columns:1fr 1fr;gap:10px;counter-reset:opt}
 .option{
@@ -310,7 +332,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 
 /* ---------- scheduling controls ---------- */
 .rate-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
-.rate-row .btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:11px 8px;border-radius:var(--r-in)}
+.rate-row .btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:9px 8px;min-height:48px;border-radius:var(--r-in)}
 .rate-row small{font-family:var(--mono);font-size:0.6563rem;font-weight:500;opacity:.72}
 .reveal{padding:18px 0 4px;border-top:1px solid var(--hairline);margin-top:6px;font-family:var(--display);font-size:clamp(1.1875rem, calc(0.5rem + 1.82vw), 1.5625rem);line-height:1.4}
 .reveal img{max-width:min(100%,420px);max-height:220px;object-fit:contain;border-radius:var(--r-in);margin:12px auto;display:block}
@@ -479,11 +501,18 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* Chrome firms up once content slides underneath it, the way a system bar does. */
 body.scrolled .top,body.scrolled .nav{
   background:var(--glass-strong);
-  box-shadow:var(--lift), inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-shade);
+  box-shadow:
+    0 2px 3px rgba(25,23,19,.06),
+    0 22px 48px rgba(25,23,19,.20),
+    inset 0 1px 0 var(--glass-edge),
+    inset 0 -1px 0 var(--glass-shade);
 }
 .top,.deckbar,.nav,.modalbox,.toast,.loading,.banner{
-  box-shadow:var(--shadow), inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-shade);
+  box-shadow:var(--glass-shadow);
   transition:background .3s var(--ease),box-shadow .3s var(--ease);
+}
+.modalbox,.toast,.loading{
+  -webkit-backdrop-filter:var(--glass-filter);backdrop-filter:var(--glass-filter);
 }
 
 /* ---------- lift and flex ----------
@@ -645,7 +674,7 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
    Mirrors the system setting: firmer borders, plainer surfaces, no tinted
    translucency competing with text. */
 @media (prefers-contrast:more){
-  :root{--muted:#4A4438;--border:#8C8574;}
+  :root{--muted:#3A3A3F;--border:#8E8E93;}
   .glass,.top,.deckbar,.nav,.modalbox,.toast,.loading,.banner,.btn.secondary,.smallbtn{
     -webkit-backdrop-filter:none;backdrop-filter:none;background:var(--content);
   }
@@ -761,6 +790,12 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
 </style>
 </head>
 <body>
+<svg id="glassDefs" width="0" height="0" aria-hidden="true" focusable="false" style="position:absolute;pointer-events:none">
+  <filter id="glassLens" x="0%" y="0%" width="100%" height="100%" color-interpolation-filters="sRGB">
+    <feImage id="lensMap" preserveAspectRatio="none" result="map"></feImage>
+    <feDisplacementMap in="SourceGraphic" in2="map" scale="18" xChannelSelector="R" yChannelSelector="G"></feDisplacementMap>
+  </filter>
+</svg>
 <a class="skip" href="#mainContent">Skip to the deck</a>
 <div class="app">
 <header class="top"><div class="brand">
@@ -3049,6 +3084,45 @@ registerServiceWorker();
    chrome firms up once content scrolls beneath it. Both are presentation only;
    if either listener never runs the interface is simply the static material.
    Reduce Motion suppresses the highlight, since it is movement for its own sake. */
+/* The displacement map: neutral through the middle so the centre of a panel is
+   undistorted, ramping to a push at the rim so the edge magnifies what lies
+   behind it -- which is what makes glass look like glass rather than frost.
+   Drawn once into a small texture and stretched over each surface. */
+(function buildLens(){
+  try{
+    const SIZE=128, EDGE=0.16;
+    const c=document.createElement('canvas');
+    c.width=c.height=SIZE;
+    const ctx=c.getContext('2d');
+    const img=ctx.createImageData(SIZE,SIZE);
+    const ramp=t=>t*t*(3-2*t);
+    for(let y=0;y<SIZE;y++){
+      for(let x=0;x<SIZE;x++){
+        const u=x/(SIZE-1), v=y/(SIZE-1);
+        let fx=0,fy=0;
+        if(u<EDGE)      fx=-ramp((EDGE-u)/EDGE);
+        else if(u>1-EDGE)fx= ramp((u-(1-EDGE))/EDGE);
+        if(v<EDGE)      fy=-ramp((EDGE-v)/EDGE);
+        else if(v>1-EDGE)fy= ramp((v-(1-EDGE))/EDGE);
+        const i=(y*SIZE+x)*4;
+        img.data[i]   = Math.max(0,Math.min(255,Math.round(128+fx*127)));
+        img.data[i+1] = Math.max(0,Math.min(255,Math.round(128+fy*127)));
+        img.data[i+2] = 128;
+        img.data[i+3] = 255;
+      }
+    }
+    ctx.putImageData(img,0,0);
+    const map=document.getElementById('lensMap');
+    if(!map)return;
+    const url=c.toDataURL('image/png');
+    map.setAttribute('href',url);
+    map.setAttributeNS('http://www.w3.org/1999/xlink','xlink:href',url);
+    // Only claim the lens where the engine will actually apply it.
+    const probe=document.createElement('div');
+    probe.style.backdropFilter='blur(2px) url(#glassLens)';
+    if(probe.style.backdropFilter)document.documentElement.classList.add('has-lens');
+  }catch(e){ console.warn('lens unavailable',e) }
+})();
 (function glassResponse(){
   const still=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
   if(!still){
