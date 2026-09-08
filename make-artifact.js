@@ -11,7 +11,9 @@ const pick = (re, what) => {
 };
 const body = src.slice(src.indexOf('<body>') + 6, src.lastIndexOf('</body>')).trim();
 if (!body) throw new Error('index.html has no <body> content');
-const out = `${pick(/<title>[\s\S]*?<\/title>/, '<title>')}\n${pick(/<style>[\s\S]*?<\/style>/, '<style>')}\n${body}\n`;
+const head = src.slice(0, src.indexOf('</head>'));
+const links = (head.match(/<link\b[^>]*>/g) || []).join('\n');
+const out = `${pick(/<title>[\s\S]*?<\/title>/, '<title>')}\n${links}\n${pick(/<style>[\s\S]*?<\/style>/, '<style>')}\n${body}\n`;
 for (const tag of ['<!DOCTYPE', '<html', '</html>', '<head>', '</head>', '<body>', '</body>']) {
   if (out.includes(tag)) throw new Error(`wrapper ${tag} survived the strip`);
 }
