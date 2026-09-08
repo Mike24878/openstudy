@@ -747,19 +747,19 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
     <p>Quizlet puts Learn and Test behind a subscription. Export your set, drop it here, and study it with flashcards, learn, write, match and test.</p>
     <div class="trust">No account. Your cards stay in your browser.</div>
   </div>
-  <div class="drop" id="drop" tabindex="0">
+  <div class="drop" id="drop" tabindex="0" role="button" aria-label="Choose a file to import, or drop one here">
     <h2>Drop your export here</h2>
     <p>A photo, or HTML, ZIP, PDF, Word, PowerPoint, Excel, Anki, Markdown, CSV, TSV or JSON.</p>
     <button class="btn" id="chooseBtn">Choose files</button>
     <input class="file-input" id="file" type="file" multiple accept=".html,.htm,.zip,.pdf,.docx,.pptx,.xlsx,.xls,.ods,.md,.apkg,.txt,.tsv,.csv,.json,.png,.jpg,.jpeg,.gif,.webp,.svg,application/pdf,text/html,text/plain,application/json,application/zip,image/*">
     <div class="hint">Dropping a saved HTML page? Select its image files at the same time, or zip them together.</div>
   </div>
-  <div class="loading" id="loading" hidden>
+  <div class="loading" id="loading" hidden aria-busy="true">
     <div class="loading-joke" id="loadingJoke"></div>
     <div class="loading-bar"><div id="loadingBar"></div></div>
-    <div class="loading-status" id="loadingStatus"></div>
+    <div class="loading-status" id="loadingStatus" role="status" aria-live="polite" aria-atomic="true"></div>
   </div>
-  <div class="status" id="status"></div>
+  <div class="status" id="status" role="status" aria-live="polite" aria-atomic="true"></div>
   <div class="detail">
     <div>
       <h3>What you can bring</h3>
@@ -803,8 +803,8 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
     </div>
   </div>
 </div></section>
-<nav class="nav" id="nav"><span class="nav-pill" id="navPill"></span><button class="tab active" data-mode="cards">Flashcards</button><button class="tab" data-mode="learn">Learn</button><button class="tab" data-mode="write">Write</button><button class="tab" data-mode="match">Match</button><button class="tab" data-mode="test">Test</button><button class="tab" data-mode="review">Review <span class="duebadge" id="dueBadge" hidden></span></button><button class="tab" data-mode="browse">Browse</button><button class="tab" data-mode="progress">Progress</button></nav>
-<section class="view active" id="view-cards"><div class="toolbar"><span class="muted" id="fcProgress"></span><span class="muted kbd-hint">Space: flip · ←/→: navigate · S: star · R: read aloud</span></div><div class="flash-wrap" id="flashWrap"><div class="flash" id="flash"><div class="face"><span class="face-label">Term</span><div class="content" id="front"></div></div><div class="face back"><span class="face-label">Definition</span><div class="content" id="back"></div></div></div></div><div class="controls"><button class="btn secondary" id="prev">← Previous</button><div class="mid"><button class="btn secondary" id="shuffle">Shuffle</button><button class="btn ghost" id="starBtn">☆ Star</button><button class="btn ghost" id="speakBtn">🔊</button></div><button class="btn" id="next">Next →</button></div><div class="rate-row" id="cardRate">
+<nav class="nav" id="nav" role="tablist" aria-label="Study modes"><span class="nav-pill" id="navPill" aria-hidden="true"></span><button class="tab active" data-mode="cards">Flashcards</button><button class="tab" data-mode="learn">Learn</button><button class="tab" data-mode="write">Write</button><button class="tab" data-mode="match">Match</button><button class="tab" data-mode="test">Test</button><button class="tab" data-mode="review">Review <span class="duebadge" id="dueBadge" hidden></span></button><button class="tab" data-mode="browse">Browse</button><button class="tab" data-mode="progress">Progress</button></nav>
+<section class="view active" id="view-cards"><div class="toolbar"><span class="muted" id="fcProgress"></span><span class="muted kbd-hint">Space: flip · ←/→: navigate · S: star · R: read aloud</span></div><div class="flash-wrap" id="flashWrap" role="button" tabindex="0" aria-label="Flashcard. Activate to turn it over."><div class="flash" id="flash"><div class="face"><span class="face-label">Term</span><div class="content" id="front"></div></div><div class="face back"><span class="face-label">Definition</span><div class="content" id="back"></div></div></div></div><div class="controls"><button class="btn secondary" id="prev">← Previous</button><div class="mid"><button class="btn secondary" id="shuffle">Shuffle</button><button class="btn ghost" id="starBtn">☆ Star</button><button class="btn ghost" id="speakBtn" aria-label="Read this card aloud">🔊</button></div><button class="btn" id="next">Next →</button></div><div class="rate-row" id="cardRate">
   <button class="btn secondary" data-crate="1">Again<small></small></button>
   <button class="btn secondary" data-crate="2">Hard<small></small></button>
   <button class="btn" data-crate="3">Good<small></small></button>
@@ -834,12 +834,12 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
 <div class="editor-tools"><button class="btn secondary" id="addCard">+ Add card</button><button class="btn secondary" id="dedupe">Remove duplicates</button><span class="sep"></span><span class="muted">Pictures off by one?</span><button class="smallbtn" id="shiftAllUp">⬆ Shift all pictures up</button><button class="smallbtn" id="shiftAllDown">⬇ Shift all pictures down</button></div>
 <div id="editorTable"></div></section>
 </div>
-<div class="modal" id="settingsModal"><div class="modalbox"><h3>Study settings</h3><div class="field"><label>Answer direction</label><select id="direction"><option value="term-def">Term → Definition</option><option value="def-term">Definition → Term</option><option value="mixed">Mixed</option></select></div><div class="field"><label>Test length</label><select id="testLength"><option value="all">All cards</option><option value="10">10 cards</option><option value="20">20 cards</option><option value="30">30 cards</option></select></div><div class="field"><label>Match board size</label><select id="matchSize"><option value="6">6 pairs</option><option value="8">8 pairs</option><option value="10">10 pairs</option></select></div><div class="field"><label>How often cards come back</label><select id="retentionMode"><option value="relaxed">Relaxed &mdash; longer gaps, less review</option><option value="balanced">Balanced</option><option value="thorough">Thorough &mdash; shorter gaps, more review</option></select></div>
-<div class="field"><label>Spelling in Write</label><select id="strictMode"><option value="lenient">Forgiving &mdash; a typo still counts</option><option value="strict">Careful &mdash; close, but nearly right</option><option value="exact">Exact &mdash; must match the answer</option></select></div>
-<div class="field"><label>Moving to the next card</label><select id="advanceMode"><option value="on">Automatic after answering</option><option value="off">Wait for me to continue</option></select></div>
-<div class="field"><label>Fill in the blank</label><select id="clozeMode"><option value="on">Use it when a card allows</option><option value="off">Always ask for the definition</option></select></div>
-<div class="field"><label>Auto-speak flashcards</label><select id="autoSpeak"><option value="off">Off</option><option value="term">Term</option><option value="definition">Definition</option><option value="both">Both</option></select></div><div class="modal-actions"><button class="btn secondary" id="closeSettings">Cancel</button><button class="btn" id="saveSettings">Save</button></div></div></div>
-<div class="toast" id="toast"></div>
+<div class="modal" id="settingsModal"><div class="modalbox"><h3>Study settings</h3><div class="field"><label for="direction">Answer direction</label><select id="direction"><option value="term-def">Term → Definition</option><option value="def-term">Definition → Term</option><option value="mixed">Mixed</option></select></div><div class="field"><label for="testLength">Test length</label><select id="testLength"><option value="all">All cards</option><option value="10">10 cards</option><option value="20">20 cards</option><option value="30">30 cards</option></select></div><div class="field"><label for="matchSize">Match board size</label><select id="matchSize"><option value="6">6 pairs</option><option value="8">8 pairs</option><option value="10">10 pairs</option></select></div><div class="field"><label for="retentionMode">How often cards come back</label><select id="retentionMode"><option value="relaxed">Relaxed &mdash; longer gaps, less review</option><option value="balanced">Balanced</option><option value="thorough">Thorough &mdash; shorter gaps, more review</option></select></div>
+<div class="field"><label for="strictMode">Spelling in Write</label><select id="strictMode"><option value="lenient">Forgiving &mdash; a typo still counts</option><option value="strict">Careful &mdash; close, but nearly right</option><option value="exact">Exact &mdash; must match the answer</option></select></div>
+<div class="field"><label for="advanceMode">Moving to the next card</label><select id="advanceMode"><option value="on">Automatic after answering</option><option value="off">Wait for me to continue</option></select></div>
+<div class="field"><label for="clozeMode">Fill in the blank</label><select id="clozeMode"><option value="on">Use it when a card allows</option><option value="off">Always ask for the definition</option></select></div>
+<div class="field"><label for="autoSpeak">Auto-speak flashcards</label><select id="autoSpeak"><option value="off">Off</option><option value="term">Term</option><option value="definition">Definition</option><option value="both">Both</option></select></div><div class="modal-actions"><button class="btn secondary" id="closeSettings">Cancel</button><button class="btn" id="saveSettings">Save</button></div></div></div>
+<div class="toast" id="toast" role="status" aria-live="polite" aria-atomic="true"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
@@ -1897,7 +1897,68 @@ async function importFiles(files){
 }
 function showDeck(){if(!state.deck.length)return;$('uploadPanel').style.display='none';$('deckbar').style.display='flex';$('nav').style.display='flex';requestAnimationFrame(moveNavPill);$('deckTitle').textContent=state.title;$('deckMeta').textContent=`${state.deck.length} cards · ${state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length} with pictures`;updateDueBadge();switchMode(dueDeck().length&&state.deck.some(c=>c.sched)?'review':'cards')}
 function answerFor(c){let d=state.settings.direction;if(d==='mixed')d=Math.random()<.5?'term-def':'def-term';return d==='term-def'?{prompt:c.termHtml,answer:c.defHtml,text:c.defText}:{prompt:c.defHtml,answer:c.termHtml,text:c.termText}}
-function renderCards(){if(!state.deck.length)return;const c=state.deck[state.index];labelRateButtons($('cardRate'),c,'data-crate');$('front').innerHTML=c.termHtml;$('back').innerHTML=c.defHtml;$('fcProgress').textContent=`Card ${state.index+1} / ${state.deck.length}`;$('starBtn').textContent=c.star?'★ Starred':'☆ Star';$('flash').classList.toggle('flip',state.flipped);if(state.settings.autoSpeak!=='off')setTimeout(()=>speakCurrent(),120)}
+/* Imported pictures carry loading="lazy", which is right for the long lists in
+   Browse and the editor. It is wrong for the flashcard: the back face is turned
+   away and hidden, so the browser counts it as not visible and puts off loading
+   it until the moment you flip -- which is the pause. The two faces on screen
+   are therefore loaded eagerly and decoded up front, and the neighbouring cards
+   are warmed while the machine is idle, so racing ahead does not leave a queue
+   of decodes for the next flip to wait behind. */
+const warmed=new Map();
+function warmSrc(src){
+  if(!src||warmed.has(src))return;
+  const img=new Image();
+  img.decoding='async';
+  img.src=src;
+  const p=img.decode?img.decode().catch(()=>{}):Promise.resolve();
+  warmed.set(src,p);
+  // Keep the cache bounded; the browser keeps the real decode either way.
+  if(warmed.size>120)warmed.delete(warmed.keys().next().value);
+}
+function cardSrcs(card){
+  if(!card)return [];
+  if(card._srcs)return card._srcs;
+  const box=document.createElement('div');
+  box.innerHTML=(card.termHtml||'')+(card.defHtml||'');
+  card._srcs=[...box.querySelectorAll('img')].map(i=>i.getAttribute('src')).filter(Boolean);
+  return card._srcs;
+}
+function primeVisibleFaces(){
+  ['front','back'].forEach(id=>{
+    const host=$(id);
+    if(!host)return;
+    host.querySelectorAll('img').forEach(img=>{
+      img.loading='eager';
+      if(img.decode)img.decode().catch(()=>{});
+    });
+  });
+}
+function warmNeighbours(){
+  const len=state.deck.length;
+  if(!len)return;
+  const idle=window.requestIdleCallback||(fn=>setTimeout(fn,60));
+  idle(()=>{
+    [state.index+1,state.index-1,state.index+2].forEach(k=>{
+      cardSrcs(state.deck[((k%len)+len)%len]).forEach(warmSrc);
+    });
+  });
+}
+function renderCards(){
+  if(!state.deck.length)return;
+  const c=state.deck[state.index];
+  labelRateButtons($('cardRate'),c,'data-crate');
+  const wrap=$('flashWrap');
+  if(wrap){
+    wrap.setAttribute('aria-label','Card '+(state.index+1)+' of '+state.deck.length+'. '+
+      (state.flipped?('Definition: '+(c.defText||'a picture')):('Term: '+(c.termText||'a picture')))+
+      '. Activate to turn it over.');
+  }
+  const star=$('starBtn');
+  if(star)star.setAttribute('aria-pressed',String(!!c.star));$('front').innerHTML=c.termHtml;$('back').innerHTML=c.defHtml;$('fcProgress').textContent=`Card ${state.index+1} / ${state.deck.length}`;$('starBtn').textContent=c.star?'★ Starred':'☆ Star';$('flash').classList.toggle('flip',state.flipped);
+  primeVisibleFaces();
+  warmNeighbours();
+  if(state.settings.autoSpeak!=='off')setTimeout(()=>speakCurrent(),120);
+}
 function flip(){
   state.flipped=!state.flipped;
   // Drop the backdrop blur while the card turns, then restore it.
@@ -1916,7 +1977,23 @@ function recordCurrent(rating){
 }
 function speak(text){if(!('speechSynthesis'in window)||!text)return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=.9;window.speechSynthesis.speak(u)}
 function speakCurrent(){const c=state.deck[state.index],text=state.flipped?c.defText:c.termText;speak(text)}
-function switchMode(mode){cancelAdvance();state.mode=mode;updateDueBadge();requestAnimationFrame(moveNavPill);document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('view-'+mode).classList.add('active');if(mode==='cards')renderCards();if(mode==='learn')initLearn();if(mode==='write')initWrite();if(mode==='match')initMatch();if(mode==='test')initTest();if(mode==='review')initReview();if(mode==='browse')renderBrowse();if(mode==='progress')renderProgress()}
+function switchMode(mode){
+  cancelAdvance();state.mode=mode;updateDueBadge();requestAnimationFrame(moveNavPill);
+  document.querySelectorAll('.tab').forEach(b=>{
+    const on=b.dataset.mode===mode;
+    b.classList.toggle('active',on);
+    b.setAttribute('role','tab');
+    b.setAttribute('aria-selected',String(on));
+    b.setAttribute('tabindex',on?'0':'-1');
+    if(!b.id)b.id='tab-'+b.dataset.mode;
+    b.setAttribute('aria-controls','view-'+b.dataset.mode);
+  });
+  document.querySelectorAll('.view').forEach(v=>{v.classList.remove('active')});
+  const panel=$('view-'+mode);
+  panel.classList.add('active');
+  panel.setAttribute('role','tabpanel');
+  panel.setAttribute('aria-labelledby','tab-'+mode);
+  panel.setAttribute('tabindex','0');if(mode==='cards')renderCards();if(mode==='learn')initLearn();if(mode==='write')initWrite();if(mode==='match')initMatch();if(mode==='test')initTest();if(mode==='review')initReview();if(mode==='browse')renderBrowse();if(mode==='progress')renderProgress()}
 /* ---------- spaced review ---------- */
 function dueDeck(now=Date.now()){return state.deck.filter(c=>isDue(c.sched,now))}
 function fmtInterval(d){
@@ -1934,10 +2011,14 @@ function nextDueText(){
   return hrs<24?('Next card in '+Math.max(1,Math.round(hrs))+'h'):('Next card in '+Math.round(hrs/24)+'d');
 }
 function labelRateButtons(root,card,attr){
+  const names={1:'Again',2:'Hard',3:'Good',4:'Easy'};
   root.querySelectorAll('['+attr+']').forEach(b=>{
     const r=+b.getAttribute(attr);
+    const iv=reviewNow(card&&card.sched,r).interval;
     const s=b.querySelector('small');
-    if(s)s.textContent=fmtInterval(reviewNow(card&&card.sched,r).interval);
+    if(s){s.textContent=fmtInterval(iv);s.setAttribute('aria-hidden','true')}
+    // Spoken as a sentence rather than "Good 4d".
+    b.setAttribute('aria-label',names[r]+' — next review in '+iv+(iv===1?' day':' days'));
   });
 }
 /* The active-tab pill slides rather than blinking between tabs: the fluid
@@ -2107,7 +2188,14 @@ function tileHTML(html,text){
   return '<div class="tile-in">'+(img?'<img src="'+img.getAttribute('src')+'" alt="">':'')+
          (short?'<span>'+esc(short)+'</span>':'')+'</div>';
 }
-function initMatch(){if(!state.deck.length)return;const n=Math.min(+state.settings.matchSize,state.deck.length),subset=shuffle(state.deck).slice(0,n),tiles=[];subset.forEach((c,i)=>{tiles.push({id:i,type:'term',html:tileHTML(c.termHtml,c.termText)});tiles.push({id:i,type:'def',html:tileHTML(c.defHtml,c.defText)})});state.match={selected:null,left:n};const board=$('matchGrid');board.innerHTML='';shuffle(tiles).forEach(t=>{const el=document.createElement('div');el.className='tile';el.innerHTML=t.html;el.onclick=()=>matchClick(el,t);board.appendChild(el)});$('matchMeta').textContent=`${n} pairs`}
+function initMatch(){if(!state.deck.length)return;const n=Math.min(+state.settings.matchSize,state.deck.length),subset=shuffle(state.deck).slice(0,n),tiles=[];subset.forEach((c,i)=>{tiles.push({id:i,type:'term',html:tileHTML(c.termHtml,c.termText)});tiles.push({id:i,type:'def',html:tileHTML(c.defHtml,c.defText)})});state.match={selected:null,left:n};const board=$('matchGrid');board.innerHTML='';shuffle(tiles).forEach(t=>{
+  const el=document.createElement('button');
+  el.className='tile';el.type='button';
+  el.innerHTML=t.html;
+  el.setAttribute('aria-label',clean(strip(t.html))||'a picture');
+  el.onclick=()=>matchClick(el,t);
+  board.appendChild(el);
+});$('matchMeta').textContent=`${n} pairs`}
 function matchClick(el,t){if(el.classList.contains('matched'))return;if(!state.match.selected){state.match.selected={el,t};el.classList.add('selected');return}const s=state.match.selected;if(s.el===el){el.classList.remove('selected');state.match.selected=null;return}if(s.t.id===t.id&&s.t.type!==t.type){s.el.classList.add('matched');el.classList.add('matched');state.match.left--;state.match.selected=null;if(!state.match.left)toast('Match complete')}else{el.classList.add('wrong');s.el.classList.add('wrong');setTimeout(()=>{el.classList.remove('wrong');s.el.classList.remove('wrong','selected');state.match.selected=null},450)}}
 function initTest(){const pool=shuffle(state.deck),len=state.settings.testLength==='all'?pool.length:Math.min(+state.settings.testLength,pool.length);state.test={queue:pool.slice(0,len),i:0,score:0,answered:false};$('testRunner').style.display='block';$('testResult').style.display='none';renderTest()}
 function renderTest(){const t=state.test;if(t.i>=t.queue.length)return finishTest();const c=t.queue[t.i],a=answerFor(c);t.current=c;t.answerText=a.text;t.answered=false;$('testMeta').textContent=`Question ${t.i+1} of ${t.queue.length}`;$('testBar').style.width=(t.i/t.queue.length*100)+'%';$('testPrompt').innerHTML=a.prompt;$('testOptions').innerHTML='';shuffle([c,...shuffle(state.deck.filter(x=>x!==c)).slice(0,3)]).forEach(x=>{const b=document.createElement('button');b.className='option';b.innerHTML=answerFor(x).answer;b.dataset.correct=x===c?'1':'';b.onclick=()=>testAnswer(b,x===c,c);$('testOptions').appendChild(b)})}
@@ -2158,7 +2246,7 @@ function openReport(){
       '<button class="btn secondary" id="reportSend" hidden>Send report</button>'+
       '<button class="btn" id="reportCopy">Copy report</button></div></div>';
     document.body.appendChild(m);
-    m.querySelector('#reportClose').onclick=()=>m.classList.remove('show');
+    m.querySelector('#reportClose').onclick=()=>hideModal(m);
     m.querySelector('#reportCopy').onclick=async()=>{
       const t=$('reportText');
       try{await navigator.clipboard.writeText(t.value);toast('Report copied — please attach the file you imported')}
@@ -2178,7 +2266,7 @@ function openReport(){
         const res=await fetch(REPORT_ENDPOINT,{method:'POST',body:fd,headers:{Accept:'application/json'}});
         if(!res.ok)throw new Error('HTTP '+res.status);
         toast('Report sent \u2014 thank you, this is genuinely useful');
-        m.classList.remove('show');
+        hideModal(m);
       }catch(err){
         console.warn('report send failed',err);
         toast('Could not send. Copy the report instead and paste it to me.');
@@ -2190,7 +2278,7 @@ function openReport(){
     };
   }
   $('reportText').value=describeImport();
-  m.classList.add('show');
+  showModal(m);
 }
 const LOADING_LINES=[
   'Consulting Mike…',
@@ -2270,7 +2358,7 @@ function renderBrowse(){
   const list=state.deck.map((c,i)=>({c,i}))
     .filter(x=>pass(x.c))
     .filter(x=>!q||(x.c.termText+' '+x.c.defText).toLowerCase().includes(q));
-  renderFilterChip(list.length,state.deck.length);$('cardList').innerHTML=list.length?list.map(x=>`<div class="row"><div class="num">${x.i+1}</div><div>${x.c.termHtml}</div><div>${x.c.defHtml}</div><button class="star ${x.c.star?'on':''}" data-star="${x.i}">${x.c.star?'★':'☆'}</button></div>`).join(''):emptyBrowseHTML(q);document.querySelectorAll('[data-star]').forEach(b=>b.onclick=()=>toggleStar(+b.dataset.star))}
+  renderFilterChip(list.length,state.deck.length);$('cardList').innerHTML=list.length?list.map(x=>`<div class="row"><div class="num">${x.i+1}</div><div>${x.c.termHtml}</div><div>${x.c.defHtml}</div><button class="star ${x.c.star?'on':''}" data-star="${x.i}" aria-pressed="${x.c.star?'true':'false'}" aria-label="${x.c.star?'Remove star from':'Star'} ${esc(x.c.termText||'this card')}">${x.c.star?'★':'☆'}</button></div>`).join(''):emptyBrowseHTML(q);document.querySelectorAll('[data-star]').forEach(b=>b.onclick=()=>toggleStar(+b.dataset.star))}
 function toggleStar(i){state.deck[i].star=!state.deck[i].star;saveLocal();renderBrowse()}
 function renderProgress(){const total=state.deck.length,attempts=state.deck.reduce((n,c)=>n+c.correct+c.wrong,0),correct=state.deck.reduce((n,c)=>n+c.correct,0),star=state.deck.filter(c=>c.star).length,master=state.deck.filter(c=>c.correct>=3&&c.correct>c.wrong).length,visual=state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length;const due=dueDeck().length,leeches=state.deck.filter(isLeech).length;
   // Each figure is a question about a subset, so each one opens that subset.
@@ -2361,7 +2449,7 @@ function renderEditor(){
   const box=$('editorTable');
   box.innerHTML=`<table class="editor-table"><thead><tr><th>#</th><th>Term</th><th>Definition</th><th></th></tr></thead><tbody>${state.deck.map((c,i)=>{
     const pic=hasVisual(c.termHtml)||hasVisual(c.defHtml);
-    return `<tr><td class="num">${i+1}</td><td><div class="editable" contenteditable="true" data-edit="term" data-i="${i}">${c.termHtml}</div></td><td><div class="editable" contenteditable="true" data-edit="def" data-i="${i}">${c.defHtml}</div></td><td><div class="row-actions">${pic?`<button class="smallbtn" data-picup="${i}" title="Move this card's picture to the previous card">⬆ pic</button><button class="smallbtn" data-picdown="${i}" title="Move this card's picture to the next card">⬇ pic</button>`:''}<button class="smallbtn" data-addpic="${i}">+ pic</button><button class="smallbtn" data-del="${i}">Delete</button></div></td></tr>`;
+    return `<tr><td class="num">${i+1}</td><td><div class="editable" contenteditable="true" data-edit="term" data-i="${i}">${c.termHtml}</div></td><td><div class="editable" contenteditable="true" data-edit="def" data-i="${i}">${c.defHtml}</div></td><td><div class="row-actions">${pic?`<button class="smallbtn" data-picup="${i}" aria-label="Move this picture to card ${i}">⬆ pic</button><button class="smallbtn" data-picdown="${i}" aria-label="Move this picture to card ${i+2}">⬇ pic</button>`:''}<button class="smallbtn" data-addpic="${i}" aria-label="Add a picture to card ${i+1}">+ pic</button><button class="smallbtn" data-del="${i}" aria-label="Delete card ${i+1}">Delete</button></div></td></tr>`;
   }).join('')}</tbody></table>`;
   document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{state.deck.splice(+b.dataset.del,1);saveLocal();renderEditor()});
   document.querySelectorAll('[data-picup]').forEach(b=>b.onclick=()=>moveCardPictures(+b.dataset.picup,-1));
@@ -2416,11 +2504,11 @@ function showDeckJSON(json){
     m=document.createElement('div');m.id='exportModal';m.className='modal';
     m.innerHTML='<div class="modalbox"><h3>Copy your deck</h3><p class="muted">This viewer blocks downloads. Copy the text below and save it as a .json file — you can re-import it here any time.</p><textarea id="exportText" spellcheck="false" style="width:100%;height:250px;background:var(--field);color:var(--text);border:1px solid var(--border);border-radius:9px;padding:10px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px"></textarea><div class="modal-actions"><button class="btn secondary" id="exportClose">Close</button><button class="btn" id="exportCopy">Copy</button></div></div>';
     document.body.appendChild(m);
-    m.querySelector('#exportClose').onclick=()=>m.classList.remove('show');
+    m.querySelector('#exportClose').onclick=()=>hideModal(m);
     m.querySelector('#exportCopy').onclick=()=>{const t=$('exportText');t.focus();t.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}toast(ok?'Deck copied':'Press Ctrl+C to copy')};
   }
   $('exportText').value=json;
-  m.classList.add('show');
+  showModal(m);
 }
 /* ===================== storage and library =====================
    Decks live in IndexedDB: an index record listing what exists, one record per
@@ -2590,7 +2678,7 @@ function renderLibrary(){
         '<button class="smallbtn" data-del="'+d.id+'">Delete</button>'+
       '</div></div>').join('');
   body.querySelectorAll('[data-open]').forEach(b=>b.onclick=async()=>{
-    await openDeckById(b.dataset.open);$('libraryModal').classList.remove('show');
+    await openDeckById(b.dataset.open);hideModal($('libraryModal'));
   });
   body.querySelectorAll('[data-rename]').forEach(b=>b.onclick=async()=>{
     const d=libraryIndex.find(x=>x.id===b.dataset.rename);
@@ -2608,6 +2696,47 @@ function renderLibrary(){
     await deleteDeckById(b.dataset.del);
   });
 }
+/* A sheet should say what it is, hold focus while it is open, close on Escape
+   or a click outside, and hand focus back where it came from. */
+let modalReturn=null;
+function showModal(m){
+  if(!m)return;
+  modalReturn=document.activeElement;
+  m.setAttribute('role','dialog');
+  m.setAttribute('aria-modal','true');
+  const heading=m.querySelector('h3');
+  if(heading){
+    if(!heading.id)heading.id='dlg-'+Math.random().toString(36).slice(2,8);
+    m.setAttribute('aria-labelledby',heading.id);
+  }
+  m.classList.add('show');
+  const first=m.querySelector('button,select,input,textarea,[tabindex]');
+  if(first)setTimeout(()=>first.focus(),40);
+}
+function hideModal(m){
+  if(!m)return;
+  m.classList.remove(String('show'));
+  if(modalReturn&&modalReturn.focus)try{modalReturn.focus()}catch(e){}
+  modalReturn=null;
+}
+function openModals(){return [...document.querySelectorAll('.modal.show')]}
+document.addEventListener('keydown',e=>{
+  const open=openModals().pop();
+  if(!open)return;
+  if(e.key==='Escape'){e.preventDefault();hideModal(open);return}
+  if(e.key!=='Tab')return;
+  // Keep Tab inside the sheet.
+  const f=[...open.querySelectorAll('button,select,input,textarea,summary,[href],[tabindex]:not([tabindex="-1"])')]
+    .filter(el=>!el.disabled&&el.offsetParent!==null);
+  if(!f.length)return;
+  const first=f[0],last=f[f.length-1];
+  if(e.shiftKey&&document.activeElement===first){e.preventDefault();last.focus()}
+  else if(!e.shiftKey&&document.activeElement===last){e.preventDefault();first.focus()}
+});
+document.addEventListener('mousedown',e=>{
+  const open=openModals().pop();
+  if(open&&e.target===open)hideModal(open);
+});
 function toggleMore(force){
   const menu=$('moreMenu'),btn=$('moreBtn');
   if(!menu)return;
@@ -2631,11 +2760,11 @@ function openLibrary(){
       '<div class="modal-actions"><button class="btn secondary" id="libImport">Import another</button>'+
       '<button class="btn" id="libClose">Done</button></div></div>';
     document.body.appendChild(m);
-    m.querySelector('#libClose').onclick=()=>m.classList.remove('show');
-    m.querySelector('#libImport').onclick=()=>{m.classList.remove('show');newDeck()};
+    m.querySelector('#libClose').onclick=()=>hideModal(m);
+    m.querySelector('#libImport').onclick=()=>{hideModal(m);newDeck()};
   }
   renderLibrary();
-  m.classList.add('show');
+  showModal(m);
 }
 
 /* ===================== share by link =====================
@@ -2699,7 +2828,7 @@ async function openShare(){
       '<div class="modal-actions"><button class="btn secondary" id="shareClose">Close</button>'+
       '<button class="btn" id="shareCopy">Copy link</button></div></div>';
     document.body.appendChild(m);
-    m.querySelector('#shareClose').onclick=()=>m.classList.remove('show');
+    m.querySelector('#shareClose').onclick=()=>hideModal(m);
     m.querySelector('#shareCopy').onclick=async()=>{
       const t=$('shareText');
       try{await navigator.clipboard.writeText(t.value);toast('Link copied')}
@@ -2721,7 +2850,7 @@ async function openShare(){
   $('sharePics').checked=false;
   $('sharePics').onchange=refresh;
   await refresh();
-  m.classList.add('show');
+  showModal(m);
 }
 async function importFromHash(){
   const h=location.hash||'';
@@ -2801,18 +2930,18 @@ function exportDeck(){
       '<button class="btn secondary" id="expTsv">Save .tsv</button></div>'+
       '<div class="modal-actions"><button class="btn ghost" id="expClose">Close</button></div></div>';
     document.body.appendChild(m);
-    m.querySelector('#expClose').onclick=()=>m.classList.remove('show');
+    m.querySelector('#expClose').onclick=()=>hideModal(m);
     m.querySelector('#expJson').onclick=()=>{
       offerFile(JSON.stringify({title:state.title,cards:state.deck},null,2),
         (state.title||'openstudy-deck').replace(/[^\w.-]+/g,'-')+'.json','application/json');
-      m.classList.remove('show');
+      hideModal(m);
     };
     m.querySelector('#expTsv').onclick=()=>{
       offerFile(deckToTSV(),(state.title||'openstudy-deck').replace(/[^\w.-]+/g,'-')+'.tsv','text/tab-separated-values');
-      m.classList.remove('show');
+      hideModal(m);
     };
   }
-  m.classList.add('show');
+  showModal(m);
 }
 
 /* ===================== after an import =====================
@@ -2845,19 +2974,34 @@ function openSettings(){$('direction').value=state.settings.direction;$('testLen
   $('retentionMode').value=state.settings.retention||'balanced';
   $('strictMode').value=state.settings.strictness||'lenient';
   $('advanceMode').value=state.settings.autoAdvance||'on';
-  $('settingsModal').classList.add('show')}
-function closeSettings(){$('settingsModal').classList.remove('show')}
+  showModal($('settingsModal'))}
+function closeSettings(){hideModal($('settingsModal'))}
 function saveSettings(){state.settings.direction=$('direction').value;state.settings.testLength=$('testLength').value;state.settings.matchSize=+$('matchSize').value;state.settings.autoSpeak=$('autoSpeak').value;state.settings.cloze=$('clozeMode').value;
   state.settings.retention=$('retentionMode').value;
   state.settings.strictness=$('strictMode').value;
   state.settings.autoAdvance=$('advanceMode').value;
   saveLocal();closeSettings();renderCards();toast('Settings saved')}
-$('chooseBtn').onclick=e=>{e.stopPropagation();$('file').click()};$('file').addEventListener('change',e=>importFiles([...e.target.files]));$('drop').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click()});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('drag')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('drag'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files])});const bind=(id,fn)=>{const el=$(id);if(el)el.onclick=fn};
+$('chooseBtn').onclick=e=>{e.stopPropagation();$('file').click()};$('file').addEventListener('change',e=>importFiles([...e.target.files]));$('drop').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click()});
+$('drop').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();$('file').click()}});
+$('flashWrap').addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();flip()}});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('drag')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('drag'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files])});const bind=(id,fn)=>{const el=$(id);if(el)el.onclick=fn};
 bind('settingsBtn',openSettings);bind('settingsBtn2',openSettings);
 bind('moreBtn',e=>{toggleMore()});$('closeSettings').onclick=closeSettings;$('saveSettings').onclick=saveSettings;bind('newBtn',newDeck);bind('newBtn2',newDeck);
 if($('moreMenu'))$('moreMenu').addEventListener('click',()=>toggleMore(false));bind('exportBtn',exportDeck);bind('libraryBtn',openLibrary);bind('shareBtn',openShare);bind('reportBtn',openReport);bind('editBtn',openEditor);$('doneEdit').onclick=()=>{reviewingImport=false;renderReviewBar();showDeck();saveLocal()};$('addCard').onclick=()=>{state.deck.push(makeCard('<span>New term</span>','<span>New definition</span>'));saveLocal();renderEditor()};$('dedupe').onclick=()=>{state.deck=finalizeCards(state.deck);saveLocal();renderEditor();toast('Duplicates removed')};$('shiftAllUp').onclick=()=>shiftAllPictures(-1);$('shiftAllDown').onclick=()=>shiftAllPictures(1);$('flashWrap').onclick=flip;$('next').onclick=nextCard;$('prev').onclick=prevCard;$('shuffle').onclick=shuffleDeck;$('starBtn').onclick=e=>{e.stopPropagation();starCurrent()};$('speakBtn').onclick=e=>{e.stopPropagation();speakCurrent()};document.querySelectorAll('[data-crate]').forEach(b=>b.onclick=()=>recordCurrent(+b.dataset.crate));
 $('revealBtn').onclick=revealReview;
-document.querySelectorAll('[data-rate]').forEach(b=>b.onclick=()=>answerReview(+b.dataset.rate));$('learnContinue').onclick=()=>{cancelAdvance();renderLearn()};$('writeCheck').onclick=checkWrite;$('writeInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkWrite()});$('writeContinue').onclick=()=>{cancelAdvance();renderWrite()};$('matchRestart').onclick=initMatch;$('testAgain').onclick=initTest;$('browseSearch').addEventListener('input',renderBrowse);document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)||document.activeElement.isContentEditable)return;
+document.querySelectorAll('[data-rate]').forEach(b=>b.onclick=()=>answerReview(+b.dataset.rate));$('learnContinue').onclick=()=>{cancelAdvance();renderLearn()};$('writeCheck').onclick=checkWrite;$('writeInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkWrite()});$('writeContinue').onclick=()=>{cancelAdvance();renderWrite()};$('matchRestart').onclick=initMatch;$('testAgain').onclick=initTest;$('browseSearch').addEventListener('input',renderBrowse);document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));
+$('nav').addEventListener('keydown',e=>{
+  if(!['ArrowLeft','ArrowRight','Home','End'].includes(e.key))return;
+  const tabs=[...document.querySelectorAll('.tab')];
+  const at=tabs.findIndex(t=>t.dataset.mode===state.mode);
+  let next=at;
+  if(e.key==='ArrowLeft')next=(at-1+tabs.length)%tabs.length;
+  if(e.key==='ArrowRight')next=(at+1)%tabs.length;
+  if(e.key==='Home')next=0;
+  if(e.key==='End')next=tabs.length-1;
+  e.preventDefault();
+  switchMode(tabs[next].dataset.mode);
+  tabs[next].focus();
+});window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)||document.activeElement.isContentEditable)return;
   if(e.key.length===1){mikeBuf=(mikeBuf+e.key.toLowerCase()).slice(-4);if(mikeBuf==='mike'){mikeBuf='';toast(mikeLine());return}}
   if(!state.deck.length)return;
   if(state.mode==='review'){
