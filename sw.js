@@ -9,7 +9,7 @@
    The page itself is always fetched from the network, falling back to cache
    only when genuinely offline, so an update is never withheld. Everything else
    is cache-first for speed. */
-const VERSION = 'd2138b1ba556';
+const VERSION = '80623dab83a8';
 const CACHE = 'openstudy-' + VERSION;
 const SHELL = ['./', './index.html', './manifest.webmanifest', './icon-192.png', './icon-512.png'];
 
