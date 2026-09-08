@@ -533,6 +533,32 @@ body.scrolled .top,body.scrolled .nav{
   .tab:hover:not(.active),.btn:active,.tile:active,.option:active{transform:none}
 }
 
+/* Learn: the outcome should read before the words do. */
+.feedback.good{color:var(--good);font-weight:600}
+.feedback.bad{color:var(--bad);font-weight:600}
+.option.correct{box-shadow:0 0 0 2px var(--good) inset}
+.option.correct.chosen{animation:pop .34s var(--spring)}
+.option.wrong.chosen{animation:nudge .3s var(--ease)}
+.option.correct::after{content:"\2713";position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--good);font-weight:700;font-size:17px}
+.option.wrong.chosen::after{content:"\2715";position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--bad);font-weight:700;font-size:16px}
+@keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.03)}100%{transform:scale(1)}}
+@keyframes nudge{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
+
+/* Match: tiles were tight against one another and against the toolbar. */
+.match-grid{gap:14px;margin-top:4px}
+.tile{padding:16px}
+
+/* Performance. The ambient field is blurred and animated, and the chrome blurs
+   whatever passes beneath it; both re-rasterise every frame unless promoted.
+   During the card flip the backdrop blur is dropped altogether — half a second
+   nobody sees, and it keeps the animation on the compositor. */
+body::before{will-change:transform}
+.flash{will-change:transform}
+.face{contain:paint}
+body.flipping .top,body.flipping .nav,body.flipping .deckbar{
+  -webkit-backdrop-filter:none;backdrop-filter:none;background:var(--glass-strong);
+}
+
 /* Mike is not in any deck. Mike simply is. */
 .mike-row .num{color:var(--star)}
 .mike-row b{font-family:var(--display);font-size:17px}
@@ -729,7 +755,10 @@ body.scrolled .top,body.scrolled .nav{
 <div class="editor-tools"><button class="btn secondary" id="addCard">+ Add card</button><button class="btn secondary" id="dedupe">Remove duplicates</button><span class="sep"></span><span class="muted">Pictures off by one?</span><button class="smallbtn" id="shiftAllUp">⬆ Shift all pictures up</button><button class="smallbtn" id="shiftAllDown">⬇ Shift all pictures down</button></div>
 <div id="editorTable"></div></section>
 </div>
-<div class="modal" id="settingsModal"><div class="modalbox"><h3>Study settings</h3><div class="field"><label>Answer direction</label><select id="direction"><option value="term-def">Term → Definition</option><option value="def-term">Definition → Term</option><option value="mixed">Mixed</option></select></div><div class="field"><label>Test length</label><select id="testLength"><option value="all">All cards</option><option value="10">10 cards</option><option value="20">20 cards</option><option value="30">30 cards</option></select></div><div class="field"><label>Match board size</label><select id="matchSize"><option value="6">6 pairs</option><option value="8">8 pairs</option><option value="10">10 pairs</option></select></div><div class="field"><label>Fill in the blank</label><select id="clozeMode"><option value="on">Use it when a card allows</option><option value="off">Always ask for the definition</option></select></div>
+<div class="modal" id="settingsModal"><div class="modalbox"><h3>Study settings</h3><div class="field"><label>Answer direction</label><select id="direction"><option value="term-def">Term → Definition</option><option value="def-term">Definition → Term</option><option value="mixed">Mixed</option></select></div><div class="field"><label>Test length</label><select id="testLength"><option value="all">All cards</option><option value="10">10 cards</option><option value="20">20 cards</option><option value="30">30 cards</option></select></div><div class="field"><label>Match board size</label><select id="matchSize"><option value="6">6 pairs</option><option value="8">8 pairs</option><option value="10">10 pairs</option></select></div><div class="field"><label>How often cards come back</label><select id="retentionMode"><option value="relaxed">Relaxed &mdash; longer gaps, less review</option><option value="balanced">Balanced</option><option value="thorough">Thorough &mdash; shorter gaps, more review</option></select></div>
+<div class="field"><label>Spelling in Write</label><select id="strictMode"><option value="lenient">Forgiving &mdash; a typo still counts</option><option value="strict">Careful &mdash; close, but nearly right</option><option value="exact">Exact &mdash; must match the answer</option></select></div>
+<div class="field"><label>Moving to the next card</label><select id="advanceMode"><option value="on">Automatic after answering</option><option value="off">Wait for me to continue</option></select></div>
+<div class="field"><label>Fill in the blank</label><select id="clozeMode"><option value="on">Use it when a card allows</option><option value="off">Always ask for the definition</option></select></div>
 <div class="field"><label>Auto-speak flashcards</label><select id="autoSpeak"><option value="off">Off</option><option value="term">Term</option><option value="definition">Definition</option><option value="both">Both</option></select></div><div class="modal-actions"><button class="btn secondary" id="closeSettings">Cancel</button><button class="btn" id="saveSettings">Save</button></div></div></div>
 <div class="toast" id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
@@ -738,7 +767,7 @@ body.scrolled .top,body.scrolled .nav{
 'use strict';
 const $=id=>document.getElementById(id);
 const STORAGE='openstudy-universal-v5';
-const state={deck:[],title:'',index:0,flipped:false,mode:'cards',learn:null,write:null,test:null,match:null,settings:{direction:'term-def',testLength:'all',matchSize:6,autoSpeak:'off',cloze:'on'}};
+const state={deck:[],title:'',index:0,flipped:false,mode:'cards',learn:null,write:null,test:null,match:null,settings:{direction:'term-def',testLength:'all',matchSize:6,autoSpeak:'off',cloze:'on',retention:'balanced',strictness:'lenient',autoAdvance:'on'}};
 const PDF_WORKER_URL='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 /* A worker script cannot be constructed from another origin — the same-origin
    policy blocks `new Worker(https://cdn…)` in every browser, and from a
@@ -914,7 +943,10 @@ function tokenF1(a,b){
   const p=hit/A.length,r=hit/B.length;
   return p+r?2*p*r/(p+r):0;
 }
-function gradeAnswer(guess,answer){
+/* strictness: 'lenient' forgives a typo, 'exact' demands the answer verbatim.
+   Misgrading is the fastest way to lose trust in a study tool, so which way it
+   errs has to be the learner's choice rather than mine. */
+function gradeAnswer(guess,answer,strictness){
   const g=normalizeAnswer(guess);
   if(!g)return {ok:false,score:0};
   // Alternatives on slash or semicolon only — commas appear inside real definitions.
@@ -929,7 +961,9 @@ function gradeAnswer(guess,answer){
     if(sim>best)best=sim;
   }
   const shortest=Math.min(...alts.map(a=>a.length));
-  const bar=shortest<=24?0.82:0.62;
+  if(strictness==='exact')return {ok:best>=0.999,score:Math.max(0,best)};
+  const bars=strictness==='strict'?[0.94,0.78]:[0.82,0.62];
+  const bar=shortest<=24?bars[0]:bars[1];
   return {ok:best>=bar,score:Math.max(0,best)};
 }
 
@@ -1739,7 +1773,13 @@ async function importFiles(files){
 function showDeck(){if(!state.deck.length)return;$('uploadPanel').style.display='none';$('deckbar').style.display='flex';$('nav').style.display='flex';requestAnimationFrame(moveNavPill);$('deckTitle').textContent=state.title;$('deckMeta').textContent=`${state.deck.length} cards · ${state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length} with pictures`;updateDueBadge();switchMode(dueDeck().length&&state.deck.some(c=>c.sched)?'review':'cards')}
 function answerFor(c){let d=state.settings.direction;if(d==='mixed')d=Math.random()<.5?'term-def':'def-term';return d==='term-def'?{prompt:c.termHtml,answer:c.defHtml,text:c.defText}:{prompt:c.defHtml,answer:c.termHtml,text:c.termText}}
 function renderCards(){if(!state.deck.length)return;const c=state.deck[state.index];labelRateButtons($('cardRate'),c,'data-crate');$('front').innerHTML=c.termHtml;$('back').innerHTML=c.defHtml;$('fcProgress').textContent=`Card ${state.index+1} / ${state.deck.length}`;$('starBtn').textContent=c.star?'★ Starred':'☆ Star';$('flash').classList.toggle('flip',state.flipped);if(state.settings.autoSpeak!=='off')setTimeout(()=>speakCurrent(),120)}
-function flip(){state.flipped=!state.flipped;$('flash').classList.toggle('flip',state.flipped);if(state.settings.autoSpeak!=='off')speakCurrent()}
+function flip(){
+  state.flipped=!state.flipped;
+  // Drop the backdrop blur while the card turns, then restore it.
+  document.body.classList.add('flipping');
+  clearTimeout(flip._t);
+  flip._t=setTimeout(()=>document.body.classList.remove('flipping'),620);
+  $('flash').classList.toggle('flip',state.flipped);if(state.settings.autoSpeak!=='off')speakCurrent()}
 function nextCard(){state.index=(state.index+1)%state.deck.length;state.flipped=false;renderCards()}function prevCard(){state.index=(state.index-1+state.deck.length)%state.deck.length;state.flipped=false;renderCards()}
 function shuffleDeck(){state.deck=shuffle(state.deck);state.index=0;state.flipped=false;saveLocal();renderCards()}
 function starCurrent(){state.deck[state.index].star=!state.deck[state.index].star;saveLocal();renderCards();if(state.mode==='browse'||state.mode==='progress')renderBrowse()}
@@ -1751,7 +1791,7 @@ function recordCurrent(rating){
 }
 function speak(text){if(!('speechSynthesis'in window)||!text)return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=.9;window.speechSynthesis.speak(u)}
 function speakCurrent(){const c=state.deck[state.index],text=state.flipped?c.defText:c.termText;speak(text)}
-function switchMode(mode){state.mode=mode;updateDueBadge();requestAnimationFrame(moveNavPill);document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('view-'+mode).classList.add('active');if(mode==='cards')renderCards();if(mode==='learn')initLearn();if(mode==='write')initWrite();if(mode==='match')initMatch();if(mode==='test')initTest();if(mode==='review')initReview();if(mode==='browse')renderBrowse();if(mode==='progress')renderProgress()}
+function switchMode(mode){cancelAdvance();state.mode=mode;updateDueBadge();requestAnimationFrame(moveNavPill);document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('view-'+mode).classList.add('active');if(mode==='cards')renderCards();if(mode==='learn')initLearn();if(mode==='write')initWrite();if(mode==='match')initMatch();if(mode==='test')initTest();if(mode==='review')initReview();if(mode==='browse')renderBrowse();if(mode==='progress')renderProgress()}
 /* ---------- spaced review ---------- */
 function dueDeck(now=Date.now()){return state.deck.filter(c=>isDue(c.sched,now))}
 function fmtInterval(d){
@@ -1772,7 +1812,7 @@ function labelRateButtons(root,card,attr){
   root.querySelectorAll('['+attr+']').forEach(b=>{
     const r=+b.getAttribute(attr);
     const s=b.querySelector('small');
-    if(s)s.textContent=fmtInterval(fsrsReview(card&&card.sched,r,Date.now()).interval);
+    if(s)s.textContent=fmtInterval(reviewNow(card&&card.sched,r).interval);
   });
 }
 /* The active-tab pill slides rather than blinking between tabs: the fluid
@@ -1794,8 +1834,15 @@ function updateDueBadge(){
   const n=dueDeck().length;
   b.textContent=n;b.hidden=!n;requestAnimationFrame(moveNavPill);
 }
+// One place decides how far ahead a rating pushes a card, so the setting
+// reaches the buttons' printed intervals and the actual schedule alike.
+function targetRetention(){
+  const map={relaxed:0.85,balanced:0.90,thorough:0.95};
+  return map[state.settings.retention]||0.90;
+}
+function reviewNow(sched,rating,when){return fsrsReview(sched,rating,when||Date.now(),targetRetention())}
 function rateCard(card,rating){
-  card.sched=fsrsReview(card.sched,rating);
+  card.sched=reviewNow(card.sched,rating);
   if(rating===1)card.wrong++;else card.correct++;
   saveLocal();updateDueBadge();
 }
@@ -1847,11 +1894,45 @@ function answerReview(rating){
   r.done++;
   renderReview();
 }
-function initLearn(){const pool=state.deck.filter(c=>c.wrong>=c.correct);state.learn={current:null,answered:false,pool:pool.length?pool:state.deck};renderLearn()}
+/* The Continue button was a second click to say "yes, I read that". It stays
+   for anyone who wants to linger, but by default the next card arrives on its
+   own — sooner when you were right, later when there is a correction to read. */
+let advanceTimer=null;
+function cancelAdvance(){clearTimeout(advanceTimer);advanceTimer=null}
+function autoAdvance(wasCorrect,next){
+  cancelAdvance();
+  if(state.settings.autoAdvance==='off')return;
+  advanceTimer=setTimeout(()=>{advanceTimer=null;next()},wasCorrect?900:2400);
+}
+function initLearn(){
+  cancelAdvance();const pool=state.deck.filter(c=>c.wrong>=c.correct);state.learn={current:null,answered:false,pool:pool.length?pool:state.deck};renderLearn()}
 function renderLearn(){
   if(!state.deck.length||!state.learn||!state.learn.pool.length)return emptyStudyState('learn');
-  const c=shuffle(state.learn.pool)[0],a=answerFor(c);state.learn.current=c;state.learn.answered=false;$('learnPrompt').innerHTML=a.prompt;$('learnMeta').textContent=`${state.learn.pool.length} cards in review queue`;$('learnFeedback').textContent='';$('learnContinue').style.display='none';let opts=shuffle([c,...shuffle(state.deck.filter(x=>x!==c)).slice(0,3)]);$('learnOptions').innerHTML='';opts.forEach(x=>{const b=document.createElement('button');b.className='option';b.innerHTML=answerFor(x).answer;b.onclick=()=>handleLearn(b,x===c,c,a.text);$('learnOptions').appendChild(b)});const mastered=state.deck.filter(x=>x.correct>=3&&x.correct>x.wrong).length,pct=Math.round(mastered/state.deck.length*100);$('learnMastery').textContent=pct+'% mastered';$('learnBar').style.width=pct+'%'}
-function handleLearn(btn,correct,c,text){if(state.learn.answered)return;state.learn.answered=true;document.querySelectorAll('#learnOptions .option').forEach(b=>b.disabled=true);if(correct){btn.classList.add('correct');c.correct++;$('learnFeedback').textContent='Correct'}else{btn.classList.add('wrong');c.wrong++;$('learnFeedback').textContent='Incorrect — correct answer: '+(text||'(picture)')}saveLocal();$('learnContinue').style.display='inline-block'}
+  const c=shuffle(state.learn.pool)[0],a=answerFor(c);state.learn.current=c;state.learn.answered=false;$('learnPrompt').innerHTML=a.prompt;$('learnMeta').textContent=`${state.learn.pool.length} cards in review queue`;$('learnFeedback').textContent='';$('learnContinue').style.display='none';let opts=shuffle([c,...shuffle(state.deck.filter(x=>x!==c)).slice(0,3)]);$('learnOptions').innerHTML='';opts.forEach(x=>{const b=document.createElement('button');b.className='option';b.innerHTML=answerFor(x).answer;b.dataset.right=(x===c)?'1':'';b.onclick=()=>handleLearn(b,x===c,c,a.text);$('learnOptions').appendChild(b)});const mastered=state.deck.filter(x=>x.correct>=3&&x.correct>x.wrong).length,pct=Math.round(mastered/state.deck.length*100);$('learnMastery').textContent=pct+'% mastered';$('learnBar').style.width=pct+'%'}
+function handleLearn(btn,correct,c,text){
+  if(state.learn.answered)return;
+  state.learn.answered=true;
+  const opts=[...document.querySelectorAll('#learnOptions .option')];
+  opts.forEach(b=>b.disabled=true);
+  const fb=$('learnFeedback');
+  if(correct){
+    btn.classList.add('correct','chosen');
+    c.correct++;
+    fb.className='feedback good';
+    fb.textContent='Correct';
+  }else{
+    btn.classList.add('wrong','chosen');
+    c.wrong++;
+    // Always show which one was right, marked as clearly as the mistake.
+    const right=opts.find(b=>b!==btn&&b.dataset.right==='1');
+    if(right)right.classList.add('correct');
+    fb.className='feedback bad';
+    fb.textContent='Not quite — the answer is '+(text||'the picture shown');
+  }
+  rateCard(c,correct?3:1);
+  $('learnContinue').style.display='inline-block';
+  autoAdvance(correct,renderLearn);
+}
 // Write mode needs a typeable answer, so picture-only sides are excluded.
 function writablePool(){const p=state.deck.filter(c=>c.termText&&c.defText);return p.length?p:state.deck}
 function emptyStudyState(which){
@@ -1862,7 +1943,7 @@ function emptyStudyState(which){
   ['writeCheck','writeContinue','learnContinue'].forEach(id=>{const e=$(id);if(e)e.style.display='none'});
   const opts=$('learnOptions');if(opts&&which==='learn')opts.innerHTML='';
 }
-function initWrite(){state.write={current:null,answered:false};renderWrite()}
+function initWrite(){cancelAdvance();state.write={current:null,answered:false};renderWrite()}
 function renderWrite(){
   if(!state.deck.length)return emptyStudyState('write');
   const useCloze=state.settings.cloze!=='off';
@@ -1884,13 +1965,14 @@ function renderWrite(){
 function similarity(a,b){a=clean(a).toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,'');b=clean(b).toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,'');if(a===b)return 1;const aa=a.split(/\s+/),bb=b.split(/\s+/),set=new Set(bb);return aa.filter(x=>set.has(x)).length/Math.max(aa.length,bb.length,1)}
 function checkWrite(){
   if(state.write.answered)return;
-  const {ok}=gradeAnswer($('writeInput').value,state.write.answer);
+  const {ok}=gradeAnswer($('writeInput').value,state.write.answer,state.settings.strictness);
   state.write.answered=true;
   $('writeInput').disabled=true;$('writeCheck').style.display='none';
   const c=state.write.current;
-  if(ok){c.correct++;c.sched=fsrsReview(c.sched,3);$('writeFeedback').textContent='Correct — '+state.write.answer}
-  else{c.wrong++;c.sched=fsrsReview(c.sched,1);$('writeFeedback').textContent='Not quite. Answer: '+state.write.answer}
+  if(ok){c.correct++;c.sched=reviewNow(c.sched,3);$('writeFeedback').textContent='Correct — '+state.write.answer}
+  else{c.wrong++;c.sched=reviewNow(c.sched,1);$('writeFeedback').textContent='Not quite. Answer: '+state.write.answer}
   saveLocal();$('writeContinue').style.display='inline-block';
+  autoAdvance(ok,renderWrite);
 }
 function tileHTML(html,text){
   const box=document.createElement('div');box.innerHTML=html||'';
@@ -2488,15 +2570,23 @@ function showImportBanner(cards,pics){
 }
 function hideImportBanner(){const b=$('importBanner');if(b)b.hidden=true}
 function newDeck(){hideImportBanner();state.deck=[];state.deckId=null;$('deckbar').style.display='none';$('nav').style.display='none';document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('uploadPanel').style.display='block';$('file').value='';$('status').textContent='';toast('Ready for another deck')}
-function openSettings(){$('direction').value=state.settings.direction;$('testLength').value=state.settings.testLength;$('matchSize').value=state.settings.matchSize;$('autoSpeak').value=state.settings.autoSpeak;$('clozeMode').value=state.settings.cloze||'on';$('settingsModal').classList.add('show')}
+function openSettings(){$('direction').value=state.settings.direction;$('testLength').value=state.settings.testLength;$('matchSize').value=state.settings.matchSize;$('autoSpeak').value=state.settings.autoSpeak;$('clozeMode').value=state.settings.cloze||'on';
+  $('retentionMode').value=state.settings.retention||'balanced';
+  $('strictMode').value=state.settings.strictness||'lenient';
+  $('advanceMode').value=state.settings.autoAdvance||'on';
+  $('settingsModal').classList.add('show')}
 function closeSettings(){$('settingsModal').classList.remove('show')}
-function saveSettings(){state.settings.direction=$('direction').value;state.settings.testLength=$('testLength').value;state.settings.matchSize=+$('matchSize').value;state.settings.autoSpeak=$('autoSpeak').value;state.settings.cloze=$('clozeMode').value;saveLocal();closeSettings();renderCards();toast('Settings saved')}
+function saveSettings(){state.settings.direction=$('direction').value;state.settings.testLength=$('testLength').value;state.settings.matchSize=+$('matchSize').value;state.settings.autoSpeak=$('autoSpeak').value;state.settings.cloze=$('clozeMode').value;
+  state.settings.retention=$('retentionMode').value;
+  state.settings.strictness=$('strictMode').value;
+  state.settings.autoAdvance=$('advanceMode').value;
+  saveLocal();closeSettings();renderCards();toast('Settings saved')}
 $('chooseBtn').onclick=e=>{e.stopPropagation();$('file').click()};$('file').addEventListener('change',e=>importFiles([...e.target.files]));$('drop').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click()});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('drag')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('drag'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files])});const bind=(id,fn)=>{const el=$(id);if(el)el.onclick=fn};
 bind('settingsBtn',openSettings);bind('settingsBtn2',openSettings);
 bind('moreBtn',e=>{toggleMore()});$('closeSettings').onclick=closeSettings;$('saveSettings').onclick=saveSettings;bind('newBtn',newDeck);bind('newBtn2',newDeck);
 if($('moreMenu'))$('moreMenu').addEventListener('click',()=>toggleMore(false));bind('exportBtn',exportDeck);bind('libraryBtn',openLibrary);bind('shareBtn',openShare);bind('reportBtn',openReport);bind('editBtn',openEditor);$('doneEdit').onclick=()=>{showDeck();saveLocal()};$('addCard').onclick=()=>{state.deck.push(makeCard('<span>New term</span>','<span>New definition</span>'));saveLocal();renderEditor()};$('dedupe').onclick=()=>{state.deck=finalizeCards(state.deck);saveLocal();renderEditor();toast('Duplicates removed')};$('shiftAllUp').onclick=()=>shiftAllPictures(-1);$('shiftAllDown').onclick=()=>shiftAllPictures(1);$('flashWrap').onclick=flip;$('next').onclick=nextCard;$('prev').onclick=prevCard;$('shuffle').onclick=shuffleDeck;$('starBtn').onclick=e=>{e.stopPropagation();starCurrent()};$('speakBtn').onclick=e=>{e.stopPropagation();speakCurrent()};document.querySelectorAll('[data-crate]').forEach(b=>b.onclick=()=>recordCurrent(+b.dataset.crate));
 $('revealBtn').onclick=revealReview;
-document.querySelectorAll('[data-rate]').forEach(b=>b.onclick=()=>answerReview(+b.dataset.rate));$('learnContinue').onclick=renderLearn;$('writeCheck').onclick=checkWrite;$('writeInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkWrite()});$('writeContinue').onclick=renderWrite;$('matchRestart').onclick=initMatch;$('testAgain').onclick=initTest;$('browseSearch').addEventListener('input',renderBrowse);document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)||document.activeElement.isContentEditable)return;
+document.querySelectorAll('[data-rate]').forEach(b=>b.onclick=()=>answerReview(+b.dataset.rate));$('learnContinue').onclick=()=>{cancelAdvance();renderLearn()};$('writeCheck').onclick=checkWrite;$('writeInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkWrite()});$('writeContinue').onclick=()=>{cancelAdvance();renderWrite()};$('matchRestart').onclick=initMatch;$('testAgain').onclick=initTest;$('browseSearch').addEventListener('input',renderBrowse);document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)||document.activeElement.isContentEditable)return;
   if(e.key.length===1){mikeBuf=(mikeBuf+e.key.toLowerCase()).slice(-4);if(mikeBuf==='mike'){mikeBuf='';toast(mikeLine());return}}
   if(!state.deck.length)return;
   if(state.mode==='review'){
