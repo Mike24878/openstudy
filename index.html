@@ -194,7 +194,9 @@ button,input,select,textarea{font:inherit;color:inherit}
 .file-input{display:none}
 .hint{font-size:12.5px;color:var(--muted);margin-top:14px;text-align:center;max-width:70ch;margin-inline:auto}
 .status{font-size:13px;color:var(--muted);min-height:20px;padding:0 8px;font-family:var(--mono)}
-.detail{padding:8px 20px 26px;display:grid;gap:28px}
+.detail{padding:8px 20px 26px;display:grid;gap:28px;min-width:0}
+.detail>*{min-width:0}
+.tablewrap{min-width:0;max-width:100%}
 .detail h3{font-family:var(--display);font-weight:600;font-size:18px;margin:0 0 12px}
 .tablewrap{overflow-x:auto}
 .fmt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:460px}
@@ -596,6 +598,16 @@ body.scrolled .top,body.scrolled .nav{
   .row{grid-template-columns:26px 1fr 1fr;gap:10px}
   .row .star{grid-column:3;justify-self:end}
   .study-panel,.test,.browse,.editor,.progress-panel{padding:16px}
+  .fmt{min-width:0;font-size:14px}
+  .fmt thead{display:none}
+  .fmt,.fmt tbody,.fmt tr,.fmt td{display:block;width:100%}
+  .fmt tr{padding:12px 0;border-bottom:1px solid var(--hairline)}
+  .fmt tr:last-child{border-bottom:0}
+  .fmt td{border:0;padding:2px 0}
+  .fmt td:first-child{font-size:15px;white-space:normal}
+  .fmt td:nth-child(2){font-size:12.5px;text-transform:uppercase;letter-spacing:.06em}
+  .fmt td:nth-child(2)::before{content:"Pictures: ";color:var(--muted);font-weight:500}
+  .tablewrap{overflow:visible}
   .landing{padding:20px 12px 4px}
   .detail{padding:8px 12px 18px}
   .steps{grid-template-columns:1fr}
@@ -632,9 +644,9 @@ body.scrolled .top,body.scrolled .nav{
   </div>
   <div class="drop" id="drop" tabindex="0">
     <h2>Drop your export here</h2>
-    <p>HTML, ZIP, PDF, Word, PowerPoint, CSV, TSV or JSON.</p>
+    <p>HTML, ZIP, PDF, Word, PowerPoint, Excel, Markdown, CSV, TSV or JSON.</p>
     <button class="btn" id="chooseBtn">Choose files</button>
-    <input class="file-input" id="file" type="file" multiple accept=".html,.htm,.zip,.pdf,.docx,.pptx,.txt,.tsv,.csv,.json,.png,.jpg,.jpeg,.gif,.webp,.svg,application/pdf,text/html,text/plain,application/json,application/zip,image/*">
+    <input class="file-input" id="file" type="file" multiple accept=".html,.htm,.zip,.pdf,.docx,.pptx,.xlsx,.xls,.ods,.md,.txt,.tsv,.csv,.json,.png,.jpg,.jpeg,.gif,.webp,.svg,application/pdf,text/html,text/plain,application/json,application/zip,image/*">
     <div class="hint">Dropping a saved HTML page? Select its image files at the same time, or zip them together.</div>
   </div>
   <div class="loading" id="loading" hidden>
@@ -654,7 +666,8 @@ body.scrolled .top,body.scrolled .nav{
           <tr><td>Exported text</td><td class="no">No</td><td>Quizlet&rsquo;s own Export, saved as .txt, .csv or .tsv. Fastest route when your set has no images.</td></tr>
           <tr><td>Lecture slides</td><td class="yes">Yes</td><td>A PowerPoint .pptx &mdash; each slide&rsquo;s title becomes the term and its content the definition.</td></tr>
           <tr><td>A Word handout</td><td class="yes">Yes</td><td>A .docx. A two-column table imports best; otherwise each line is read as term and definition.</td></tr>
-          <tr><td>A spreadsheet</td><td class="no">No</td><td>Any CSV or TSV with the term in the first column and the definition in the second.</td></tr>
+          <tr><td>A spreadsheet</td><td class="no">No</td><td>CSV, TSV or Excel (.xlsx). Terms in the first column, definitions in the second. Kahoot&rsquo;s own export is understood too.</td></tr>
+          <tr><td>Notes in Markdown</td><td class="no">No</td><td>A .md export from Notion, Obsidian or Google Docs &mdash; a table, or lines like &ldquo;term: definition&rdquo;.</td></tr>
           <tr><td>An OpenStudy deck</td><td class="yes">Yes</td><td>A .json file you exported from here, pictures included.</td></tr>
         </tbody>
       </table></div>
@@ -714,7 +727,8 @@ body.scrolled .top,body.scrolled .nav{
 <div class="editor-tools"><button class="btn secondary" id="addCard">+ Add card</button><button class="btn secondary" id="dedupe">Remove duplicates</button><span class="sep"></span><span class="muted">Pictures off by one?</span><button class="smallbtn" id="shiftAllUp">⬆ Shift all pictures up</button><button class="smallbtn" id="shiftAllDown">⬇ Shift all pictures down</button></div>
 <div id="editorTable"></div></section>
 </div>
-<div class="modal" id="settingsModal"><div class="modalbox"><h3>Study settings</h3><div class="field"><label>Answer direction</label><select id="direction"><option value="term-def">Term → Definition</option><option value="def-term">Definition → Term</option><option value="mixed">Mixed</option></select></div><div class="field"><label>Test length</label><select id="testLength"><option value="all">All cards</option><option value="10">10 cards</option><option value="20">20 cards</option><option value="30">30 cards</option></select></div><div class="field"><label>Match board size</label><select id="matchSize"><option value="6">6 pairs</option><option value="8">8 pairs</option><option value="10">10 pairs</option></select></div><div class="field"><label>Auto-speak flashcards</label><select id="autoSpeak"><option value="off">Off</option><option value="term">Term</option><option value="definition">Definition</option><option value="both">Both</option></select></div><div class="modal-actions"><button class="btn secondary" id="closeSettings">Cancel</button><button class="btn" id="saveSettings">Save</button></div></div></div>
+<div class="modal" id="settingsModal"><div class="modalbox"><h3>Study settings</h3><div class="field"><label>Answer direction</label><select id="direction"><option value="term-def">Term → Definition</option><option value="def-term">Definition → Term</option><option value="mixed">Mixed</option></select></div><div class="field"><label>Test length</label><select id="testLength"><option value="all">All cards</option><option value="10">10 cards</option><option value="20">20 cards</option><option value="30">30 cards</option></select></div><div class="field"><label>Match board size</label><select id="matchSize"><option value="6">6 pairs</option><option value="8">8 pairs</option><option value="10">10 pairs</option></select></div><div class="field"><label>Fill in the blank</label><select id="clozeMode"><option value="on">Use it when a card allows</option><option value="off">Always ask for the definition</option></select></div>
+<div class="field"><label>Auto-speak flashcards</label><select id="autoSpeak"><option value="off">Off</option><option value="term">Term</option><option value="definition">Definition</option><option value="both">Both</option></select></div><div class="modal-actions"><button class="btn secondary" id="closeSettings">Cancel</button><button class="btn" id="saveSettings">Save</button></div></div></div>
 <div class="toast" id="toast"></div>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -722,7 +736,7 @@ body.scrolled .top,body.scrolled .nav{
 'use strict';
 const $=id=>document.getElementById(id);
 const STORAGE='openstudy-universal-v5';
-const state={deck:[],title:'',index:0,flipped:false,mode:'cards',learn:null,write:null,test:null,match:null,settings:{direction:'term-def',testLength:'all',matchSize:6,autoSpeak:'off'}};
+const state={deck:[],title:'',index:0,flipped:false,mode:'cards',learn:null,write:null,test:null,match:null,settings:{direction:'term-def',testLength:'all',matchSize:6,autoSpeak:'off',cloze:'on'}};
 const PDF_WORKER_URL='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
 /* A worker script cannot be constructed from another origin — the same-origin
    policy blocks `new Worker(https://cdn…)` in every browser, and from a
@@ -1427,19 +1441,137 @@ async function parsePPTX(file){
 }
 /* ===================== end Office documents ===================== */
 
+/* ===================== more sources =====================
+   Notion, Google Docs and Obsidian all export Markdown; Kahoot, Google Sheets
+   and Brainscape all export a spreadsheet. Two readers cover the long tail
+   rather than one integration per site. */
+const scriptsLoaded={};
+function loadScriptOnce(src){
+  if(scriptsLoaded[src])return scriptsLoaded[src];
+  scriptsLoaded[src]=new Promise((res,rej)=>{
+    const s=document.createElement('script');
+    s.src=src;s.onload=()=>res();s.onerror=()=>rej(new Error('Could not load '+src));
+    document.head.appendChild(s);
+  }).catch(e=>{delete scriptsLoaded[src];throw e});
+  return scriptsLoaded[src];
+}
+
+/* Markdown: a table if there is one, otherwise definition lists, bullets or
+   bold-led lines — the shapes note apps actually produce. */
+function parseMarkdown(text,filename){
+  const lines=text.split(/\r?\n/);
+  const cards=[];
+  const push=(a,b)=>{
+    a=clean(a).replace(/^[*_`]+|[*_`]+$/g,'');
+    b=clean(b).replace(/^[*_`]+|[*_`]+$/g,'');
+    if(!a||!b)return;
+    const c=makeCard(esc(a),esc(b));
+    if(c)cards.push(c);
+  };
+  // pipe tables
+  let inTable=false;
+  for(const line of lines){
+    if(/^\s*\|(.+)\|\s*$/.test(line)){
+      const cells=line.trim().slice(1,-1).split('|').map(s=>s.trim());
+      if(cells.every(c=>/^:?-{2,}:?$/.test(c))){inTable=true;continue}
+      if(cells.length>=2){
+        if(!inTable&&HEADER_WORDS.test(cells[0]))continue;
+        push(cells[0],cells.slice(1).join(' '));
+      }
+      continue;
+    }
+    inTable=false;
+  }
+  if(cards.length)return {cards:finalizeCards(cards),title:filename.replace(/\.mdx?$/i,'')};
+
+  // "- term: definition" / "term — definition" / "**term** definition"
+  for(const raw of lines){
+    const line=clean(raw.replace(/^\s*[-*+]\s+/,''));
+    if(!line||/^#{1,6}\s/.test(line))continue;
+    let m=line.match(/^\*\*(.+?)\*\*[:\s—-]+(.+)$/)
+        ||line.match(/^(.+?)\s+[—–]\s+(.+)$/)
+        ||line.match(/^([^:]{1,80}):\s+(.+)$/);
+    if(m)push(m[1],m[2]);
+  }
+  if(!cards.length)throw new Error('No term and definition pairs found in that Markdown. A two-column table, or lines like "term: definition", import best.');
+  return {cards:finalizeCards(cards),title:filename.replace(/\.mdx?$/i,'')};
+}
+
+/* Spreadsheets. Kahoot's own export puts the question in column B and the
+   correct answer index in the last column, so that shape is read properly
+   rather than as two arbitrary columns. */
+async function parseSpreadsheet(file){
+  setStatus('Reading the spreadsheet…',0.2);
+  await loadScriptOnce('https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js');
+  if(!window.XLSX)throw new Error('Could not load the spreadsheet reader. Check your internet connection.');
+  const wb=XLSX.read(await file.arrayBuffer(),{type:'array'});
+  const sheet=wb.Sheets[wb.SheetNames[0]];
+  if(!sheet)throw new Error('That spreadsheet has no sheets.');
+  const rows=XLSX.utils.sheet_to_json(sheet,{header:1,blankrows:false,defval:''})
+    .map(r=>r.map(c=>clean(String(c))));
+  if(!rows.length)throw new Error('That spreadsheet is empty.');
+
+  const cards=[];
+  const looksKahoot=rows.some(r=>r.some(c=>/^question\s*-\s*max/i.test(c)))
+    ||rows.some(r=>/correct answer/i.test(r.join(' ')));
+  if(looksKahoot){
+    for(const r of rows){
+      const q=clean(r[1]||'');
+      const idx=parseInt(r[6]||r[r.length-1],10);
+      const answers=[r[2],r[3],r[4],r[5]].map(x=>clean(x||''));
+      if(!q||!(idx>=1&&idx<=4))continue;
+      const a=answers[idx-1];
+      if(!a)continue;
+      const c=makeCard(esc(q),esc(a));
+      if(c)cards.push(c);
+    }
+  }
+  if(!cards.length){
+    // Generic: first two columns that carry content, header row dropped.
+    rows.forEach((r,i)=>{
+      const filled=r.filter(Boolean);
+      if(filled.length<2)return;
+      if(i===0&&HEADER_WORDS.test(filled[0]))return;
+      const c=makeCard(esc(filled[0]),esc(filled.slice(1).join(' ')));
+      if(c)cards.push(c);
+    });
+  }
+  if(!cards.length)throw new Error('No term and definition pairs found in that spreadsheet. Put terms in the first column and definitions in the second.');
+  return {cards:finalizeCards(cards),title:file.name.replace(/\.(xlsx|xls|ods)$/i,'')};
+}
+
+/* ===================== cloze =====================
+   Many exported definitions already contain the blank, and where they do not
+   the term itself can be hidden inside its own definition. Folded into Write
+   rather than added as another tab: it is the same task, asked better. */
+function clozeFor(card){
+  const term=clean(card.termText),def=clean(card.defText);
+  if(!term||!def)return null;
+  if(/_{3,}/.test(def))return {text:def.replace(/_{3,}/g,'_____'),answer:term};
+  const escaped=term.replace(/[.*+?^${}()|[\]\\]/g,'\\async function parseZip(file){');
+  const re=new RegExp('\\b'+escaped+'\\b','ig');
+  if(!re.test(def))return null;
+  return {text:def.replace(re,'_____'),answer:term};
+}
+function clozePool(){
+  return state.deck.map(c=>({card:c,cloze:clozeFor(c)})).filter(x=>x.cloze);
+}
+
 async function parseZip(file){if(!window.JSZip)throw new Error('ZIP support is unavailable. Check your internet connection.');const zip=await JSZip.loadAsync(file),names=Object.keys(zip.files),htmlName=names.find(n=>/\.html?$/i.test(n)&&!zip.files[n].dir);if(!htmlName)throw new Error('ZIP does not contain an HTML file.');const map={};for(const n of names){if(zip.files[n].dir||!/\.(png|jpe?g|gif|webp|svg)$/i.test(n))continue;const blob=await zip.files[n].async('blob'),data=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(blob)});map[n]=data;map[n.split('/').pop()]=data}return parseHTMLFile(await zip.files[htmlName].async('string'),htmlName,map)}
 async function importFiles(files){
   if(!files.length)return;
   setStatus('Reading '+files.map(f=>f.name).join(', ')+'…');
   lastImport={when:new Date().toISOString(),files:files.map(f=>({name:f.name,size:f.size})),route:'?',cards:null,error:null};
   lastImportFile=files[0]||null;
-  startLoading(files.some(f=>/.(pdf|zip|docx|pptx)$/i.test(f.name)||f.size>150000));
+  startLoading(files.some(f=>/\.(pdf|zip|docx|pptx|xlsx|xls|ods)$/i.test(f.name)||f.size>150000));
   await yieldToPaint();
   try{
-    const first=files.find(f=>/\.(html?|zip|pdf|json|txt|tsv|csv|docx|pptx)$/i.test(f.name))||files[0];
+    const first=files.find(f=>/\.(html?|zip|pdf|json|txt|tsv|csv|docx|pptx|xlsx|xls|ods|mdx?)$/i.test(f.name))||files[0];
     let result;
-    lastImport.route=/\.docx$/i.test(first.name)?'docx':/\.pptx$/i.test(first.name)?'pptx':/\.zip$/i.test(first.name)?'zip':/\.pdf$/i.test(first.name)?'pdf':/\.html?$/i.test(first.name)?'html':/\.json$/i.test(first.name)?'json':'delimited';
-    if(/\.docx$/i.test(first.name))result=await parseDOCX(first);
+    lastImport.route=/\.(xlsx|xls|ods)$/i.test(first.name)?'spreadsheet':/\.mdx?$/i.test(first.name)?'markdown':/\.docx$/i.test(first.name)?'docx':/\.pptx$/i.test(first.name)?'pptx':/\.zip$/i.test(first.name)?'zip':/\.pdf$/i.test(first.name)?'pdf':/\.html?$/i.test(first.name)?'html':/\.json$/i.test(first.name)?'json':'delimited';
+    if(/\.(xlsx|xls|ods)$/i.test(first.name))result=await parseSpreadsheet(first);
+    else if(/\.mdx?$/i.test(first.name))result=parseMarkdown(await first.text(),first.name);
+    else if(/\.docx$/i.test(first.name))result=await parseDOCX(first);
     else if(/\.pptx$/i.test(first.name))result=await parsePPTX(first);
     else if(/\.zip$/i.test(first.name))result=await parseZip(first);
     else if(/\.pdf$/i.test(first.name))result=await parsePDF(first);
@@ -1575,12 +1707,39 @@ function answerReview(rating){
   renderReview();
 }
 function initLearn(){const pool=state.deck.filter(c=>c.wrong>=c.correct);state.learn={current:null,answered:false,pool:pool.length?pool:state.deck};renderLearn()}
-function renderLearn(){const c=shuffle(state.learn.pool)[0],a=answerFor(c);state.learn.current=c;state.learn.answered=false;$('learnPrompt').innerHTML=a.prompt;$('learnMeta').textContent=`${state.learn.pool.length} cards in review queue`;$('learnFeedback').textContent='';$('learnContinue').style.display='none';let opts=shuffle([c,...shuffle(state.deck.filter(x=>x!==c)).slice(0,3)]);$('learnOptions').innerHTML='';opts.forEach(x=>{const b=document.createElement('button');b.className='option';b.innerHTML=answerFor(x).answer;b.onclick=()=>handleLearn(b,x===c,c,a.text);$('learnOptions').appendChild(b)});const mastered=state.deck.filter(x=>x.correct>=3&&x.correct>x.wrong).length,pct=Math.round(mastered/state.deck.length*100);$('learnMastery').textContent=pct+'% mastered';$('learnBar').style.width=pct+'%'}
+function renderLearn(){
+  if(!state.deck.length||!state.learn||!state.learn.pool.length)return emptyStudyState('learn');
+  const c=shuffle(state.learn.pool)[0],a=answerFor(c);state.learn.current=c;state.learn.answered=false;$('learnPrompt').innerHTML=a.prompt;$('learnMeta').textContent=`${state.learn.pool.length} cards in review queue`;$('learnFeedback').textContent='';$('learnContinue').style.display='none';let opts=shuffle([c,...shuffle(state.deck.filter(x=>x!==c)).slice(0,3)]);$('learnOptions').innerHTML='';opts.forEach(x=>{const b=document.createElement('button');b.className='option';b.innerHTML=answerFor(x).answer;b.onclick=()=>handleLearn(b,x===c,c,a.text);$('learnOptions').appendChild(b)});const mastered=state.deck.filter(x=>x.correct>=3&&x.correct>x.wrong).length,pct=Math.round(mastered/state.deck.length*100);$('learnMastery').textContent=pct+'% mastered';$('learnBar').style.width=pct+'%'}
 function handleLearn(btn,correct,c,text){if(state.learn.answered)return;state.learn.answered=true;document.querySelectorAll('#learnOptions .option').forEach(b=>b.disabled=true);if(correct){btn.classList.add('correct');c.correct++;$('learnFeedback').textContent='Correct'}else{btn.classList.add('wrong');c.wrong++;$('learnFeedback').textContent='Incorrect — correct answer: '+(text||'(picture)')}saveLocal();$('learnContinue').style.display='inline-block'}
 // Write mode needs a typeable answer, so picture-only sides are excluded.
 function writablePool(){const p=state.deck.filter(c=>c.termText&&c.defText);return p.length?p:state.deck}
+function emptyStudyState(which){
+  const prompt=$(which==='write'?'writePrompt':'learnPrompt');
+  const meta=$(which==='write'?'writeMeta':'learnMeta');
+  if(prompt)prompt.textContent='This deck has no cards left.';
+  if(meta)meta.textContent='';
+  ['writeCheck','writeContinue','learnContinue'].forEach(id=>{const e=$(id);if(e)e.style.display='none'});
+  const opts=$('learnOptions');if(opts&&which==='learn')opts.innerHTML='';
+}
 function initWrite(){state.write={current:null,answered:false};renderWrite()}
-function renderWrite(){const c=shuffle(writablePool())[0],a=answerFor(c);state.write.current=c;state.write.answer=a.text;state.write.answered=false;$('writePrompt').innerHTML=a.prompt;$('writeMeta').textContent='Write the answer';$('writeInput').value='';$('writeInput').disabled=false;$('writeFeedback').textContent='';$('writeCheck').style.display='inline-block';$('writeContinue').style.display='none';setTimeout(()=>$('writeInput').focus(),50)}
+function renderWrite(){
+  if(!state.deck.length)return emptyStudyState('write');
+  const useCloze=state.settings.cloze!=='off';
+  const pool=useCloze?clozePool():[];
+  if(pool.length&&Math.random()<0.6){
+    // Fill in the blank: same recall, asked in context.
+    const pick=shuffle(pool)[0];
+    state.write.current=pick.card;
+    state.write.answer=pick.cloze.answer;
+    state.write.answered=false;
+    $('writePrompt').innerHTML=esc(pick.cloze.text);
+    $('writeMeta').textContent='Fill in the blank';
+    $('writeInput').value='';$('writeInput').disabled=false;$('writeFeedback').textContent='';
+    $('writeCheck').style.display='inline-block';$('writeContinue').style.display='none';
+    setTimeout(()=>$('writeInput').focus(),50);
+    return;
+  }
+  const c=shuffle(writablePool())[0],a=answerFor(c);state.write.current=c;state.write.answer=a.text;state.write.answered=false;$('writePrompt').innerHTML=a.prompt;$('writeMeta').textContent='Write the answer';$('writeInput').value='';$('writeInput').disabled=false;$('writeFeedback').textContent='';$('writeCheck').style.display='inline-block';$('writeContinue').style.display='none';setTimeout(()=>$('writeInput').focus(),50)}
 function similarity(a,b){a=clean(a).toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,'');b=clean(b).toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,'');if(a===b)return 1;const aa=a.split(/\s+/),bb=b.split(/\s+/),set=new Set(bb);return aa.filter(x=>set.has(x)).length/Math.max(aa.length,bb.length,1)}
 function checkWrite(){
   if(state.write.answered)return;
@@ -2185,9 +2344,9 @@ function showImportBanner(cards,pics){
 }
 function hideImportBanner(){const b=$('importBanner');if(b)b.hidden=true}
 function newDeck(){hideImportBanner();state.deck=[];state.deckId=null;$('deckbar').style.display='none';$('nav').style.display='none';document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('uploadPanel').style.display='block';$('file').value='';$('status').textContent='';toast('Ready for another deck')}
-function openSettings(){$('direction').value=state.settings.direction;$('testLength').value=state.settings.testLength;$('matchSize').value=state.settings.matchSize;$('autoSpeak').value=state.settings.autoSpeak;$('settingsModal').classList.add('show')}
+function openSettings(){$('direction').value=state.settings.direction;$('testLength').value=state.settings.testLength;$('matchSize').value=state.settings.matchSize;$('autoSpeak').value=state.settings.autoSpeak;$('clozeMode').value=state.settings.cloze||'on';$('settingsModal').classList.add('show')}
 function closeSettings(){$('settingsModal').classList.remove('show')}
-function saveSettings(){state.settings.direction=$('direction').value;state.settings.testLength=$('testLength').value;state.settings.matchSize=+$('matchSize').value;state.settings.autoSpeak=$('autoSpeak').value;saveLocal();closeSettings();renderCards();toast('Settings saved')}
+function saveSettings(){state.settings.direction=$('direction').value;state.settings.testLength=$('testLength').value;state.settings.matchSize=+$('matchSize').value;state.settings.autoSpeak=$('autoSpeak').value;state.settings.cloze=$('clozeMode').value;saveLocal();closeSettings();renderCards();toast('Settings saved')}
 $('chooseBtn').onclick=e=>{e.stopPropagation();$('file').click()};$('file').addEventListener('change',e=>importFiles([...e.target.files]));$('drop').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click()});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('drag')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('drag'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files])});const bind=(id,fn)=>{const el=$(id);if(el)el.onclick=fn};
 bind('settingsBtn',openSettings);bind('settingsBtn2',openSettings);
 bind('moreBtn',e=>{toggleMore()});$('closeSettings').onclick=closeSettings;$('saveSettings').onclick=saveSettings;bind('newBtn',newDeck);bind('newBtn2',newDeck);
