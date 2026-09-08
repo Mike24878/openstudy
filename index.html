@@ -559,6 +559,25 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
   -webkit-backdrop-filter:none;backdrop-filter:none;background:var(--glass-strong);
 }
 
+/* Progress figures are questions; make them look answerable. */
+.stat{font:inherit;text-align:left;width:100%;cursor:pointer;border:1px solid var(--border);background:var(--content)}
+.stat:hover{border-color:var(--accent)}
+.stat:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+.filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
+.chip{display:inline-flex;align-items:center;padding:5px 13px;border-radius:var(--cap);background:var(--accent-wash);color:var(--accent);font-size:12.5px;font-weight:600}
+
+/* A card field that will take a picture should say so when one is over it. */
+.editable.drop-into{background:var(--accent-wash);box-shadow:0 0 0 2px var(--accent) inset}
+
+/* Decks were separated by a hairline and ran together. Each is its own object. */
+.lib-row{
+  border-bottom:0;margin-bottom:10px;padding:14px 16px;
+  border:1px solid var(--border);border-radius:var(--r);background:var(--content-2);
+}
+.lib-row:last-of-type{margin-bottom:0}
+.lib-row.current{border-color:var(--accent);background:var(--accent-wash)}
+.lib-row.current b::after{margin-left:8px}
+
 /* Mike is not in any deck. Mike simply is. */
 .mike-row .num{color:var(--star)}
 .mike-row b{font-family:var(--display);font-size:17px}
@@ -749,7 +768,7 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
   </div>
   <div class="empty" id="reviewEmpty" hidden></div>
 </section>
-<section class="view panel browse" id="view-browse"><input class="search" id="browseSearch" placeholder="Search terms and definitions…"><div class="cardlist" id="cardList"></div></section>
+<section class="view panel browse" id="view-browse"><div class="filter-bar" id="browseFilterBar" hidden></div><input class="search" id="browseSearch" placeholder="Search terms and definitions…"><div class="cardlist" id="cardList"></div></section>
 <section class="view" id="view-progress"><div class="stats" id="stats"></div><div class="panel progress-panel"><h3>Cards needing the most review</h3><div class="cardlist" id="weakList"></div></div></section>
 <section class="view panel editor" id="view-editor"><div class="toolbar"><div><h2 style="margin:0">Edit deck</h2><div class="muted">Fix parsing mistakes or remove cards before studying.</div></div><button class="btn" id="doneEdit">Done</button></div>
 <div class="editor-tools"><button class="btn secondary" id="addCard">+ Add card</button><button class="btn secondary" id="dedupe">Remove duplicates</button><span class="sep"></span><span class="muted">Pictures off by one?</span><button class="smallbtn" id="shiftAllUp">⬆ Shift all pictures up</button><button class="smallbtn" id="shiftAllDown">⬇ Shift all pictures down</button></div>
@@ -2115,10 +2134,44 @@ function emptyBrowseHTML(q){
   if(q!=='mike')return '<div class="empty">No cards match your search.</div>';
   return '<div class="row mike-row"><div class="num">&#9733;</div><div><b>Mike</b></div><div>'+esc(mikeLine())+'<br><small class="muted">Not in this deck. Simply true.</small></div><div></div></div>';
 }
-function renderBrowse(){const q=clean($('browseSearch').value).toLowerCase(),list=state.deck.map((c,i)=>({c,i})).filter(x=>!q||(x.c.termText+' '+x.c.defText).toLowerCase().includes(q));$('cardList').innerHTML=list.length?list.map(x=>`<div class="row"><div class="num">${x.i+1}</div><div>${x.c.termHtml}</div><div>${x.c.defHtml}</div><button class="star ${x.c.star?'on':''}" data-star="${x.i}">${x.c.star?'★':'☆'}</button></div>`).join(''):emptyBrowseHTML(q);document.querySelectorAll('[data-star]').forEach(b=>b.onclick=()=>toggleStar(+b.dataset.star))}
+const BROWSE_FILTERS={
+  all:{label:'All cards',test:()=>true},
+  due:{label:'Due now',test:c=>isDue(c.sched)},
+  starred:{label:'Starred',test:c=>c.star},
+  leech:{label:'Sticking points',test:c=>isLeech(c)},
+  wrong:{label:'Got wrong most',test:c=>c.wrong>c.correct},
+  pics:{label:'With pictures',test:c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)}
+};
+function applyBrowseFilter(key){
+  state.browseFilter=BROWSE_FILTERS[key]?key:'all';
+  switchMode('browse');
+  renderBrowse();
+}
+function renderFilterChip(shown,total){
+  const bar=$('browseFilterBar');
+  if(!bar)return;
+  const key=state.browseFilter||'all';
+  if(key==='all'){bar.hidden=true;return}
+  bar.hidden=false;
+  bar.innerHTML='<span class="chip">'+esc(BROWSE_FILTERS[key].label)+
+    ' &middot; '+shown+' of '+total+'</span><button class="smallbtn" id="clearFilter">Show all</button>';
+  $('clearFilter').onclick=()=>{state.browseFilter='all';renderBrowse()};
+}
+function renderBrowse(){
+  const key=state.browseFilter||'all';
+  const pass=(BROWSE_FILTERS[key]||BROWSE_FILTERS.all).test;
+  const q=clean($('browseSearch').value).toLowerCase();
+  const list=state.deck.map((c,i)=>({c,i}))
+    .filter(x=>pass(x.c))
+    .filter(x=>!q||(x.c.termText+' '+x.c.defText).toLowerCase().includes(q));
+  renderFilterChip(list.length,state.deck.length);$('cardList').innerHTML=list.length?list.map(x=>`<div class="row"><div class="num">${x.i+1}</div><div>${x.c.termHtml}</div><div>${x.c.defHtml}</div><button class="star ${x.c.star?'on':''}" data-star="${x.i}">${x.c.star?'★':'☆'}</button></div>`).join(''):emptyBrowseHTML(q);document.querySelectorAll('[data-star]').forEach(b=>b.onclick=()=>toggleStar(+b.dataset.star))}
 function toggleStar(i){state.deck[i].star=!state.deck[i].star;saveLocal();renderBrowse()}
 function renderProgress(){const total=state.deck.length,attempts=state.deck.reduce((n,c)=>n+c.correct+c.wrong,0),correct=state.deck.reduce((n,c)=>n+c.correct,0),star=state.deck.filter(c=>c.star).length,master=state.deck.filter(c=>c.correct>=3&&c.correct>c.wrong).length,visual=state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length;const due=dueDeck().length,leeches=state.deck.filter(isLeech).length;
-  $('stats').innerHTML=`<div class="stat"><b>${total}</b><span>Total cards</span></div><div class="stat"><b>${due}</b><span>Due now</span></div><div class="stat"><b>${star}</b><span>Starred</span></div><div class="stat"><b>${attempts?Math.round(correct/attempts*100):0}%</b><span>Accuracy</span></div><div class="stat"><b>${leeches}</b><span>Sticking points</span></div>`;const weak=state.deck.map((c,i)=>({c,i,rate:(c.correct+c.wrong)?c.correct/(c.correct+c.wrong):0})).sort((a,b)=>a.rate-b.rate).slice(0,8);$('weakList').innerHTML=weak.map(x=>`<div class="row"><div class="num">${x.i+1}</div><div>${x.c.termHtml}</div><div>${x.c.defHtml}<br><small class="muted">${x.c.correct} correct · ${x.c.wrong} wrong${isLeech(x.c)?' · <span class="leech">sticking point</span>':''}${x.c.sched?' · next in '+fmtInterval(x.c.sched.interval):''}</small></div><div></div></div>`).join('')}
+  // Each figure is a question about a subset, so each one opens that subset.
+  $('stats').dataset.clickable='1';
+  $('stats').innerHTML=`<button class="stat" data-filter="all"><b>${total}</b><span>Total cards</span></button><button class="stat" data-filter="due"><b>${due}</b><span>Due now</span></button><button class="stat" data-filter="starred"><b>${star}</b><span>Starred</span></button><button class="stat" data-filter="wrong"><b>${attempts?Math.round(correct/attempts*100):0}%</b><span>Accuracy</span></button><button class="stat" data-filter="leech"><b>${leeches}</b><span>Sticking points</span></button>`;
+  $('stats').querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>applyBrowseFilter(b.dataset.filter));
+  const weak=state.deck.map((c,i)=>({c,i,rate:(c.correct+c.wrong)?c.correct/(c.correct+c.wrong):0})).sort((a,b)=>a.rate-b.rate).slice(0,8);$('weakList').innerHTML=weak.map(x=>`<div class="row"><div class="num">${x.i+1}</div><div>${x.c.termHtml}</div><div>${x.c.defHtml}<br><small class="muted">${x.c.correct} correct · ${x.c.wrong} wrong${isLeech(x.c)?' · <span class="leech">sticking point</span>':''}${x.c.sched?' · next in '+fmtInterval(x.c.sched.interval):''}</small></div><div></div></div>`).join('')}
 
 /* Manual repair for whatever the layout heuristics still get wrong. Per-card
    nudges handle one-off mistakes; the global shift fixes a systematic
@@ -2150,16 +2203,65 @@ function shiftAllPictures(dir){
   });
   saveLocal();renderEditor();toast(`All pictures shifted ${dir>0?'down':'up'} one card`);
 }
+/* Dropping a picture anywhere outside a drop target makes the browser navigate
+   to the file, losing the deck. Every stray drop is swallowed, and the card
+   fields accept one properly. */
+['dragover','drop'].forEach(ev=>window.addEventListener(ev,e=>{
+  const t=e.target;
+  if(t&&t.closest&&(t.closest('#drop')||t.closest('.editable')))return;
+  e.preventDefault();
+},false));
+
+function commitEditable(el){
+  const i=+el.dataset.i;
+  if(!state.deck[i])return;
+  const html=sanitizeHTML(el.innerHTML,'https://local.openstudy/');
+  if(el.dataset.edit==='term'){state.deck[i].termHtml=html;state.deck[i].termText=clean(strip(html))}
+  else{state.deck[i].defHtml=html;state.deck[i].defText=clean(strip(html))}
+  saveLocal();
+}
+async function insertPictures(el,files){
+  const imgs=[...files].filter(isImageFile);
+  if(!imgs.length)return;
+  for(const f of imgs){
+    try{
+      const url=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f)});
+      el.insertAdjacentHTML('beforeend','<img src="'+(await shrinkImage(url))+'" alt="Added picture">');
+    }catch(e){console.warn('picture insert failed',e);toast('That picture could not be added')}
+  }
+  commitEditable(el);
+  toast(imgs.length===1?'Picture added':imgs.length+' pictures added');
+}
+function wireEditorDrops(){
+  document.querySelectorAll('.editable').forEach(el=>{
+    el.addEventListener('dragover',e=>{e.preventDefault();el.classList.add('drop-into')});
+    el.addEventListener('dragleave',()=>el.classList.remove('drop-into'));
+    el.addEventListener('drop',e=>{
+      e.preventDefault();e.stopPropagation();
+      el.classList.remove('drop-into');
+      insertPictures(el,(e.dataTransfer&&e.dataTransfer.files)||[]);
+    });
+  });
+  document.querySelectorAll('[data-addpic]').forEach(b=>b.onclick=()=>{
+    const target=document.querySelector('[data-edit="def"][data-i="'+b.dataset.addpic+'"]');
+    if(!target)return;
+    const picker=document.createElement('input');
+    picker.type='file';picker.accept='image/*';picker.multiple=true;
+    picker.onchange=()=>insertPictures(target,picker.files);
+    picker.click();
+  });
+}
 function renderEditor(){
   const box=$('editorTable');
   box.innerHTML=`<table class="editor-table"><thead><tr><th>#</th><th>Term</th><th>Definition</th><th></th></tr></thead><tbody>${state.deck.map((c,i)=>{
     const pic=hasVisual(c.termHtml)||hasVisual(c.defHtml);
-    return `<tr><td class="num">${i+1}</td><td><div class="editable" contenteditable="true" data-edit="term" data-i="${i}">${c.termHtml}</div></td><td><div class="editable" contenteditable="true" data-edit="def" data-i="${i}">${c.defHtml}</div></td><td><div class="row-actions">${pic?`<button class="smallbtn" data-picup="${i}" title="Move this card's picture to the previous card">⬆ pic</button><button class="smallbtn" data-picdown="${i}" title="Move this card's picture to the next card">⬇ pic</button>`:''}<button class="smallbtn" data-del="${i}">Delete</button></div></td></tr>`;
+    return `<tr><td class="num">${i+1}</td><td><div class="editable" contenteditable="true" data-edit="term" data-i="${i}">${c.termHtml}</div></td><td><div class="editable" contenteditable="true" data-edit="def" data-i="${i}">${c.defHtml}</div></td><td><div class="row-actions">${pic?`<button class="smallbtn" data-picup="${i}" title="Move this card's picture to the previous card">⬆ pic</button><button class="smallbtn" data-picdown="${i}" title="Move this card's picture to the next card">⬇ pic</button>`:''}<button class="smallbtn" data-addpic="${i}">+ pic</button><button class="smallbtn" data-del="${i}">Delete</button></div></td></tr>`;
   }).join('')}</tbody></table>`;
   document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{state.deck.splice(+b.dataset.del,1);saveLocal();renderEditor()});
   document.querySelectorAll('[data-picup]').forEach(b=>b.onclick=()=>moveCardPictures(+b.dataset.picup,-1));
   document.querySelectorAll('[data-picdown]').forEach(b=>b.onclick=()=>moveCardPictures(+b.dataset.picdown,1));
-  document.querySelectorAll('[data-edit]').forEach(el=>el.addEventListener('blur',()=>{const i=+el.dataset.i;if(el.dataset.edit==='term'){state.deck[i].termHtml=sanitizeHTML(el.innerHTML,'https://local.openstudy/');state.deck[i].termText=clean(strip(state.deck[i].termHtml))}else{state.deck[i].defHtml=sanitizeHTML(el.innerHTML,'https://local.openstudy/');state.deck[i].defText=clean(strip(state.deck[i].defHtml))}saveLocal()}));
+  document.querySelectorAll('[data-edit]').forEach(el=>el.addEventListener('blur',()=>commitEditable(el)));
+  wireEditorDrops();
 }
 function openEditor(){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('view-editor').classList.add('active');document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));renderEditor()}
 function showDeckJSON(json){
