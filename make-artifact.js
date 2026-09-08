@@ -11,8 +11,15 @@ const pick = (re, what) => {
 };
 const body = src.slice(src.indexOf('<body>') + 6, src.lastIndexOf('</body>')).trim();
 if (!body) throw new Error('index.html has no <body> content');
+
+// Font stylesheets have to travel with the page. The manifest and icon links do
+// not: the artifact host supplies its own head and there is no service-worker
+// scope inside it, so those would only 404.
 const head = src.slice(0, src.indexOf('</head>'));
-const links = (head.match(/<link\b[^>]*>/g) || []).join('\n');
+const links = (head.match(/<link\b[^>]*>/g) || [])
+  .filter(tag => !/rel=["'](manifest|icon|apple-touch-icon)["']/.test(tag))
+  .join('\n');
+
 const out = `${pick(/<title>[\s\S]*?<\/title>/, '<title>')}\n${links}\n${pick(/<style>[\s\S]*?<\/style>/, '<style>')}\n${body}\n`;
 for (const tag of ['<!DOCTYPE', '<html', '</html>', '<head>', '</head>', '<body>', '</body>']) {
   if (out.includes(tag)) throw new Error(`wrapper ${tag} survived the strip`);

@@ -4,6 +4,11 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0">
 <title>OpenStudy</title>
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
+<link rel="apple-touch-icon" href="icon-192.png">
+<meta name="theme-color" content="#0E5C55">
+<meta name="description" content="Import Quizlet exports and study them locally, pictures included. Free, no account.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,600;9..144,700&family=IBM+Plex+Mono:wght@500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap">
@@ -419,6 +424,39 @@ button,input,select,textarea{font:inherit;color:inherit}
 .notice{padding:13px;border:1px solid var(--star);background:color-mix(in srgb,var(--star) 10%,transparent);border-radius:var(--r-in);font-size:13px;line-height:1.5;margin-top:12px}
 [hidden]{display:none!important}
 
+/* ---------- deck library + share ---------- */
+.lib-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 2px;border-bottom:1px solid var(--hairline)}
+.lib-row:last-of-type{border-bottom:0}
+.lib-row b{display:block;font-size:14.5px;margin-bottom:2px}
+.lib-row span{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.lib-row.current b::after{content:"";display:inline-block;width:7px;height:7px;margin-left:8px;border-radius:var(--cap);background:var(--accent);vertical-align:middle}
+.lib-actions{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}
+#shareText{width:100%;height:92px;font-family:var(--mono);font-size:12px;line-height:1.5;resize:vertical;word-break:break-all}
+
+/* ---------- glass, second pass ----------
+   Two things separate a convincing glass surface from a translucent panel: a
+   specular highlight that tracks the pointer, and a material that responds when
+   content passes beneath it. Both are decoration only — pointer-events stay
+   off, and everything degrades to the flat surface without them. */
+.top,.deckbar,.nav{position:relative;isolation:isolate}
+.top::after,.deckbar::after,.nav::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;
+  background:radial-gradient(160px circle at var(--mx,50%) var(--my,0%),var(--glass-edge),transparent 62%);
+  opacity:0;transition:opacity .35s var(--ease);
+}
+.top:hover::after,.deckbar:hover::after,.nav:hover::after{opacity:.9}
+.top>*,.deckbar>*{position:relative;z-index:1}
+
+/* Chrome firms up once content slides underneath it, the way a system bar does. */
+body.scrolled .top,body.scrolled .nav{
+  background:var(--glass-strong);
+  box-shadow:var(--lift), inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-shade);
+}
+.top,.deckbar,.nav,.modalbox,.toast,.loading,.banner{
+  box-shadow:var(--shadow), inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-shade);
+  transition:background .3s var(--ease),box-shadow .3s var(--ease);
+}
+
 /* Mike is not in any deck. Mike simply is. */
 .mike-row .num{color:var(--star)}
 .mike-row b{font-family:var(--display);font-size:17px}
@@ -516,7 +554,7 @@ button,input,select,textarea{font:inherit;color:inherit}
     </div>
   </div>
 </section>
-<section class="deckbar" id="deckbar"><div class="deck-info"><strong id="deckTitle">Untitled deck</strong><br><span id="deckMeta"></span></div><div class="deck-actions"><button class="btn secondary" id="editBtn">Edit cards</button><button class="btn secondary" id="settingsBtn2">Options</button><button class="btn secondary" id="exportBtn">Export deck</button><button class="btn ghost" id="reportBtn">Import look wrong?</button><button class="btn ghost" id="newBtn2">Load another</button></div></section>
+<section class="deckbar" id="deckbar"><div class="deck-info"><strong id="deckTitle">Untitled deck</strong><br><span id="deckMeta"></span></div><div class="deck-actions"><button class="btn secondary" id="editBtn">Edit cards</button><button class="btn secondary" id="settingsBtn2">Options</button><button class="btn secondary" id="libraryBtn">Decks</button><button class="btn secondary" id="shareBtn">Share</button><button class="btn secondary" id="exportBtn">Export deck</button><button class="btn ghost" id="reportBtn">Import look wrong?</button><button class="btn ghost" id="newBtn2">Load another</button></div></section>
 <nav class="nav" id="nav"><span class="nav-pill" id="navPill"></span><button class="tab active" data-mode="cards">Flashcards</button><button class="tab" data-mode="learn">Learn</button><button class="tab" data-mode="write">Write</button><button class="tab" data-mode="match">Match</button><button class="tab" data-mode="test">Test</button><button class="tab" data-mode="review">Review <span class="duebadge" id="dueBadge" hidden></span></button><button class="tab" data-mode="browse">Browse</button><button class="tab" data-mode="progress">Progress</button></nav>
 <section class="view active" id="view-cards"><div class="toolbar"><span class="muted" id="fcProgress"></span><span class="muted">Space: flip · ←/→: navigate · S: star · R: read aloud</span></div><div class="flash-wrap" id="flashWrap"><div class="flash" id="flash"><div class="face"><span class="face-label">Term</span><div class="content" id="front"></div></div><div class="face back"><span class="face-label">Definition</span><div class="content" id="back"></div></div></div></div><div class="controls"><button class="btn secondary" id="prev">← Previous</button><div class="mid"><button class="btn secondary" id="shuffle">Shuffle</button><button class="btn ghost" id="starBtn">☆ Star</button><button class="btn ghost" id="speakBtn">🔊</button></div><button class="btn" id="next">Next →</button></div><div class="rate-row" id="cardRate">
   <button class="btn secondary" data-crate="1">Again<small></small></button>
@@ -1283,7 +1321,7 @@ async function importFiles(files){
     if(!result.cards.length)throw new Error('No term/definition pairs were detected. If this is a saved Quizlet webpage, select the HTML plus its image files or upload the ZIP containing them.');
     lastImport.cards=result.cards.length;
     if(result.diag)Object.assign(lastImport,result.diag);
-    state.deck=result.cards;state.title=result.title||'Imported deck';state.index=0;state.flipped=false;
+    state.deckId=newDeckId();state.deck=result.cards;state.title=result.title||'Imported deck';state.index=0;state.flipped=false;
     saveLocal();showDeck();$('status').textContent='';showImportBanner(state.deck.length,withPicsCount());
     const withPics=state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length;
     toast(`Imported ${state.deck.length} cards${withPics?` · ${withPics} with pictures`:''}`);
@@ -1615,13 +1653,13 @@ function showDeckJSON(json){
   $('exportText').value=json;
   m.classList.add('show');
 }
-/* ===================== storage =====================
-   localStorage caps around 5 MB per origin, and a picture card costs roughly
-   11 KB, so a 450-card illustrated set would silently fail to save. IndexedDB
-   has no such practical ceiling and stores structured data directly. Anything
-   already in localStorage is migrated on first load; if IndexedDB is
-   unavailable (private windows, blocked site data) the old path still works. */
-const DB_NAME='openstudy',DB_STORE='decks',DB_KEY='current';
+/* ===================== storage and library =====================
+   Decks live in IndexedDB: an index record listing what exists, one record per
+   deck, and the settings. Previously a single record held "the" deck, so
+   importing a second set destroyed the first — the library exists to fix that,
+   and it is the prerequisite for anything that syncs or shares later. */
+const DB_NAME='openstudy',DB_STORE='decks';
+const LEGACY_KEY='current',IDX_KEY='index',SET_KEY='settings';
 let dbPromise=null;
 function idb(){
   if(dbPromise)return dbPromise;
@@ -1637,30 +1675,49 @@ function idb(){
   }).catch(e=>{dbPromise=null;throw e});
   return dbPromise;
 }
-function idbPut(value){
+function idbPutKey(key,value){
   return idb().then(db=>new Promise((res,rej)=>{
     const tx=db.transaction(DB_STORE,'readwrite');
-    tx.objectStore(DB_STORE).put(value,DB_KEY);
+    tx.objectStore(DB_STORE).put(value,key);
     tx.oncomplete=()=>res(true);
     tx.onerror=()=>rej(tx.error);
     tx.onabort=()=>rej(tx.error||new Error('write aborted'));
   }));
 }
-function idbGet(){
+function idbGetKey(key){
   return idb().then(db=>new Promise((res,rej)=>{
     const tx=db.transaction(DB_STORE,'readonly');
-    const q=tx.objectStore(DB_STORE).get(DB_KEY);
-    q.onsuccess=()=>res(q.result||null);
+    const q=tx.objectStore(DB_STORE).get(key);
+    q.onsuccess=()=>res(q.result===undefined?null:q.result);
     q.onerror=()=>rej(q.error);
   }));
 }
-function idbClear(){
+function idbDelKey(key){
   return idb().then(db=>new Promise((res,rej)=>{
     const tx=db.transaction(DB_STORE,'readwrite');
-    tx.objectStore(DB_STORE).delete(DB_KEY);
+    tx.objectStore(DB_STORE).delete(key);
     tx.oncomplete=()=>res(true);
     tx.onerror=()=>rej(tx.error);
   })).catch(()=>false);
+}
+const deckKey=id=>'deck:'+id;
+const newDeckId=()=>'d'+Date.now().toString(36)+Math.random().toString(36).slice(2,7);
+function idbClear(){
+  // Used by "New deck": clears the working deck, never the library.
+  return idbDelKey(LEGACY_KEY);
+}
+
+let libraryIndex=[];
+function deckSummary(){
+  return {id:state.deckId,title:state.title,count:state.deck.length,
+          pics:withPicsCount(),updated:Date.now()};
+}
+async function readIndex(){
+  try{ libraryIndex=(await idbGetKey(IDX_KEY))||[] }catch(e){ libraryIndex=[] }
+  return libraryIndex;
+}
+async function writeIndex(){
+  try{ await idbPutKey(IDX_KEY,libraryIndex) }catch(e){}
 }
 let saveTimer=null,warnedFull=false;
 // Study modes call this on every answer, so coalesce the writes.
@@ -1669,14 +1726,21 @@ function saveLocal(){
   saveTimer=setTimeout(persistNow,250);
 }
 async function persistNow(){
-  const payload={title:state.title,deck:state.deck,settings:state.settings};
+  if(!state.deck.length)return false;
+  if(!state.deckId)state.deckId=newDeckId();
+  const record={id:state.deckId,title:state.title,deck:state.deck,updated:Date.now()};
   try{
-    await idbPut(payload);
+    await idbPutKey(deckKey(state.deckId),record);
+    await idbPutKey(SET_KEY,{settings:state.settings,currentId:state.deckId});
+    const summary=deckSummary();
+    const at=libraryIndex.findIndex(d=>d.id===state.deckId);
+    if(at>=0)libraryIndex[at]=summary; else libraryIndex.unshift(summary);
+    await writeIndex();
     try{localStorage.removeItem(STORAGE)}catch(e){}
     return true;
   }catch(e){
     try{
-      localStorage.setItem(STORAGE,JSON.stringify(payload));
+      localStorage.setItem(STORAGE,JSON.stringify({title:state.title,deck:state.deck,settings:state.settings}));
       return true;
     }catch(e2){
       if(!warnedFull){warnedFull=true;toast('This deck is too large for browser storage — export it to keep a copy')}
@@ -1685,20 +1749,216 @@ async function persistNow(){
   }
 }
 async function loadSaved(){
-  let saved=null;
-  try{saved=await idbGet()}catch(e){}
-  if(!saved){
-    try{saved=JSON.parse(localStorage.getItem(STORAGE)||'null')}catch(e){}
-    if(saved&&saved.deck&&saved.deck.length){
-      try{await idbPut(saved);localStorage.removeItem(STORAGE)}catch(e){}
-    }
+  await readIndex();
+  let meta=null;
+  try{ meta=await idbGetKey(SET_KEY) }catch(e){}
+  if(meta&&meta.settings)state.settings={...state.settings,...meta.settings};
+
+  // Anything written by an earlier version becomes the first library entry.
+  let legacy=null;
+  try{ legacy=await idbGetKey(LEGACY_KEY) }catch(e){}
+  if(!legacy){
+    try{ legacy=JSON.parse(localStorage.getItem(STORAGE)||'null') }catch(e){}
   }
-  if(saved&&saved.deck&&saved.deck.length){
-    state.title=saved.title||'Saved deck';
-    state.deck=finalizeCards(saved.deck);
-    state.settings={...state.settings,...saved.settings};
+  if(legacy&&legacy.deck&&legacy.deck.length&&!libraryIndex.length){
+    state.deckId=newDeckId();
+    state.title=legacy.title||'Saved deck';
+    state.deck=finalizeCards(legacy.deck);
+    if(legacy.settings)state.settings={...state.settings,...legacy.settings};
+    await persistNow();
+    await idbDelKey(LEGACY_KEY);
+    try{localStorage.removeItem(STORAGE)}catch(e){}
     showDeck();
+    return;
   }
+  const wanted=(meta&&meta.currentId)||(libraryIndex[0]&&libraryIndex[0].id);
+  if(wanted)await openDeckById(wanted,true);
+}
+async function openDeckById(id,silent){
+  let rec=null;
+  try{ rec=await idbGetKey(deckKey(id)) }catch(e){}
+  if(!rec||!rec.deck||!rec.deck.length){
+    libraryIndex=libraryIndex.filter(d=>d.id!==id);
+    await writeIndex();
+    if(!silent)toast('That deck could not be opened');
+    return false;
+  }
+  state.deckId=id;
+  state.title=rec.title||'Saved deck';
+  state.deck=finalizeCards(rec.deck);
+  state.index=0;state.flipped=false;
+  try{ await idbPutKey(SET_KEY,{settings:state.settings,currentId:id}) }catch(e){}
+  hideImportBanner();
+  showDeck();
+  return true;
+}
+async function deleteDeckById(id){
+  await idbDelKey(deckKey(id));
+  libraryIndex=libraryIndex.filter(d=>d.id!==id);
+  await writeIndex();
+  if(state.deckId===id){
+    state.deck=[];state.deckId=null;
+    if(libraryIndex.length)await openDeckById(libraryIndex[0].id,true);
+    else newDeck();
+  }
+  renderLibrary();
+}
+function renderLibrary(){
+  const body=$('libraryBody');
+  if(!body)return;
+  if(!libraryIndex.length){
+    body.innerHTML='<div class="empty">No saved decks yet. Import one and it will appear here.</div>';
+    return;
+  }
+  body.innerHTML=libraryIndex.map(d=>
+    '<div class="lib-row'+(d.id===state.deckId?' current':'')+'">'+
+      '<div><b>'+esc(d.title||'Untitled')+'</b>'+
+      '<span>'+d.count+' cards'+(d.pics?' · '+d.pics+' with pictures':'')+
+      (d.id===state.deckId?' · open now':'')+'</span></div>'+
+      '<div class="lib-actions">'+
+        (d.id===state.deckId?'':'<button class="smallbtn" data-open="'+d.id+'">Open</button>')+
+        '<button class="smallbtn" data-rename="'+d.id+'">Rename</button>'+
+        '<button class="smallbtn" data-del="'+d.id+'">Delete</button>'+
+      '</div></div>').join('');
+  body.querySelectorAll('[data-open]').forEach(b=>b.onclick=async()=>{
+    await openDeckById(b.dataset.open);$('libraryModal').classList.remove('show');
+  });
+  body.querySelectorAll('[data-rename]').forEach(b=>b.onclick=async()=>{
+    const d=libraryIndex.find(x=>x.id===b.dataset.rename);
+    const name=prompt('Name this deck',d?d.title:'');
+    if(name==null)return;
+    d.title=clean(name)||d.title;
+    if(state.deckId===d.id){state.title=d.title;$('deckTitle').textContent=d.title}
+    const rec=await idbGetKey(deckKey(d.id));
+    if(rec){rec.title=d.title;await idbPutKey(deckKey(d.id),rec)}
+    await writeIndex();renderLibrary();
+  });
+  body.querySelectorAll('[data-del]').forEach(b=>b.onclick=async()=>{
+    const d=libraryIndex.find(x=>x.id===b.dataset.del);
+    if(!confirm('Delete "'+(d?d.title:'this deck')+'"? This cannot be undone.'))return;
+    await deleteDeckById(b.dataset.del);
+  });
+}
+function openLibrary(){
+  let m=$('libraryModal');
+  if(!m){
+    m=document.createElement('div');
+    m.id='libraryModal';m.className='modal';
+    m.innerHTML='<div class="modalbox"><h3>Your decks</h3>'+
+      '<p class="report-why">Everything you have imported on this browser. Decks are stored locally and are not synced between devices.</p>'+
+      '<div id="libraryBody"></div>'+
+      '<div class="modal-actions"><button class="btn secondary" id="libImport">Import another</button>'+
+      '<button class="btn" id="libClose">Done</button></div></div>';
+    document.body.appendChild(m);
+    m.querySelector('#libClose').onclick=()=>m.classList.remove('show');
+    m.querySelector('#libImport').onclick=()=>{m.classList.remove('show');newDeck()};
+  }
+  renderLibrary();
+  m.classList.add('show');
+}
+
+/* ===================== share by link =====================
+   No server, so the deck travels inside the URL fragment — gzipped and
+   base64url encoded. Text only: a picture card is roughly 11 KB and would blow
+   past any practical link length, so illustrated decks are shared as a file
+   instead. The fragment never leaves the browser: it is not sent to the host. */
+function b64urlEncode(bytes){
+  let s='';
+  for(let i=0;i<bytes.length;i+=0x8000)s+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));
+  return btoa(s).replace(/\+/g,'-').replace(/\//g,'_').replace(/=+$/,'');
+}
+function b64urlDecode(str){
+  const s=str.replace(/-/g,'+').replace(/_/g,'/');
+  const bin=atob(s+'==='.slice((s.length+3)%4));
+  const out=new Uint8Array(bin.length);
+  for(let i=0;i<bin.length;i++)out[i]=bin.charCodeAt(i);
+  return out;
+}
+async function deflate(text){
+  if(typeof CompressionStream==='undefined')return null;
+  const stream=new Blob([text]).stream().pipeThrough(new CompressionStream('gzip'));
+  return new Uint8Array(await new Response(stream).arrayBuffer());
+}
+async function inflate(bytes){
+  const stream=new Blob([bytes]).stream().pipeThrough(new DecompressionStream('gzip'));
+  return await new Response(stream).text();
+}
+async function buildShareLink(){
+  const payload={t:state.title,c:state.deck.map(c=>[c.termText,c.defText])};
+  const json=JSON.stringify(payload);
+  const packed=await deflate(json);
+  const encoded=packed?('1'+b64urlEncode(packed)):('0'+b64urlEncode(new TextEncoder().encode(json)));
+  const base=location.origin+location.pathname;
+  return {url:base+'#d='+encoded,bytes:encoded.length};
+}
+async function openShare(){
+  const droppedPics=withPicsCount();
+  const {url,bytes}=await buildShareLink();
+  let m=$('shareModal');
+  if(!m){
+    m=document.createElement('div');
+    m.id='shareModal';m.className='modal';
+    m.innerHTML='<div class="modalbox"><h3>Share this deck</h3>'+
+      '<p class="report-why" id="shareWhy"></p>'+
+      '<textarea id="shareText" spellcheck="false" readonly></textarea>'+
+      '<div class="modal-actions"><button class="btn secondary" id="shareClose">Close</button>'+
+      '<button class="btn" id="shareCopy">Copy link</button></div></div>';
+    document.body.appendChild(m);
+    m.querySelector('#shareClose').onclick=()=>m.classList.remove('show');
+    m.querySelector('#shareCopy').onclick=async()=>{
+      const t=$('shareText');
+      try{await navigator.clipboard.writeText(t.value);toast('Link copied')}
+      catch(e){t.focus();t.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}
+        toast(ok?'Link copied':'Press Ctrl+C to copy')}
+    };
+  }
+  const kb=(bytes/1024).toFixed(1);
+  let why='Anyone opening this link gets the whole deck — the cards travel inside the link itself, so nothing is uploaded anywhere.';
+  if(droppedPics)why+=' Pictures are <b>not</b> included: they are far too large for a link. Export the .json file instead if the pictures matter.';
+  if(bytes>8000)why+=' At '+kb+' KB this link is long, and some chat apps truncate long links — send it somewhere that preserves the whole thing, or share the .json file.';
+  $('shareWhy').innerHTML=why;
+  $('shareText').value=url;
+  m.classList.add('show');
+}
+async function importFromHash(){
+  const h=location.hash||'';
+  if(!h.startsWith('#d='))return false;
+  const raw=h.slice(3);
+  try{
+    const bytes=b64urlDecode(raw.slice(1));
+    const json=raw[0]==='1'?await inflate(bytes):new TextDecoder().decode(bytes);
+    const payload=JSON.parse(json);
+    const cards=finalizeCards((payload.c||[]).map(([t,d])=>({termText:t,defText:d})));
+    if(!cards.length)throw new Error('empty');
+    history.replaceState(null,'',location.pathname+location.search);
+    state.deckId=newDeckId();
+    state.deck=cards;
+    state.title=payload.t||'Shared deck';
+    state.index=0;state.flipped=false;
+    await persistNow();
+    showDeck();
+    showImportBanner(cards.length,0);
+    toast('Opened a shared deck — '+cards.length+' cards');
+    return true;
+  }catch(e){
+    console.warn('shared link failed',e);
+    toast('That shared link could not be read.');
+    history.replaceState(null,'',location.pathname+location.search);
+    return false;
+  }
+}
+
+/* ===================== installable app =====================
+   Studying happens on phones, in transit, offline. Registered only for a
+   top-level page over http(s); inside an embedded viewer there is no scope to
+   register against. */
+function registerServiceWorker(){
+  if(!('serviceWorker'in navigator))return;
+  if(window.self!==window.top)return;
+  if(!/^https?:$/.test(location.protocol))return;
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').catch(e=>console.warn('service worker not registered',e));
+  });
 }
 
 /* ===================== export =====================
@@ -1776,11 +2036,11 @@ function showImportBanner(cards,pics){
   $('bannerHide').onclick=()=>{b.hidden=true};
 }
 function hideImportBanner(){const b=$('importBanner');if(b)b.hidden=true}
-function newDeck(){localStorage.removeItem(STORAGE);idbClear();hideImportBanner();state.deck=[];$('deckbar').style.display='none';$('nav').style.display='none';document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('uploadPanel').style.display='block';$('file').value='';$('status').textContent='';toast('Ready for another deck')}
+function newDeck(){hideImportBanner();state.deck=[];state.deckId=null;$('deckbar').style.display='none';$('nav').style.display='none';document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('uploadPanel').style.display='block';$('file').value='';$('status').textContent='';toast('Ready for another deck')}
 function openSettings(){$('direction').value=state.settings.direction;$('testLength').value=state.settings.testLength;$('matchSize').value=state.settings.matchSize;$('autoSpeak').value=state.settings.autoSpeak;$('settingsModal').classList.add('show')}
 function closeSettings(){$('settingsModal').classList.remove('show')}
 function saveSettings(){state.settings.direction=$('direction').value;state.settings.testLength=$('testLength').value;state.settings.matchSize=+$('matchSize').value;state.settings.autoSpeak=$('autoSpeak').value;saveLocal();closeSettings();renderCards();toast('Settings saved')}
-$('chooseBtn').onclick=e=>{e.stopPropagation();$('file').click()};$('file').addEventListener('change',e=>importFiles([...e.target.files]));$('drop').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click()});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('drag')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('drag'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files])});$('settingsBtn').onclick=openSettings;$('settingsBtn2').onclick=openSettings;$('closeSettings').onclick=closeSettings;$('saveSettings').onclick=saveSettings;$('newBtn').onclick=newDeck;$('newBtn2').onclick=newDeck;$('exportBtn').onclick=exportDeck;$('reportBtn').onclick=openReport;$('editBtn').onclick=openEditor;$('doneEdit').onclick=()=>{showDeck();saveLocal()};$('addCard').onclick=()=>{state.deck.push(makeCard('<span>New term</span>','<span>New definition</span>'));saveLocal();renderEditor()};$('dedupe').onclick=()=>{state.deck=finalizeCards(state.deck);saveLocal();renderEditor();toast('Duplicates removed')};$('shiftAllUp').onclick=()=>shiftAllPictures(-1);$('shiftAllDown').onclick=()=>shiftAllPictures(1);$('flashWrap').onclick=flip;$('next').onclick=nextCard;$('prev').onclick=prevCard;$('shuffle').onclick=shuffleDeck;$('starBtn').onclick=e=>{e.stopPropagation();starCurrent()};$('speakBtn').onclick=e=>{e.stopPropagation();speakCurrent()};document.querySelectorAll('[data-crate]').forEach(b=>b.onclick=()=>recordCurrent(+b.dataset.crate));
+$('chooseBtn').onclick=e=>{e.stopPropagation();$('file').click()};$('file').addEventListener('change',e=>importFiles([...e.target.files]));$('drop').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click()});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('drag')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('drag'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files])});$('settingsBtn').onclick=openSettings;$('settingsBtn2').onclick=openSettings;$('closeSettings').onclick=closeSettings;$('saveSettings').onclick=saveSettings;$('newBtn').onclick=newDeck;$('newBtn2').onclick=newDeck;$('exportBtn').onclick=exportDeck;$('libraryBtn').onclick=openLibrary;$('shareBtn').onclick=openShare;$('reportBtn').onclick=openReport;$('editBtn').onclick=openEditor;$('doneEdit').onclick=()=>{showDeck();saveLocal()};$('addCard').onclick=()=>{state.deck.push(makeCard('<span>New term</span>','<span>New definition</span>'));saveLocal();renderEditor()};$('dedupe').onclick=()=>{state.deck=finalizeCards(state.deck);saveLocal();renderEditor();toast('Duplicates removed')};$('shiftAllUp').onclick=()=>shiftAllPictures(-1);$('shiftAllDown').onclick=()=>shiftAllPictures(1);$('flashWrap').onclick=flip;$('next').onclick=nextCard;$('prev').onclick=prevCard;$('shuffle').onclick=shuffleDeck;$('starBtn').onclick=e=>{e.stopPropagation();starCurrent()};$('speakBtn').onclick=e=>{e.stopPropagation();speakCurrent()};document.querySelectorAll('[data-crate]').forEach(b=>b.onclick=()=>recordCurrent(+b.dataset.crate));
 $('revealBtn').onclick=revealReview;
 document.querySelectorAll('[data-rate]').forEach(b=>b.onclick=()=>answerReview(+b.dataset.rate));$('learnContinue').onclick=renderLearn;$('writeCheck').onclick=checkWrite;$('writeInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkWrite()});$('writeContinue').onclick=renderWrite;$('matchRestart').onclick=initMatch;$('testAgain').onclick=initTest;$('browseSearch').addEventListener('input',renderBrowse);document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)||document.activeElement.isContentEditable)return;
   if(e.key.length===1){mikeBuf=(mikeBuf+e.key.toLowerCase()).slice(-4);if(mikeBuf==='mike'){mikeBuf='';toast(mikeLine());return}}
@@ -1790,7 +2050,45 @@ document.querySelectorAll('[data-rate]').forEach(b=>b.onclick=()=>answerReview(+
     if('1234'.includes(e.key)){answerReview(+e.key);return}
   }
   if(e.code==='Space'&&state.mode==='cards'){e.preventDefault();flip()}if(e.key==='ArrowRight'&&state.mode==='cards')nextCard();if(e.key==='ArrowLeft'&&state.mode==='cards')prevCard();if(e.key.toLowerCase()==='s'&&state.mode==='cards')starCurrent();if(e.key.toLowerCase()==='r'&&state.mode==='cards')speakCurrent()});let mikeBuf='';
-loadSaved();
+(async()=>{ if(!await importFromHash()) await loadSaved(); })();
+// Pasting a share link into a tab that already has the app open only changes
+// the fragment; the page never reloads, so listen for that too.
+window.addEventListener('hashchange',()=>{ importFromHash(); });
+registerServiceWorker();
+/* ---------- glass response ----------
+   The specular highlight follows the pointer across each glass surface, and the
+   chrome firms up once content scrolls beneath it. Both are presentation only;
+   if either listener never runs the interface is simply the static material.
+   Reduce Motion suppresses the highlight, since it is movement for its own sake. */
+(function glassResponse(){
+  const still=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  if(!still){
+    let queued=false,pending=null;
+    const paint=()=>{
+      queued=false;
+      if(!pending)return;
+      const {el,x,y}=pending;
+      const r=el.getBoundingClientRect();
+      el.style.setProperty('--mx',((x-r.left)/r.width*100).toFixed(1)+'%');
+      el.style.setProperty('--my',((y-r.top)/r.height*100).toFixed(1)+'%');
+    };
+    document.addEventListener('pointermove',e=>{
+      const el=e.target&&e.target.closest&&e.target.closest('.top,.deckbar,.nav');
+      if(!el)return;
+      pending={el,x:e.clientX,y:e.clientY};
+      if(!queued){queued=true;requestAnimationFrame(paint)}
+    },{passive:true});
+  }
+  let ticking=false;
+  const onScroll=()=>{
+    ticking=false;
+    document.body.classList.toggle('scrolled',window.scrollY>8);
+  };
+  window.addEventListener('scroll',()=>{
+    if(!ticking){ticking=true;requestAnimationFrame(onScroll)}
+  },{passive:true});
+  onScroll();
+})();
 console.log('%cOpenStudy','font:600 14px ui-sans-serif','\u2014 with thanks to Mike, who did not need the help.');
 </script>
 </body>
