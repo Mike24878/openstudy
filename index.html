@@ -91,7 +91,7 @@
 html{scroll-behavior:smooth}
 body{
   margin:0;background:var(--paper);color:var(--text);
-  font-family:var(--sans);font-size:15px;line-height:1.55;min-height:100vh;
+  font-family:var(--sans);font-size:0.9375rem;line-height:1.55;min-height:100vh;
   -webkit-font-smoothing:antialiased;
 }
 /* The ambient field gives the glass something to refract. Fixed, so it stays
@@ -136,14 +136,14 @@ button,input,select,textarea{font:inherit;color:inherit}
   border:1px solid var(--glass-edge-low);
   box-shadow:var(--shadow), inset 0 1px 0 var(--glass-edge);
 }
-.brand h1{margin:0;font-family:var(--display);font-weight:700;font-size:clamp(24px,3.2vw,31px);letter-spacing:-.02em;line-height:1}
-.brand p{margin:5px 0 0;color:var(--muted);font-size:13.5px;max-width:62ch}
+.brand h1{margin:0;font-family:var(--display);font-weight:700;font-size:clamp(1.5rem, calc(0.5rem + 2.24vw), 1.9375rem);letter-spacing:-.02em;line-height:1}
+.brand p{margin:5px 0 0;color:var(--muted);font-size:0.8438rem;max-width:62ch}
 .top-actions,.deck-actions{display:flex;gap:8px;flex-wrap:wrap}
 
 /* ---------- controls: capsules that flex on press ---------- */
 .btn{
   border:1px solid transparent;border-radius:var(--cap);padding:9px 17px;
-  background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:14px;cursor:pointer;
+  background:var(--accent);color:var(--accent-ink);font-weight:600;font-size:0.875rem;cursor:pointer;
   transition:transform .22s var(--spring),background .18s var(--ease),box-shadow .18s var(--ease),color .18s var(--ease);
   box-shadow:0 1px 2px var(--glass-shade), inset 0 1px 0 rgba(255,255,255,.22);
 }
@@ -161,7 +161,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .btn:disabled{opacity:.45;cursor:not-allowed;transform:none}
 .smallbtn{
   border:1px solid var(--glass-edge-low);background:var(--glass-strong);color:var(--text);
-  border-radius:var(--cap);padding:5px 11px;cursor:pointer;font-size:12.5px;font-weight:500;
+  border-radius:var(--cap);padding:5px 11px;cursor:pointer;font-size:0.7813rem;font-weight:500;
   -webkit-backdrop-filter:blur(10px);backdrop-filter:blur(10px);
   transition:transform .2s var(--spring),color .16s,border-color .16s;
 }
@@ -175,13 +175,13 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* ---------- import ---------- */
 .upload{padding:8px}
 .landing{text-align:center;padding:30px 20px 6px;max-width:64ch;margin-inline:auto}
-.landing h2{font-family:var(--display);font-weight:600;font-size:clamp(24px,3.6vw,34px);line-height:1.18;margin:0 0 12px;text-wrap:balance}
-.landing p{margin:0;color:var(--muted);font-size:15px;line-height:1.6}
+.landing h2{font-family:var(--display);font-weight:600;font-size:clamp(1.5rem, calc(0.5rem + 2.52vw), 2.125rem);line-height:1.18;margin:0 0 12px;text-wrap:balance}
+.landing p{margin:0;color:var(--muted);font-size:0.9375rem;line-height:1.6}
 .trust{
   display:inline-flex;align-items:center;gap:7px;margin-top:18px;padding:7px 15px;border-radius:var(--cap);
   background:var(--glass-strong);border:1px solid var(--glass-edge-low);color:var(--accent);
   -webkit-backdrop-filter:blur(12px);backdrop-filter:blur(12px);
-  font-size:12.5px;font-weight:600;box-shadow:inset 0 1px 0 var(--glass-edge);
+  font-size:0.7813rem;font-weight:600;box-shadow:inset 0 1px 0 var(--glass-edge);
 }
 .drop{
   border:1.5px dashed var(--border);border-radius:var(--r);padding:52px 24px;text-align:center;cursor:pointer;
@@ -189,27 +189,27 @@ button,input,select,textarea{font:inherit;color:inherit}
 }
 .drop:hover,.drop.drag{border-color:var(--accent);background:var(--accent-wash)}
 .drop.drag{transform:scale(1.01)}
-.drop h2{margin:0 0 10px;font-family:var(--display);font-weight:500;font-size:23px;text-wrap:balance}
-.drop p{margin:0 auto 18px;color:var(--muted);max-width:64ch;font-size:14px}
+.drop h2{margin:0 0 10px;font-family:var(--display);font-weight:500;font-size:1.4375rem;text-wrap:balance}
+.drop p{margin:0 auto 18px;color:var(--muted);max-width:64ch;font-size:0.875rem}
 .file-input{display:none}
-.hint{font-size:12.5px;color:var(--muted);margin-top:14px;text-align:center;max-width:70ch;margin-inline:auto}
-.status{font-size:13px;color:var(--muted);min-height:20px;padding:0 8px;font-family:var(--mono)}
+.hint{font-size:0.7813rem;color:var(--muted);margin-top:14px;text-align:center;max-width:70ch;margin-inline:auto}
+.status{font-size:0.8125rem;color:var(--muted);min-height:20px;padding:0 8px;font-family:var(--mono)}
 .detail{padding:8px 20px 26px;display:grid;gap:28px;min-width:0}
 .detail>*{min-width:0}
 .tablewrap{min-width:0;max-width:100%}
-.detail h3{font-family:var(--display);font-weight:600;font-size:18px;margin:0 0 12px}
+.detail h3{font-family:var(--display);font-weight:600;font-size:1.125rem;margin:0 0 12px}
 .tablewrap{overflow-x:auto}
-.fmt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:460px}
-.fmt th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;padding:0 10px 8px;border-bottom:1px solid var(--border)}
+.fmt{width:100%;border-collapse:collapse;font-size:0.8438rem;min-width:460px}
+.fmt th{text-align:left;font-size:0.6875rem;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;padding:0 10px 8px;border-bottom:1px solid var(--border)}
 .fmt td{padding:11px 10px;border-bottom:1px solid var(--hairline);vertical-align:top}
 .fmt td:first-child{font-weight:600;white-space:nowrap}
 .fmt .yes{color:var(--good);font-weight:600}
 .fmt .no{color:var(--muted)}
 .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;counter-reset:step}
 .step{padding:17px;background:var(--content-2);border-radius:var(--r-in)}
-.step::before{counter-increment:step;content:counter(step);font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent);display:block;margin-bottom:6px}
-.step b{display:block;font-size:14.5px;margin-bottom:3px}
-.step span{font-size:13px;color:var(--muted);line-height:1.5}
+.step::before{counter-increment:step;content:counter(step);font-family:var(--mono);font-size:0.6875rem;font-weight:600;color:var(--accent);display:block;margin-bottom:6px}
+.step b{display:block;font-size:0.9063rem;margin-bottom:3px}
+.step span{font-size:0.8125rem;color:var(--muted);line-height:1.5}
 
 /* ---------- deck bar ---------- */
 .deckbar{
@@ -221,8 +221,8 @@ button,input,select,textarea{font:inherit;color:inherit}
   border:1px solid var(--glass-edge-low);
   box-shadow:var(--shadow), inset 0 1px 0 var(--glass-edge);
 }
-.deck-info strong{font-family:var(--display);font-size:19px;font-weight:600}
-.deck-info span{color:var(--muted);font-size:12.5px;font-family:var(--mono)}
+.deck-info strong{font-family:var(--display);font-size:1.1875rem;font-weight:600}
+.deck-info span{color:var(--muted);font-size:0.7813rem;font-family:var(--mono)}
 
 /* ---------- tab bar: a floating capsule with a pill that slides ---------- */
 .nav{
@@ -243,7 +243,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .tab{
   position:relative;z-index:1;
   padding:8px 16px;border-radius:var(--cap);border:0;background:transparent;color:var(--muted);
-  font-weight:600;font-size:13.5px;cursor:pointer;
+  font-weight:600;font-size:0.8438rem;cursor:pointer;
   transition:color .22s var(--ease),transform .22s var(--spring);
 }
 .tab:hover{color:var(--text)}
@@ -252,8 +252,8 @@ button,input,select,textarea{font:inherit;color:inherit}
 .view{display:none}
 .view.active{display:block}
 .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
-.muted{color:var(--muted);font-size:13px}
-.pill{display:inline-block;padding:3px 10px;border-radius:var(--cap);background:var(--content-2);color:var(--muted);font-size:11.5px;font-family:var(--mono)}
+.muted{color:var(--muted);font-size:0.8125rem}
+.pill{display:inline-block;padding:3px 10px;border-radius:var(--cap);background:var(--content-2);color:var(--muted);font-size:0.7188rem;font-family:var(--mono)}
 
 /* ---------- the card: content, therefore solid ---------- */
 .flash-wrap{perspective:1600px;height:440px;cursor:pointer}
@@ -269,9 +269,9 @@ button,input,select,textarea{font:inherit;color:inherit}
 .face::before{content:"";position:absolute;left:36px;right:36px;top:52px;height:1px;background:var(--rule-red);opacity:.45}
 .face>*{position:relative;z-index:1}
 .face.back{transform:rotateY(180deg)}
-.face-label{position:absolute;top:18px;left:24px;color:var(--muted);font-size:10.5px;font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-family:var(--mono)}
-.content{font-family:var(--display);font-size:clamp(22px,3.2vw,32px);font-weight:500;line-height:1.35;max-width:36ch;word-break:break-word;text-wrap:balance}
-.content.small{font-size:17px}
+.face-label{position:absolute;top:18px;left:24px;color:var(--muted);font-size:0.6563rem;font-weight:600;letter-spacing:.14em;text-transform:uppercase;font-family:var(--mono)}
+.content{font-family:var(--display);font-size:clamp(1.375rem, calc(0.5rem + 2.24vw), 2rem);font-weight:500;line-height:1.35;max-width:36ch;word-break:break-word;text-wrap:balance}
+.content.small{font-size:1.0625rem}
 .content img,.prompt img,.option img,.tile img,.row img{max-width:100%;max-height:240px;object-fit:contain;border-radius:var(--r-in);margin:12px auto;display:block}
 .content img{max-width:min(100%,480px)}
 .controls{display:flex;justify-content:space-between;gap:8px;margin-top:16px}
@@ -280,16 +280,16 @@ button,input,select,textarea{font:inherit;color:inherit}
 
 /* ---------- quiz surfaces ---------- */
 .study-panel,.test,.browse,.editor,.progress-panel{padding:24px}
-.prompt{font-family:var(--display);font-size:clamp(21px,3vw,29px);font-weight:500;line-height:1.35;margin:14px 0 22px;text-wrap:balance}
+.prompt{font-family:var(--display);font-size:clamp(1.3125rem, calc(0.5rem + 2.1vw), 1.8125rem);font-weight:500;line-height:1.35;margin:14px 0 22px;text-wrap:balance}
 .prompt img{max-height:210px}
 .options{display:grid;grid-template-columns:1fr 1fr;gap:10px;counter-reset:opt}
 .option{
   position:relative;text-align:left;padding:15px 15px 15px 50px;border-radius:var(--r);
   border:1px solid var(--border);background:var(--content-2);color:var(--text);cursor:pointer;
-  line-height:1.45;font-size:14.5px;
+  line-height:1.45;font-size:0.9063rem;
   transition:border-color .18s,background .18s,transform .22s var(--spring);
 }
-.option::before{counter-increment:opt;content:counter(opt,upper-alpha);position:absolute;left:14px;top:14px;width:24px;height:24px;border-radius:var(--cap);background:var(--content);color:var(--muted);font-family:var(--mono);font-size:11.5px;font-weight:600;display:grid;place-items:center;border:1px solid var(--border)}
+.option::before{counter-increment:opt;content:counter(opt,upper-alpha);position:absolute;left:14px;top:14px;width:24px;height:24px;border-radius:var(--cap);background:var(--content);color:var(--muted);font-family:var(--mono);font-size:0.7188rem;font-weight:600;display:grid;place-items:center;border:1px solid var(--border)}
 .option:hover:not(:disabled){border-color:var(--accent);background:var(--accent-wash);transform:translateY(-1px)}
 .option:active:not(:disabled){transform:scale(.99)}
 .option:disabled{cursor:default}
@@ -297,7 +297,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 .option.correct::before{background:var(--good);color:var(--content);border-color:var(--good)}
 .option.wrong{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 13%,transparent)}
 .option.wrong::before{background:var(--bad);color:var(--content);border-color:var(--bad)}
-.feedback{margin-top:16px;color:var(--muted);min-height:22px;font-size:14px}
+.feedback{margin-top:16px;color:var(--muted);min-height:22px;font-size:0.875rem}
 .progressline{height:5px;background:var(--content-2);border-radius:var(--cap);overflow:hidden}
 .progressline>div{height:100%;width:0;background:var(--accent);border-radius:var(--cap);transition:width .35s var(--ease)}
 .check-answer{display:flex;gap:8px;margin-top:14px}
@@ -311,16 +311,16 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* ---------- scheduling controls ---------- */
 .rate-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:14px}
 .rate-row .btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:11px 8px;border-radius:var(--r-in)}
-.rate-row small{font-family:var(--mono);font-size:10.5px;font-weight:500;opacity:.72}
-.reveal{padding:18px 0 4px;border-top:1px solid var(--hairline);margin-top:6px;font-family:var(--display);font-size:clamp(19px,2.6vw,25px);line-height:1.4}
+.rate-row small{font-family:var(--mono);font-size:0.6563rem;font-weight:500;opacity:.72}
+.reveal{padding:18px 0 4px;border-top:1px solid var(--hairline);margin-top:6px;font-family:var(--display);font-size:clamp(1.1875rem, calc(0.5rem + 1.82vw), 1.5625rem);line-height:1.4}
 .reveal img{max-width:min(100%,420px);max-height:220px;object-fit:contain;border-radius:var(--r-in);margin:12px auto;display:block}
-.duebadge{display:inline-block;min-width:18px;padding:1px 7px;margin-left:6px;border-radius:var(--cap);background:var(--accent);color:var(--accent-ink);font-family:var(--mono);font-size:10.5px;font-weight:600;vertical-align:middle}
-.leech{color:var(--bad);font-family:var(--mono);font-size:11px;font-weight:600}
+.duebadge{display:inline-block;min-width:18px;padding:1px 7px;margin-left:6px;border-radius:var(--cap);background:var(--accent);color:var(--accent-ink);font-family:var(--mono);font-size:0.6563rem;font-weight:600;vertical-align:middle}
+.leech{color:var(--bad);font-family:var(--mono);font-size:0.6875rem;font-weight:600}
 
 /* ---------- banner + export chooser ---------- */
 .banner{
   display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;
-  padding:13px 18px;border-radius:var(--r);font-size:13.5px;line-height:1.5;
+  padding:13px 18px;border-radius:var(--r);font-size:0.8438rem;line-height:1.5;
   background:var(--glass-strong);border:1px solid var(--accent);
   -webkit-backdrop-filter:blur(14px) saturate(var(--sat));backdrop-filter:blur(14px) saturate(var(--sat));
   box-shadow:var(--shadow), inset 0 1px 0 var(--glass-edge);
@@ -328,15 +328,15 @@ button,input,select,textarea{font:inherit;color:inherit}
 .banner-actions{display:flex;gap:6px;flex-wrap:wrap}
 .exp-opt{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:15px 0;border-bottom:1px solid var(--hairline)}
 .exp-opt:last-of-type{border-bottom:0}
-.exp-opt b{display:block;font-size:14.5px;margin-bottom:3px}
-.exp-opt span{font-size:13px;color:var(--muted);line-height:1.5}
+.exp-opt b{display:block;font-size:0.9063rem;margin-bottom:3px}
+.exp-opt span{font-size:0.8125rem;color:var(--muted);line-height:1.5}
 
 /* ---------- match ---------- */
 .match-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(158px,1fr));gap:10px}
 .tile{
   min-height:118px;padding:14px;border:1px solid var(--border);border-radius:var(--r);
   background:var(--content-2);display:flex;align-items:center;justify-content:center;text-align:center;
-  cursor:pointer;line-height:1.35;font-size:14px;overflow:hidden;
+  cursor:pointer;line-height:1.35;font-size:0.875rem;overflow:hidden;
   transition:transform .24s var(--spring),border-color .18s,background .18s,box-shadow .18s;
 }
 .tile:hover{border-color:var(--accent);transform:translateY(-2px)}
@@ -355,19 +355,19 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* ---------- results, stats, lists ---------- */
 .result{padding:46px 24px;text-align:center}
 .result h2{font-family:var(--display);font-weight:600;margin:0 0 4px}
-.score{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:52px;font-weight:600;margin:14px 0 6px;color:var(--accent)}
+.score{font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:3.25rem;font-weight:600;margin:14px 0 6px;color:var(--accent)}
 .stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px}
 .stat{padding:17px;border:1px solid var(--border);border-radius:var(--r);background:var(--content)}
-.stat b{display:block;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:26px;font-weight:600;margin-bottom:3px;letter-spacing:-.02em}
-.stat span{font-size:11.5px;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:500}
-.progress-panel h3{font-family:var(--display);font-weight:600;margin:0 0 14px;font-size:17px}
+.stat b{display:block;font-family:var(--mono);font-variant-numeric:tabular-nums;font-size:1.625rem;font-weight:600;margin-bottom:3px;letter-spacing:-.02em}
+.stat span{font-size:0.7188rem;color:var(--muted);text-transform:uppercase;letter-spacing:.07em;font-weight:500}
+.progress-panel h3{font-family:var(--display);font-weight:600;margin:0 0 14px;font-size:1.0625rem}
 .search{width:100%;margin-bottom:8px}
 .cardlist{display:grid}
 .row{display:grid;grid-template-columns:38px 1fr 1.4fr 44px;gap:16px;align-items:center;padding:14px 8px;border-bottom:1px solid var(--hairline)}
 .row:last-child{border-bottom:0}
 .row img{max-height:84px;margin:6px auto}
-.num{color:var(--muted);font-family:var(--mono);font-size:12.5px;font-variant-numeric:tabular-nums}
-.star{border:0;background:transparent;color:var(--border);font-size:20px;cursor:pointer;line-height:1;padding:4px;transition:transform .2s var(--spring),color .18s}
+.num{color:var(--muted);font-family:var(--mono);font-size:0.7813rem;font-variant-numeric:tabular-nums}
+.star{border:0;background:transparent;color:var(--border);font-size:1.25rem;cursor:pointer;line-height:1;padding:4px;transition:transform .2s var(--spring),color .18s}
 .star:hover{color:var(--star);transform:scale(1.15)}
 .star.on{color:var(--star)}
 .empty{padding:46px;text-align:center;color:var(--muted)}
@@ -375,7 +375,7 @@ button,input,select,textarea{font:inherit;color:inherit}
 /* ---------- editor ---------- */
 .editor-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:16px;align-items:center}
 .editor-table{width:100%;border-collapse:collapse}
-.editor-table th{color:var(--muted);font-size:11px;text-align:left;padding:0 10px 8px;text-transform:uppercase;letter-spacing:.07em;font-weight:600}
+.editor-table th{color:var(--muted);font-size:0.6875rem;text-align:left;padding:0 10px 8px;text-transform:uppercase;letter-spacing:.07em;font-weight:600}
 .editor-table td{border-top:1px solid var(--hairline);padding:10px;vertical-align:top}
 .editable{min-height:64px;outline:none;line-height:1.45;border-radius:var(--r-in);padding:6px;transition:background .18s}
 .editable:focus{background:var(--accent-wash)}
@@ -399,17 +399,17 @@ button,input,select,textarea{font:inherit;color:inherit}
   animation:boxIn .38s var(--spring);
 }
 @keyframes boxIn{from{transform:translateY(14px) scale(.97);opacity:0}to{transform:none;opacity:1}}
-.modalbox h3{margin:0 0 6px;font-family:var(--display);font-weight:600;font-size:20px}
+.modalbox h3{margin:0 0 6px;font-family:var(--display);font-weight:600;font-size:1.25rem}
 .field{margin:16px 0}
-.field label{display:block;color:var(--muted);font-size:11.5px;font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em}
+.field label{display:block;color:var(--muted);font-size:0.7188rem;font-weight:600;margin-bottom:6px;text-transform:uppercase;letter-spacing:.07em}
 .field input,.field select{width:100%}
 .modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:22px;flex-wrap:wrap}
-.report-why{color:var(--muted);font-size:13.5px;margin:0 0 14px;line-height:1.55}
-#reportText{width:100%;height:210px;font-family:var(--mono);font-size:12px;line-height:1.5;resize:vertical}
-#exportText{width:100%;height:250px;font-family:var(--mono);font-size:12px;resize:vertical}
+.report-why{color:var(--muted);font-size:0.8438rem;margin:0 0 14px;line-height:1.55}
+#reportText{width:100%;height:210px;font-family:var(--mono);font-size:0.75rem;line-height:1.5;resize:vertical}
+#exportText{width:100%;height:250px;font-family:var(--mono);font-size:0.75rem;resize:vertical}
 .toast{
   position:fixed;right:20px;bottom:20px;max-width:min(380px,calc(100% - 40px));z-index:30;
-  padding:13px 18px;border-radius:var(--r);font-size:13.5px;line-height:1.45;display:none;
+  padding:13px 18px;border-radius:var(--r);font-size:0.8438rem;line-height:1.45;display:none;
   background:var(--glass-strong);color:var(--text);
   -webkit-backdrop-filter:blur(20px) saturate(var(--sat));backdrop-filter:blur(20px) saturate(var(--sat));
   border:1px solid var(--glass-edge-low);
@@ -424,13 +424,13 @@ button,input,select,textarea{font:inherit;color:inherit}
   border:1px solid var(--glass-edge-low);
   box-shadow:var(--shadow), inset 0 1px 0 var(--glass-edge);
 }
-.loading-joke{font-family:var(--display);font-size:18px;font-weight:500;line-height:1.35;text-wrap:balance;min-height:1.4em}
+.loading-joke{font-family:var(--display);font-size:1.125rem;font-weight:500;line-height:1.35;text-wrap:balance;min-height:1.4em}
 .loading-bar{height:5px;background:var(--content-2);border-radius:var(--cap);overflow:hidden}
 .loading-bar>div{height:100%;width:6%;background:var(--accent);border-radius:var(--cap);transition:width .35s var(--ease)}
 .loading-bar>div.indeterminate{width:32%;animation:slide 1.15s var(--ease) infinite}
 @keyframes slide{from{transform:translateX(-115%)}to{transform:translateX(420%)}}
-.loading-status{font-family:var(--mono);font-size:12.5px;color:var(--muted)}
-.notice{padding:13px;border:1px solid var(--star);background:color-mix(in srgb,var(--star) 10%,transparent);border-radius:var(--r-in);font-size:13px;line-height:1.5;margin-top:12px}
+.loading-status{font-family:var(--mono);font-size:0.7813rem;color:var(--muted)}
+.notice{padding:13px;border:1px solid var(--star);background:color-mix(in srgb,var(--star) 10%,transparent);border-radius:var(--r-in);font-size:0.8125rem;line-height:1.5;margin-top:12px}
 [hidden]{display:none!important}
 
 /* ---------- overflow menu ---------- */
@@ -446,20 +446,20 @@ button,input,select,textarea{font:inherit;color:inherit}
 }
 .more-menu button{
   text-align:left;background:transparent;border:0;color:var(--text);
-  padding:9px 12px;border-radius:var(--r-in);cursor:pointer;font-size:13.5px;font-weight:500;
+  padding:9px 12px;border-radius:var(--r-in);cursor:pointer;font-size:0.8438rem;font-weight:500;
   transition:background .15s,color .15s;
 }
 .more-menu button:hover{background:var(--accent-wash);color:var(--accent)}
 .deckbar{padding:12px 18px}
-.deck-info strong{font-size:18px}
+.deck-info strong{font-size:1.125rem}
 /* ---------- deck library + share ---------- */
 .lib-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 2px;border-bottom:1px solid var(--hairline)}
 .lib-row:last-of-type{border-bottom:0}
-.lib-row b{display:block;font-size:14.5px;margin-bottom:2px}
-.lib-row span{font-size:12px;color:var(--muted);font-family:var(--mono)}
+.lib-row b{display:block;font-size:0.9063rem;margin-bottom:2px}
+.lib-row span{font-size:0.75rem;color:var(--muted);font-family:var(--mono)}
 .lib-row.current b::after{content:"";display:inline-block;width:7px;height:7px;margin-left:8px;border-radius:var(--cap);background:var(--accent);vertical-align:middle}
 .lib-actions{display:flex;gap:6px;flex-wrap:wrap;flex-shrink:0}
-#shareText{width:100%;height:92px;font-family:var(--mono);font-size:12px;line-height:1.5;resize:vertical;word-break:break-all}
+#shareText{width:100%;height:92px;font-family:var(--mono);font-size:0.75rem;line-height:1.5;resize:vertical;word-break:break-all}
 
 /* ---------- glass, second pass ----------
    Two things separate a convincing glass surface from a translucent panel: a
@@ -539,8 +539,8 @@ body.scrolled .top,body.scrolled .nav{
 .option.correct{box-shadow:0 0 0 2px var(--good) inset}
 .option.correct.chosen{animation:pop .34s var(--spring)}
 .option.wrong.chosen{animation:nudge .3s var(--ease)}
-.option.correct::after{content:"\2713";position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--good);font-weight:700;font-size:17px}
-.option.wrong.chosen::after{content:"\2715";position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--bad);font-weight:700;font-size:16px}
+.option.correct::after{content:"\2713";position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--good);font-weight:700;font-size:1.0625rem}
+.option.wrong.chosen::after{content:"\2715";position:absolute;right:14px;top:50%;transform:translateY(-50%);color:var(--bad);font-weight:700;font-size:1rem}
 @keyframes pop{0%{transform:scale(1)}45%{transform:scale(1.03)}100%{transform:scale(1)}}
 @keyframes nudge{25%{transform:translateX(-5px)}75%{transform:translateX(5px)}}
 
@@ -564,7 +564,7 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
 .stat:hover{border-color:var(--accent)}
 .stat:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
 .filter-bar{display:flex;align-items:center;gap:10px;margin-bottom:12px;flex-wrap:wrap}
-.chip{display:inline-flex;align-items:center;padding:5px 13px;border-radius:var(--cap);background:var(--accent-wash);color:var(--accent);font-size:12.5px;font-weight:600}
+.chip{display:inline-flex;align-items:center;padding:5px 13px;border-radius:var(--cap);background:var(--accent-wash);color:var(--accent);font-size:0.7813rem;font-weight:600}
 
 /* A card field that will take a picture should say so when one is over it. */
 .editable.drop-into{background:var(--accent-wash);box-shadow:0 0 0 2px var(--accent) inset}
@@ -585,21 +585,21 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
 
 .share-opt{display:flex;gap:11px;align-items:flex-start;padding:13px;margin:4px 0 12px;border:1px solid var(--border);border-radius:var(--r-in);background:var(--content-2);cursor:pointer}
 .share-opt input{margin-top:2px;accent-color:var(--accent);width:17px;height:17px;flex-shrink:0}
-.share-opt b{display:block;font-size:14px}
-.share-opt small{display:block;color:var(--muted);font-size:12.5px;line-height:1.45;margin-top:2px}
-.share-size{font-size:13px;margin:10px 0 0;font-weight:500}
+.share-opt b{display:block;font-size:0.875rem}
+.share-opt small{display:block;color:var(--muted);font-size:0.7813rem;line-height:1.45;margin-top:2px}
+.share-size{font-size:0.8125rem;margin:10px 0 0;font-weight:500}
 .share-size.ok{color:var(--good)}
 .share-size.warn{color:var(--star)}
 .share-size.bad{color:var(--bad)}
-.share-help{margin-top:14px;font-size:13px;color:var(--muted)}
+.share-help{margin-top:14px;font-size:0.8125rem;color:var(--muted)}
 .share-help summary{cursor:pointer;font-weight:600;color:var(--text)}
 .share-help p{margin:8px 0 0;line-height:1.55}
 
 .review-bar{display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
   padding:14px 16px;margin-bottom:18px;border:1px solid var(--accent);border-radius:var(--r);
   background:var(--accent-wash)}
-.review-bar b{display:block;font-size:15px;margin-bottom:2px}
-.review-bar span{font-size:13px;color:var(--muted);line-height:1.5}
+.review-bar b{display:block;font-size:0.9375rem;margin-bottom:2px}
+.review-bar span{font-size:0.8125rem;color:var(--muted);line-height:1.5}
 .review-actions{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0}
 
 /* ---------- Apple HIG: safe areas ----------
@@ -635,9 +635,34 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
   .nav{gap:4px}
 }
 
+/* ---------- destructive actions look destructive ----------
+   The guidelines ask that an action which destroys something be distinguishable
+   before it is pressed, not only in the alert afterwards. */
+.smallbtn.danger,.btn.danger{color:var(--bad);border-color:color-mix(in srgb,var(--bad) 45%,transparent)}
+.smallbtn.danger:hover,.btn.danger:hover{border-color:var(--bad);background:color-mix(in srgb,var(--bad) 10%,transparent);color:var(--bad)}
+
+/* ---------- increased contrast ----------
+   Mirrors the system setting: firmer borders, plainer surfaces, no tinted
+   translucency competing with text. */
+@media (prefers-contrast:more){
+  :root{--muted:#4A4438;--border:#8C8574;}
+  .glass,.top,.deckbar,.nav,.modalbox,.toast,.loading,.banner,.btn.secondary,.smallbtn{
+    -webkit-backdrop-filter:none;backdrop-filter:none;background:var(--content);
+  }
+  .top,.deckbar,.nav,.modalbox,.banner,.stat,.option,.tile{border-width:2px}
+  body::before{opacity:.12}
+  .face::after{opacity:.5}
+}
+
+/* ---------- skip link ----------
+   A keyboard user should not have to walk the whole header to reach the deck. */
+.skip{position:absolute;left:-9999px;top:0;z-index:60;padding:12px 18px;border-radius:0 0 var(--r) 0;
+  background:var(--accent);color:var(--accent-ink);font-weight:600;text-decoration:none}
+.skip:focus{left:0}
+
 /* Mike is not in any deck. Mike simply is. */
 .mike-row .num{color:var(--star)}
-.mike-row b{font-family:var(--display);font-size:17px}
+.mike-row b{font-family:var(--display);font-size:1.0625rem}
 
 /* ---------- accessibility ----------
    Apple ships Reduce Transparency alongside this material; the web equivalent
@@ -672,12 +697,12 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
      scrolling out of sight, where Browse and Progress went undiscovered. */
   .nav{position:static;width:100%;flex-wrap:wrap;overflow:visible;justify-content:flex-start;border-radius:var(--r)}
   .nav-pill{border-radius:var(--cap)}
-  .tab{padding:8px 12px;font-size:13px}
+  .tab{padding:8px 12px;font-size:0.8125rem}
 
   .deckbar{padding:12px 14px;gap:10px}
   .deck-info{flex:1 1 100%}
   .deck-actions{width:100%;gap:6px}
-  .deck-actions .btn{flex:1 1 0;min-width:0;padding:9px 6px;font-size:13.5px}
+  .deck-actions .btn{flex:1 1 0;min-width:0;padding:9px 6px;font-size:0.8438rem}
   .more-wrap{flex:1 1 0}
   .more-wrap .btn{width:100%}
   .more-menu{right:0;left:auto;min-width:0;width:min(260px,calc(100vw - 40px))}
@@ -700,14 +725,14 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
   .row{grid-template-columns:26px 1fr 1fr;gap:10px}
   .row .star{grid-column:3;justify-self:end}
   .study-panel,.test,.browse,.editor,.progress-panel{padding:16px}
-  .fmt{min-width:0;font-size:14px}
+  .fmt{min-width:0;font-size:0.875rem}
   .fmt thead{display:none}
   .fmt,.fmt tbody,.fmt tr,.fmt td{display:block;width:100%}
   .fmt tr{padding:12px 0;border-bottom:1px solid var(--hairline)}
   .fmt tr:last-child{border-bottom:0}
   .fmt td{border:0;padding:2px 0}
-  .fmt td:first-child{font-size:15px;white-space:normal}
-  .fmt td:nth-child(2){font-size:12.5px;text-transform:uppercase;letter-spacing:.06em}
+  .fmt td:first-child{font-size:0.9375rem;white-space:normal}
+  .fmt td:nth-child(2){font-size:0.7813rem;text-transform:uppercase;letter-spacing:.06em}
   .fmt td:nth-child(2)::before{content:"Pictures: ";color:var(--muted);font-weight:500}
   .tablewrap{overflow:visible}
   .landing{padding:20px 12px 4px}
@@ -718,7 +743,7 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
   .banner{padding:12px 14px}
   .modalbox{padding:20px;border-radius:var(--r)}
   .toast{right:10px;left:10px;bottom:10px;max-width:none}
-  .editor-table{font-size:13px}
+  .editor-table{font-size:0.8125rem}
   .editor-table thead{display:none}
   .editor-table,.editor-table tbody,.editor-table tr,.editor-table td{display:block;width:100%}
   .editor-table tr{border-top:1px solid var(--border);padding:6px 0}
@@ -736,6 +761,7 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
 </style>
 </head>
 <body>
+<a class="skip" href="#mainContent">Skip to the deck</a>
 <div class="app">
 <header class="top"><div class="brand">
   <span class="mark" aria-hidden="true"><svg viewBox="0 0 32 32" width="30" height="30"><rect x="1" y="1" width="30" height="30" rx="8" fill="var(--accent)"/><rect x="6.5" y="9" width="19" height="14" rx="2.4" fill="var(--content)"/><rect x="9" y="12.4" width="14" height="1.5" rx=".75" fill="var(--rule-red)"/><rect x="9" y="16.2" width="14" height="1" rx=".5" fill="var(--rule)"/><rect x="9" y="19" width="14" height="1" rx=".5" fill="var(--rule)"/></svg></span>
@@ -803,6 +829,7 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
     </div>
   </div>
 </div></section>
+<div id="mainContent" tabindex="-1"></div>
 <nav class="nav" id="nav" role="tablist" aria-label="Study modes"><span class="nav-pill" id="navPill" aria-hidden="true"></span><button class="tab active" data-mode="cards">Flashcards</button><button class="tab" data-mode="learn">Learn</button><button class="tab" data-mode="write">Write</button><button class="tab" data-mode="match">Match</button><button class="tab" data-mode="test">Test</button><button class="tab" data-mode="review">Review <span class="duebadge" id="dueBadge" hidden></span></button><button class="tab" data-mode="browse">Browse</button><button class="tab" data-mode="progress">Progress</button></nav>
 <section class="view active" id="view-cards"><div class="toolbar"><span class="muted" id="fcProgress"></span><span class="muted kbd-hint">Space: flip · ←/→: navigate · S: star · R: read aloud</span></div><div class="flash-wrap" id="flashWrap" role="button" tabindex="0" aria-label="Flashcard. Activate to turn it over."><div class="flash" id="flash"><div class="face"><span class="face-label">Term</span><div class="content" id="front"></div></div><div class="face back"><span class="face-label">Definition</span><div class="content" id="back"></div></div></div></div><div class="controls"><button class="btn secondary" id="prev">← Previous</button><div class="mid"><button class="btn secondary" id="shuffle">Shuffle</button><button class="btn ghost" id="starBtn">☆ Star</button><button class="btn ghost" id="speakBtn" aria-label="Read this card aloud">🔊</button></div><button class="btn" id="next">Next →</button></div><div class="rate-row" id="cardRate">
   <button class="btn secondary" data-crate="1">Again<small></small></button>
@@ -1895,7 +1922,10 @@ async function importFiles(files){
   }
   finally{stopLoading()}
 }
-function showDeck(){if(!state.deck.length)return;$('uploadPanel').style.display='none';$('deckbar').style.display='flex';$('nav').style.display='flex';requestAnimationFrame(moveNavPill);$('deckTitle').textContent=state.title;$('deckMeta').textContent=`${state.deck.length} cards · ${state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length} with pictures`;updateDueBadge();switchMode(dueDeck().length&&state.deck.some(c=>c.sched)?'review':'cards')}
+function showDeck(){
+  if(!state.deck.length)return;
+  // The browser tab is how someone finds this page among twenty others.
+  document.title=(state.title?state.title+' — OpenStudy':'OpenStudy');$('uploadPanel').style.display='none';$('deckbar').style.display='flex';$('nav').style.display='flex';requestAnimationFrame(moveNavPill);$('deckTitle').textContent=state.title;$('deckMeta').textContent=`${state.deck.length} cards · ${state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length} with pictures`;updateDueBadge();switchMode(dueDeck().length&&state.deck.some(c=>c.sched)?'review':'cards')}
 function answerFor(c){let d=state.settings.direction;if(d==='mixed')d=Math.random()<.5?'term-def':'def-term';return d==='term-def'?{prompt:c.termHtml,answer:c.defHtml,text:c.defText}:{prompt:c.defHtml,answer:c.termHtml,text:c.termText}}
 /* Imported pictures carry loading="lazy", which is right for the long lists in
    Browse and the editor. It is wrong for the flashcard: the back face is turned
@@ -2449,7 +2479,7 @@ function renderEditor(){
   const box=$('editorTable');
   box.innerHTML=`<table class="editor-table"><thead><tr><th>#</th><th>Term</th><th>Definition</th><th></th></tr></thead><tbody>${state.deck.map((c,i)=>{
     const pic=hasVisual(c.termHtml)||hasVisual(c.defHtml);
-    return `<tr><td class="num">${i+1}</td><td><div class="editable" contenteditable="true" data-edit="term" data-i="${i}">${c.termHtml}</div></td><td><div class="editable" contenteditable="true" data-edit="def" data-i="${i}">${c.defHtml}</div></td><td><div class="row-actions">${pic?`<button class="smallbtn" data-picup="${i}" aria-label="Move this picture to card ${i}">⬆ pic</button><button class="smallbtn" data-picdown="${i}" aria-label="Move this picture to card ${i+2}">⬇ pic</button>`:''}<button class="smallbtn" data-addpic="${i}" aria-label="Add a picture to card ${i+1}">+ pic</button><button class="smallbtn" data-del="${i}" aria-label="Delete card ${i+1}">Delete</button></div></td></tr>`;
+    return `<tr><td class="num">${i+1}</td><td><div class="editable" contenteditable="true" data-edit="term" data-i="${i}">${c.termHtml}</div></td><td><div class="editable" contenteditable="true" data-edit="def" data-i="${i}">${c.defHtml}</div></td><td><div class="row-actions">${pic?`<button class="smallbtn" data-picup="${i}" aria-label="Move this picture to card ${i}">⬆ pic</button><button class="smallbtn" data-picdown="${i}" aria-label="Move this picture to card ${i+2}">⬇ pic</button>`:''}<button class="smallbtn" data-addpic="${i}" aria-label="Add a picture to card ${i+1}">+ pic</button><button class="smallbtn danger" data-del="${i}" aria-label="Delete card ${i+1}">Delete</button></div></td></tr>`;
   }).join('')}</tbody></table>`;
   document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{state.deck.splice(+b.dataset.del,1);saveLocal();renderEditor()});
   document.querySelectorAll('[data-picup]').forEach(b=>b.onclick=()=>moveCardPictures(+b.dataset.picup,-1));
@@ -2485,7 +2515,7 @@ function renderReviewBar(){
   bar.innerHTML='<div><b>Does this look right?</b><span>'+esc(bits.join(' · '))+
     '. Fix anything below, then keep it.</span></div>'+
     '<div class="review-actions">'+
-      '<button class="btn secondary" id="reviewDiscard">Discard import</button>'+
+      '<button class="btn danger" id="reviewDiscard">Discard import</button>'+
       '<button class="btn" id="reviewKeep">Looks right</button>'+
     '</div>';
   $('reviewKeep').onclick=()=>{reviewingImport=false;renderReviewBar();hideImportBanner();showDeck();toast('Kept — happy studying')};
@@ -2502,7 +2532,7 @@ function showDeckJSON(json){
   let m=$('exportModal');
   if(!m){
     m=document.createElement('div');m.id='exportModal';m.className='modal';
-    m.innerHTML='<div class="modalbox"><h3>Copy your deck</h3><p class="muted">This viewer blocks downloads. Copy the text below and save it as a .json file — you can re-import it here any time.</p><textarea id="exportText" spellcheck="false" style="width:100%;height:250px;background:var(--field);color:var(--text);border:1px solid var(--border);border-radius:9px;padding:10px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px"></textarea><div class="modal-actions"><button class="btn secondary" id="exportClose">Close</button><button class="btn" id="exportCopy">Copy</button></div></div>';
+    m.innerHTML='<div class="modalbox"><h3>Copy your deck</h3><p class="muted">This viewer blocks downloads. Copy the text below and save it as a .json file — you can re-import it here any time.</p><textarea id="exportText" spellcheck="false" style="width:100%;height:250px;background:var(--field);color:var(--text);border:1px solid var(--border);border-radius:9px;padding:10px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:0.75rem"></textarea><div class="modal-actions"><button class="btn secondary" id="exportClose">Close</button><button class="btn" id="exportCopy">Copy</button></div></div>';
     document.body.appendChild(m);
     m.querySelector('#exportClose').onclick=()=>hideModal(m);
     m.querySelector('#exportCopy').onclick=()=>{const t=$('exportText');t.focus();t.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}toast(ok?'Deck copied':'Press Ctrl+C to copy')};
@@ -2675,7 +2705,7 @@ function renderLibrary(){
       '<div class="lib-actions">'+
         (d.id===state.deckId?'':'<button class="smallbtn" data-open="'+d.id+'">Open</button>')+
         '<button class="smallbtn" data-rename="'+d.id+'">Rename</button>'+
-        '<button class="smallbtn" data-del="'+d.id+'">Delete</button>'+
+        '<button class="smallbtn danger" data-del="'+d.id+'" aria-label="Delete the deck '+esc(d.title||'untitled')+'">Delete</button>'+
       '</div></div>').join('');
   body.querySelectorAll('[data-open]').forEach(b=>b.onclick=async()=>{
     await openDeckById(b.dataset.open);hideModal($('libraryModal'));
@@ -2969,7 +2999,7 @@ function showImportBanner(cards,pics){
   $('bannerHide').onclick=()=>{b.hidden=true};
 }
 function hideImportBanner(){const b=$('importBanner');if(b)b.hidden=true}
-function newDeck(){hideImportBanner();state.deck=[];state.deckId=null;$('deckbar').style.display='none';$('nav').style.display='none';document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('uploadPanel').style.display='block';$('file').value='';$('status').textContent='';toast('Ready for another deck')}
+function newDeck(){document.title='OpenStudy';hideImportBanner();state.deck=[];state.deckId=null;$('deckbar').style.display='none';$('nav').style.display='none';document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('uploadPanel').style.display='block';$('file').value='';$('status').textContent='';toast('Ready for another deck')}
 function openSettings(){$('direction').value=state.settings.direction;$('testLength').value=state.settings.testLength;$('matchSize').value=state.settings.matchSize;$('autoSpeak').value=state.settings.autoSpeak;$('clozeMode').value=state.settings.cloze||'on';
   $('retentionMode').value=state.settings.retention||'balanced';
   $('strictMode').value=state.settings.strictness||'lenient';
