@@ -196,6 +196,29 @@ button,input,select,textarea{font:inherit;color:inherit}
 .notice{padding:13px;border:1px solid var(--star);background:color-mix(in srgb,var(--star) 10%,transparent);border-radius:var(--r);font-size:13px;line-height:1.5;margin-top:12px}
 
 [hidden]{display:none!important}
+/* ---------- landing ---------- */
+.landing{text-align:center;padding:26px 20px 4px;max-width:64ch;margin-inline:auto}
+.landing h2{font-family:var(--display);font-weight:600;font-size:clamp(24px,3.6vw,33px);line-height:1.2;margin:0 0 12px;text-wrap:balance}
+.landing p{margin:0;color:var(--muted);font-size:15px;line-height:1.6}
+.trust{display:inline-flex;align-items:center;gap:7px;margin-top:16px;padding:6px 13px;border-radius:99px;background:var(--accent-wash);color:var(--accent);font-size:12.5px;font-weight:600}
+.detail{padding:8px 20px 24px;display:grid;gap:26px}
+.detail h3{font-family:var(--display);font-weight:600;font-size:18px;margin:0 0 12px}
+.tablewrap{overflow-x:auto}
+.fmt{width:100%;border-collapse:collapse;font-size:13.5px;min-width:460px}
+.fmt th{text-align:left;font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600;padding:0 10px 8px;border-bottom:1px solid var(--border)}
+.fmt td{padding:11px 10px;border-bottom:1px solid var(--hairline);vertical-align:top}
+.fmt td:first-child{font-weight:600;white-space:nowrap}
+.fmt .yes{color:var(--good);font-weight:600}
+.fmt .no{color:var(--muted)}
+.steps{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;counter-reset:step}
+.step{padding:16px;background:var(--surface-2);border-radius:var(--r)}
+.step::before{counter-increment:step;content:counter(step);font-family:var(--mono);font-size:11px;font-weight:600;color:var(--accent);display:block;margin-bottom:6px}
+.step b{display:block;font-size:14.5px;margin-bottom:3px}
+.step span{font-size:13px;color:var(--muted);line-height:1.5}
+@media(max-width:700px){.steps{grid-template-columns:1fr}.landing{padding:18px 12px 4px}.detail{padding:8px 12px 18px}}
+/* ---------- import report ---------- */
+#reportText{width:100%;height:210px;background:var(--field);color:var(--text);border:1px solid var(--border);border-radius:var(--r);padding:11px;font-family:var(--mono);font-size:12px;line-height:1.5;resize:vertical}
+.report-why{color:var(--muted);font-size:13.5px;margin:0 0 14px;line-height:1.55}
 .loading{display:grid;gap:12px;padding:20px;margin-top:12px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg)}
 .loading-joke{font-family:var(--display);font-size:18px;font-weight:500;line-height:1.35;text-wrap:balance;min-height:1.4em}
 .loading-bar{height:5px;background:var(--surface-2);border-radius:99px;overflow:hidden}
@@ -237,14 +260,19 @@ button,input,select,textarea{font:inherit;color:inherit}
 </head>
 <body>
 <div class="app">
-<header class="top"><div class="brand"><h1>OpenStudy</h1><p>Import Quizlet exports and study them locally — including cards with pictures.</p></div><div class="top-actions"><button class="btn secondary" id="settingsBtn">Settings</button><button class="btn secondary" id="newBtn">New deck</button></div></header>
+<header class="top"><div class="brand"><h1>OpenStudy</h1></div><div class="top-actions"><button class="btn secondary" id="settingsBtn">Settings</button><button class="btn secondary" id="newBtn">New deck</button></div></header>
 <section class="panel upload" id="uploadPanel">
+  <div class="landing">
+    <h2>Study your Quizlet sets for free &mdash; pictures and all.</h2>
+    <p>Quizlet puts Learn and Test behind a subscription. Export your set, drop it here, and study it with flashcards, learn, write, match and test.</p>
+    <div class="trust">No account. Your cards stay in your browser.</div>
+  </div>
   <div class="drop" id="drop" tabindex="0">
-    <h2>Drop a Quizlet export here</h2>
-    <p><b>HTML</b> is preferred when your set contains pictures. You can also select the HTML file together with its image files, upload a ZIP containing the HTML and images, or use Quizlet TSV/CSV/TXT/PDF exports.</p>
+    <h2>Drop your export here</h2>
+    <p>HTML, ZIP, PDF, CSV, TSV or JSON.</p>
     <button class="btn" id="chooseBtn">Choose files</button>
     <input class="file-input" id="file" type="file" multiple accept=".html,.htm,.zip,.pdf,.txt,.tsv,.csv,.json,.png,.jpg,.jpeg,.gif,.webp,.svg,application/pdf,text/html,text/plain,application/json,application/zip,image/*">
-    <div class="hint">For a saved HTML page with local pictures: select the HTML and all its image files at the same time, or put them in a ZIP. External image URLs and data URLs are supported too.</div>
+    <div class="hint">Dropping a saved HTML page? Select its image files at the same time, or zip them together.</div>
   </div>
   <div class="loading" id="loading" hidden>
     <div class="loading-joke" id="loadingJoke"></div>
@@ -252,8 +280,31 @@ button,input,select,textarea{font:inherit;color:inherit}
     <div class="loading-status" id="loadingStatus"></div>
   </div>
   <div class="status" id="status"></div>
+  <div class="detail">
+    <div>
+      <h3>What you can bring</h3>
+      <div class="tablewrap"><table class="fmt">
+        <thead><tr><th>What you have</th><th>Pictures</th><th>How to get it</th></tr></thead>
+        <tbody>
+          <tr><td>A Quizlet set</td><td class="yes">Best</td><td>On the set page, save the page as HTML, then drop the HTML together with its image files &mdash; or zip them.</td></tr>
+          <tr><td>A printed set</td><td class="yes">Yes</td><td>Print the Quizlet set to PDF, then drop the PDF. Pictures are matched to their cards automatically.</td></tr>
+          <tr><td>Exported text</td><td class="no">No</td><td>Quizlet&rsquo;s own Export, saved as .txt, .csv or .tsv. Fastest route when your set has no images.</td></tr>
+          <tr><td>A spreadsheet</td><td class="no">No</td><td>Any CSV or TSV with the term in the first column and the definition in the second.</td></tr>
+          <tr><td>An OpenStudy deck</td><td class="yes">Yes</td><td>A .json file you exported from here, pictures included.</td></tr>
+        </tbody>
+      </table></div>
+    </div>
+    <div>
+      <h3>How it works</h3>
+      <div class="steps">
+        <div class="step"><b>Export it</b><span>Get your set out of Quizlet as a saved page, a PDF, or plain text.</span></div>
+        <div class="step"><b>Drop it here</b><span>Everything is read in your browser. Nothing is sent anywhere.</span></div>
+        <div class="step"><b>Study it</b><span>Flashcards, learn, write, match and test &mdash; all free, no sign-up.</span></div>
+      </div>
+    </div>
+  </div>
 </section>
-<section class="deckbar" id="deckbar"><div class="deck-info"><strong id="deckTitle">Untitled deck</strong><br><span id="deckMeta"></span></div><div class="deck-actions"><button class="btn secondary" id="editBtn">Edit cards</button><button class="btn secondary" id="settingsBtn2">Options</button><button class="btn secondary" id="exportBtn">Export deck</button><button class="btn ghost" id="newBtn2">Load another</button></div></section>
+<section class="deckbar" id="deckbar"><div class="deck-info"><strong id="deckTitle">Untitled deck</strong><br><span id="deckMeta"></span></div><div class="deck-actions"><button class="btn secondary" id="editBtn">Edit cards</button><button class="btn secondary" id="settingsBtn2">Options</button><button class="btn secondary" id="exportBtn">Export deck</button><button class="btn ghost" id="reportBtn">Import look wrong?</button><button class="btn ghost" id="newBtn2">Load another</button></div></section>
 <nav class="nav" id="nav"><button class="tab active" data-mode="cards">Flashcards</button><button class="tab" data-mode="learn">Learn</button><button class="tab" data-mode="write">Write</button><button class="tab" data-mode="match">Match</button><button class="tab" data-mode="test">Test</button><button class="tab" data-mode="browse">Browse</button><button class="tab" data-mode="progress">Progress</button></nav>
 <section class="view active" id="view-cards"><div class="toolbar"><span class="muted" id="fcProgress"></span><span class="muted">Space: flip · ←/→: navigate · S: star · R: read aloud</span></div><div class="flash-wrap" id="flashWrap"><div class="flash" id="flash"><div class="face"><span class="face-label">Term</span><div class="content" id="front"></div></div><div class="face back"><span class="face-label">Definition</span><div class="content" id="back"></div></div></div></div><div class="controls"><button class="btn secondary" id="prev">← Previous</button><div class="mid"><button class="btn secondary" id="shuffle">Shuffle</button><button class="btn ghost" id="starBtn">☆ Star</button><button class="btn ghost" id="speakBtn">🔊</button></div><button class="btn" id="next">Next →</button></div><div class="study-controls"><button class="btn secondary" id="againBtn">Again</button><button class="btn secondary" id="gotItBtn">Got it</button></div></section>
 <section class="view panel study-panel" id="view-learn"><div class="toolbar"><span class="muted" id="learnMeta"></span><span class="muted" id="learnMastery"></span></div><div class="progressline"><div id="learnBar"></div></div><div class="prompt" id="learnPrompt"></div><div class="options" id="learnOptions"></div><div class="feedback" id="learnFeedback"></div><button class="btn" id="learnContinue" style="display:none;margin-top:12px">Continue</button></section>
@@ -649,7 +700,8 @@ async function parsePDF(file){
     pages.push({words:r.words,width:r.vp.width,height:r.vp.height,images:crops});
   }
   const cards=[];
-  for(const row of layoutPDFRows(pages)){
+  const rows=layoutPDFRows(pages);
+  for(const row of rows){
     let termHtml=esc(clean(row.term)),defHtml=esc(clean(row.def));
     for(const ref of row.termImages)termHtml+=`<img src="${ref}" alt="Imported picture">`;
     for(const ref of row.defImages)defHtml+=`<img src="${ref}" alt="Imported picture">`;
@@ -657,7 +709,10 @@ async function parsePDF(file){
     if(c)cards.push(c);
   }
   if(!cards.length)throw new Error('No card rows were detected in this PDF.');
-  return {cards:finalizeCards(cards),title:deckTitle||file.name.replace(/\.pdf$/i,'')};
+  const imagesFound=pages.reduce((n,p)=>n+p.images.length,0);
+  const imagesPlaced=rows.reduce((n,r)=>n+r.termImages.length+r.defImages.length,0);
+  return {cards:finalizeCards(cards),title:deckTitle||file.name.replace(/\.pdf$/i,''),
+          diag:{pages:pages.length,imagesFound,imagesPlaced}};
 }
 /* ===================== end PDF import ===================== */
 
@@ -666,23 +721,33 @@ async function parseZip(file){if(!window.JSZip)throw new Error('ZIP support is u
 async function importFiles(files){
   if(!files.length)return;
   setStatus('Reading '+files.map(f=>f.name).join(', ')+'…');
+  lastImport={when:new Date().toISOString(),files:files.map(f=>({name:f.name,size:f.size})),route:'?',cards:null,error:null};
   startLoading(files.some(f=>/.(pdf|zip)$/i.test(f.name)||f.size>150000));
   await yieldToPaint();
   try{
     const first=files.find(f=>/\.(html?|zip|pdf|json|txt|tsv|csv)$/i.test(f.name))||files[0];
     let result;
+    lastImport.route=/\.zip$/i.test(first.name)?'zip':/\.pdf$/i.test(first.name)?'pdf':/\.html?$/i.test(first.name)?'html':/\.json$/i.test(first.name)?'json':'delimited';
     if(/\.zip$/i.test(first.name))result=await parseZip(first);
     else if(/\.pdf$/i.test(first.name))result=await parsePDF(first);
     else if(/\.html?$/i.test(first.name)){const map=await readAssets(files.filter(f=>f!==first));result=parseHTMLFile(await first.text(),first.name,map)}
     else if(/\.json$/i.test(first.name)){const j=JSON.parse(await first.text()),arr=Array.isArray(j)?j:(j.cards||j.terms||j.data||[]);result={cards:finalizeCards(arr),title:j.title||first.name.replace(/\.json$/i,'')}}
     else result=parseDelimited(await first.text(),first.name);
     if(!result.cards.length)throw new Error('No term/definition pairs were detected. If this is a saved Quizlet webpage, select the HTML plus its image files or upload the ZIP containing them.');
+    lastImport.cards=result.cards.length;
+    if(result.diag)Object.assign(lastImport,result.diag);
     state.deck=result.cards;state.title=result.title||'Imported deck';state.index=0;state.flipped=false;
     saveLocal();showDeck();$('status').textContent='';
     const withPics=state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length;
     toast(`Imported ${state.deck.length} cards${withPics?` · ${withPics} with pictures`:''}`);
     if(withPics&&/\.pdf$/i.test(first.name))toast(`Imported ${state.deck.length} cards · ${withPics} with pictures. Check them in Browse — Edit cards can shift pictures if any are off.`);
-  }catch(e){console.error(e);setStatus('Import failed: '+e.message)}
+  }catch(e){
+    console.error(e);
+    if(lastImport)lastImport.error=e.message;
+    setStatus('Import failed: '+e.message);
+    const s=$('status');
+    if(s){const b=document.createElement('button');b.className='smallbtn';b.style.marginLeft='10px';b.textContent='Tell me what went wrong';b.onclick=openReport;s.appendChild(b)}
+  }
   finally{stopLoading()}
 }
 function showDeck(){if(!state.deck.length)return;$('uploadPanel').style.display='none';$('deckbar').style.display='flex';$('nav').style.display='flex';$('deckTitle').textContent=state.title;$('deckMeta').textContent=`${state.deck.length} cards · ${state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length} with pictures`;switchMode('cards')}
@@ -711,6 +776,60 @@ function initTest(){const pool=shuffle(state.deck),len=state.settings.testLength
 function renderTest(){const t=state.test;if(t.i>=t.queue.length)return finishTest();const c=t.queue[t.i],a=answerFor(c);t.current=c;t.answerText=a.text;t.answered=false;$('testMeta').textContent=`Question ${t.i+1} of ${t.queue.length}`;$('testBar').style.width=(t.i/t.queue.length*100)+'%';$('testPrompt').innerHTML=a.prompt;$('testOptions').innerHTML='';shuffle([c,...shuffle(state.deck.filter(x=>x!==c)).slice(0,3)]).forEach(x=>{const b=document.createElement('button');b.className='option';b.innerHTML=answerFor(x).answer;b.dataset.correct=x===c?'1':'';b.onclick=()=>testAnswer(b,x===c,c);$('testOptions').appendChild(b)})}
 function testAnswer(btn,correct,c){if(state.test.answered)return;state.test.answered=true;document.querySelectorAll('#testOptions .option').forEach(b=>b.disabled=true);if(correct){btn.classList.add('correct');state.test.score++;c.correct++}else{btn.classList.add('wrong');c.wrong++;document.querySelectorAll('#testOptions .option[data-correct="1"]').forEach(b=>b.classList.add('correct'))}saveLocal();setTimeout(()=>{state.test.i++;renderTest()},650)}
 function finishTest(){const t=state.test,pct=t.queue.length?Math.round(t.score/t.queue.length*100):0;$('testRunner').style.display='none';$('testResult').style.display='block';$('testScore').textContent=`${t.score} / ${t.queue.length}`;$('testResultText').textContent=pct+'%';$('testBar').style.width='100%'}
+/* Import quality is the whole point of this tool, so a bad import is the most
+   valuable thing a user can tell us — and diagnosing one needs the source file,
+   which no amount of analytics would provide. Set REPORT_ENDPOINT to a URL that
+   accepts a POST to enable one-click sending; until then the report is copied
+   and sent by hand. */
+const REPORT_ENDPOINT='';
+const REPORT_ISSUE_URL='https://github.com/Mike24878/openstudy/issues/new';
+let lastImport=null;
+function describeImport(){
+  const d=lastImport;
+  if(!d)return 'No import recorded yet.';
+  const L=[];
+  L.push('OpenStudy import report');
+  L.push('when:      '+d.when);
+  L.push('files:     '+d.files.map(f=>f.name+' ('+Math.round(f.size/1024)+' KB)').join(', '));
+  L.push('route:     '+d.route);
+  if(d.pages!=null)      L.push('pdf pages: '+d.pages);
+  L.push('cards:     '+(d.cards!=null?d.cards:'—'));
+  if(d.imagesFound!=null)L.push('pictures:  '+d.imagesFound+' found, '+d.imagesPlaced+' placed on cards');
+  if(d.error)            L.push('FAILED:    '+d.error);
+  L.push('');
+  L.push('What went wrong (please describe):');
+  L.push('');
+  L.push('');
+  L.push('--');
+  L.push('screen: '+screen.width+'x'+screen.height+'  ua: '+navigator.userAgent);
+  return L.join('\n');
+}
+function openReport(){
+  let m=$('reportModal');
+  if(!m){
+    m=document.createElement('div');m.id='reportModal';m.className='modal';
+    m.innerHTML='<div class="modalbox"><h3>Tell me what went wrong</h3>'+
+      '<p class="report-why">Getting cards and pictures out of an export correctly is the hard part of this tool. If yours came out wrong, this report plus the file you imported is what makes it fixable.</p>'+
+      '<textarea id="reportText" spellcheck="false"></textarea>'+
+      '<div class="modal-actions"><button class="btn secondary" id="reportClose">Close</button>'+
+      '<button class="btn secondary" id="reportOpenIssue">Open an issue</button>'+
+      '<button class="btn" id="reportCopy">Copy report</button></div></div>';
+    document.body.appendChild(m);
+    m.querySelector('#reportClose').onclick=()=>m.classList.remove('show');
+    m.querySelector('#reportCopy').onclick=async()=>{
+      const t=$('reportText');
+      try{await navigator.clipboard.writeText(t.value);toast('Report copied — please attach the file you imported')}
+      catch(e){t.focus();t.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}
+        toast(ok?'Report copied — please attach the file you imported':'Press Ctrl+C to copy')}
+    };
+    m.querySelector('#reportOpenIssue').onclick=()=>{
+      const body=encodeURIComponent($('reportText').value).slice(0,6000);
+      window.open(REPORT_ISSUE_URL+'?title='+encodeURIComponent('Import problem')+'&body='+body,'_blank','noopener');
+    };
+  }
+  $('reportText').value=describeImport();
+  m.classList.add('show');
+}
 const LOADING_LINES=[
   'Consulting Mike\u2026',
   'Mike has already finished this deck. Catching up\u2026',
@@ -835,7 +954,7 @@ function newDeck(){localStorage.removeItem(STORAGE);state.deck=[];$('deckbar').s
 function openSettings(){$('direction').value=state.settings.direction;$('testLength').value=state.settings.testLength;$('matchSize').value=state.settings.matchSize;$('autoSpeak').value=state.settings.autoSpeak;$('settingsModal').classList.add('show')}
 function closeSettings(){$('settingsModal').classList.remove('show')}
 function saveSettings(){state.settings.direction=$('direction').value;state.settings.testLength=$('testLength').value;state.settings.matchSize=+$('matchSize').value;state.settings.autoSpeak=$('autoSpeak').value;saveLocal();closeSettings();renderCards();toast('Settings saved')}
-$('chooseBtn').onclick=e=>{e.stopPropagation();$('file').click()};$('file').addEventListener('change',e=>importFiles([...e.target.files]));$('drop').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click()});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('drag')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('drag'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files])});$('settingsBtn').onclick=openSettings;$('settingsBtn2').onclick=openSettings;$('closeSettings').onclick=closeSettings;$('saveSettings').onclick=saveSettings;$('newBtn').onclick=newDeck;$('newBtn2').onclick=newDeck;$('exportBtn').onclick=exportDeck;$('editBtn').onclick=openEditor;$('doneEdit').onclick=()=>{showDeck();saveLocal()};$('addCard').onclick=()=>{state.deck.push(makeCard('<span>New term</span>','<span>New definition</span>'));saveLocal();renderEditor()};$('dedupe').onclick=()=>{state.deck=finalizeCards(state.deck);saveLocal();renderEditor();toast('Duplicates removed')};$('shiftAllUp').onclick=()=>shiftAllPictures(-1);$('shiftAllDown').onclick=()=>shiftAllPictures(1);$('flashWrap').onclick=flip;$('next').onclick=nextCard;$('prev').onclick=prevCard;$('shuffle').onclick=shuffleDeck;$('starBtn').onclick=e=>{e.stopPropagation();starCurrent()};$('speakBtn').onclick=e=>{e.stopPropagation();speakCurrent()};$('againBtn').onclick=()=>recordCurrent(false);$('gotItBtn').onclick=()=>recordCurrent(true);$('learnContinue').onclick=renderLearn;$('writeCheck').onclick=checkWrite;$('writeInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkWrite()});$('writeContinue').onclick=renderWrite;$('matchRestart').onclick=initMatch;$('testAgain').onclick=initTest;$('browseSearch').addEventListener('input',renderBrowse);document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)||document.activeElement.isContentEditable)return;
+$('chooseBtn').onclick=e=>{e.stopPropagation();$('file').click()};$('file').addEventListener('change',e=>importFiles([...e.target.files]));$('drop').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click()});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('drag')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('drag'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files])});$('settingsBtn').onclick=openSettings;$('settingsBtn2').onclick=openSettings;$('closeSettings').onclick=closeSettings;$('saveSettings').onclick=saveSettings;$('newBtn').onclick=newDeck;$('newBtn2').onclick=newDeck;$('exportBtn').onclick=exportDeck;$('reportBtn').onclick=openReport;$('editBtn').onclick=openEditor;$('doneEdit').onclick=()=>{showDeck();saveLocal()};$('addCard').onclick=()=>{state.deck.push(makeCard('<span>New term</span>','<span>New definition</span>'));saveLocal();renderEditor()};$('dedupe').onclick=()=>{state.deck=finalizeCards(state.deck);saveLocal();renderEditor();toast('Duplicates removed')};$('shiftAllUp').onclick=()=>shiftAllPictures(-1);$('shiftAllDown').onclick=()=>shiftAllPictures(1);$('flashWrap').onclick=flip;$('next').onclick=nextCard;$('prev').onclick=prevCard;$('shuffle').onclick=shuffleDeck;$('starBtn').onclick=e=>{e.stopPropagation();starCurrent()};$('speakBtn').onclick=e=>{e.stopPropagation();speakCurrent()};$('againBtn').onclick=()=>recordCurrent(false);$('gotItBtn').onclick=()=>recordCurrent(true);$('learnContinue').onclick=renderLearn;$('writeCheck').onclick=checkWrite;$('writeInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkWrite()});$('writeContinue').onclick=renderWrite;$('matchRestart').onclick=initMatch;$('testAgain').onclick=initTest;$('browseSearch').addEventListener('input',renderBrowse);document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)||document.activeElement.isContentEditable)return;
   if(e.key.length===1){mikeBuf=(mikeBuf+e.key.toLowerCase()).slice(-4);if(mikeBuf==='mike'){mikeBuf='';toast(mikeLine());return}}
   if(!state.deck.length)return;if(e.code==='Space'&&state.mode==='cards'){e.preventDefault();flip()}if(e.key==='ArrowRight'&&state.mode==='cards')nextCard();if(e.key==='ArrowLeft'&&state.mode==='cards')prevCard();if(e.key.toLowerCase()==='s'&&state.mode==='cards')starCurrent();if(e.key.toLowerCase()==='r'&&state.mode==='cards')speakCurrent()});let mikeBuf='';
 loadLocal();
