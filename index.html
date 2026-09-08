@@ -1,0 +1,517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<title>OpenStudy — Universal Quizlet Importer</title>
+<style>
+:root{--bg:#0b1020;--surface:#151d31;--surface2:#1b2740;--border:#2c3a56;--text:#f7f9fc;--muted:#9eabc2;--primary:#6366f1;--primary2:#818cf8;--good:#10b981;--bad:#ef4444;--warn:#f59e0b;--shadow:0 18px 50px rgba(0,0,0,.22)}
+*{box-sizing:border-box}html{scroll-behavior:smooth}body{margin:0;background:radial-gradient(circle at 50% -20%,#18254a 0,#0b1020 48%);color:var(--text);font-family:Inter,ui-sans-serif,system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;min-height:100vh}button,input,select,textarea{font:inherit}.app{width:min(1180px,calc(100% - 28px));margin:0 auto;padding:28px 0 50px}.top{display:flex;gap:16px;align-items:center;justify-content:space-between;margin-bottom:18px}.brand h1{margin:0;font-size:30px;letter-spacing:-.03em}.brand p{margin:4px 0 0;color:var(--muted);font-size:14px}.top-actions,.deck-actions{display:flex;gap:8px;flex-wrap:wrap}.btn{border:1px solid transparent;border-radius:10px;padding:10px 14px;background:var(--primary);color:#fff;font-weight:700;cursor:pointer;transition:.16s}.btn:hover{filter:brightness(1.08);transform:translateY(-1px)}.btn.secondary{background:var(--surface2);border-color:var(--border)}.btn.ghost{background:transparent;border-color:var(--border);color:var(--text)}.btn.danger{background:#3a1820;border-color:#6d2735;color:#fecaca}.btn:disabled{opacity:.45;cursor:not-allowed;transform:none}.panel{background:rgba(21,29,49,.94);border:1px solid var(--border);border-radius:16px;box-shadow:var(--shadow)}.upload{padding:24px}.drop{border:2px dashed #3c4b69;border-radius:14px;padding:40px 20px;text-align:center;cursor:pointer;background:#0d1426;transition:.15s}.drop.drag{border-color:var(--primary2);background:#111b34}.drop h2{margin:0 0 8px;font-size:21px}.drop p{margin:0 auto 16px;color:var(--muted);max-width:760px;line-height:1.5}.file-input{display:none}.hint{font-size:12px;color:var(--muted);margin-top:10px;text-align:center}.status{font-size:13px;color:var(--muted);min-height:20px;margin-top:10px}.deckbar{display:none;margin:16px 0;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}.deck-info strong{font-size:17px}.deck-info span{color:var(--muted);font-size:13px}.nav{display:none;gap:7px;flex-wrap:wrap;margin:14px 0}.tab{padding:9px 13px;border-radius:9px;border:1px solid var(--border);background:var(--surface);color:var(--muted);font-weight:700;cursor:pointer}.tab.active{background:var(--primary);color:#fff;border-color:var(--primary)}.view{display:none}.view.active{display:block}.toolbar{display:flex;align-items:center;justify-content:space-between;gap:10px;flex-wrap:wrap;margin-bottom:12px}.toolbar .muted,.muted{color:var(--muted);font-size:13px}.flash-wrap{perspective:1300px;height:460px;cursor:pointer}.flash{position:relative;width:100%;height:100%;transform-style:preserve-3d;transition:transform .48s cubic-bezier(.2,.75,.25,1)}.flash.flip{transform:rotateY(180deg)}.face{position:absolute;inset:0;backface-visibility:hidden;border-radius:18px;border:1px solid var(--border);background:linear-gradient(145deg,#17223a,#111a2d);padding:38px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;overflow:auto}.face.back{transform:rotateY(180deg);background:linear-gradient(145deg,#1d2942,#152038)}.face-label{position:absolute;top:18px;left:20px;color:var(--muted);font-size:11px;font-weight:800;letter-spacing:.1em;text-transform:uppercase}.content{font-size:clamp(20px,3vw,30px);line-height:1.45;max-width:1000px;word-break:break-word}.content.small{font-size:17px}.content img,.prompt img,.option img,.tile img,.row img{max-width:100%;max-height:250px;object-fit:contain;border-radius:10px;margin:10px auto;display:block}.content img{max-width:min(100%,520px);max-height:260px}.controls{display:flex;justify-content:space-between;gap:8px;margin-top:12px}.controls .mid{display:flex;gap:8px}.study-panel,.test,.browse,.editor,.progress-panel{padding:22px}.prompt{font-size:clamp(20px,3vw,28px);font-weight:750;line-height:1.4;margin:10px 0 18px}.prompt img{max-height:220px}.options{display:grid;grid-template-columns:1fr 1fr;gap:10px}.option{text-align:left;padding:15px;border-radius:12px;border:1px solid var(--border);background:var(--surface2);color:var(--text);cursor:pointer;line-height:1.45}.option:hover:not(:disabled){border-color:var(--primary2)}.option.correct{border-color:var(--good);background:rgba(16,185,129,.14)}.option.wrong{border-color:var(--bad);background:rgba(239,68,68,.14)}.feedback{margin-top:14px;color:var(--muted);min-height:22px}.progressline{height:7px;background:#0c1425;border-radius:99px;overflow:hidden}.progressline>div{height:100%;width:0;background:var(--primary);transition:.25s}.match-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px}.tile{min-height:120px;padding:12px;border:1px solid var(--border);border-radius:12px;background:var(--surface2);display:flex;align-items:center;justify-content:center;text-align:center;cursor:pointer;line-height:1.35;overflow:hidden}.tile.selected{border-color:var(--primary2);background:#252b67}.tile.wrong{border-color:var(--bad);background:rgba(239,68,68,.12)}.tile.matched{visibility:hidden}.result{padding:30px;text-align:center}.score{font-size:48px;font-weight:850;margin:10px 0;color:var(--primary2)}.search{width:100%;background:#0d1426;color:var(--text);border:1px solid var(--border);border-radius:10px;padding:11px 13px;margin-bottom:14px}.cardlist{display:grid;gap:9px}.row{display:grid;grid-template-columns:42px 1fr 1fr 50px;gap:12px;align-items:center;padding:12px;border:1px solid var(--border);border-radius:11px;background:#111a2d}.row img{max-height:90px}.num{color:var(--muted);font-weight:800}.star{border:0;background:transparent;color:#64748b;font-size:22px;cursor:pointer}.star.on{color:#fbbf24}.stats{display:grid;grid-template-columns:repeat(5,1fr);gap:10px;margin-bottom:14px}.stat{padding:16px;border:1px solid var(--border);border-radius:12px;background:var(--surface)}.stat b{display:block;font-size:24px;margin-bottom:4px}.stat span{font-size:12px;color:var(--muted)}.empty{padding:35px;text-align:center;color:var(--muted)}.modal{position:fixed;inset:0;background:rgba(0,0,0,.65);display:none;align-items:center;justify-content:center;padding:18px;z-index:10}.modal.show{display:flex}.modalbox{width:min(620px,100%);max-height:90vh;overflow:auto;padding:22px;background:var(--surface);border:1px solid var(--border);border-radius:16px}.modalbox h3{margin:0 0 15px}.field{margin:12px 0}.field label{display:block;color:var(--muted);font-size:12px;font-weight:800;margin-bottom:6px}.field input,.field select{width:100%;padding:10px;background:#0d1426;color:var(--text);border:1px solid var(--border);border-radius:9px}.modal-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:18px}.toast{position:fixed;right:18px;bottom:18px;background:#17223a;border:1px solid var(--border);padding:12px 15px;border-radius:10px;display:none;z-index:20}.toast.show{display:block}.editor-tools{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px;align-items:center}.editor-table{width:100%;border-collapse:separate;border-spacing:0 8px}.editor-table th{color:var(--muted);font-size:12px;text-align:left;padding:0 8px}.editor-table td{background:#111a2d;border:1px solid var(--border);padding:8px;vertical-align:top}.editor-table td:first-child{border-radius:10px 0 0 10px}.editor-table td:last-child{border-radius:0 10px 10px 0}.editable{min-height:70px;outline:none;line-height:1.4}.editable img{max-width:180px;max-height:100px}.row-actions{display:flex;gap:5px;flex-wrap:wrap}.smallbtn{border:1px solid var(--border);background:var(--surface2);color:var(--text);border-radius:7px;padding:6px 8px;cursor:pointer;font-size:12px}.smallbtn:hover{border-color:var(--primary2)}.study-controls{display:flex;gap:8px;flex-wrap:wrap;margin-top:12px}.check-answer{display:flex;gap:8px;margin-top:12px}.check-answer input{flex:1;background:#0d1426;color:var(--text);border:1px solid var(--border);border-radius:9px;padding:11px}.pill{display:inline-block;padding:3px 8px;border-radius:99px;background:#202d49;color:var(--muted);font-size:11px}.notice{padding:12px;border:1px solid #5a4820;background:rgba(245,158,11,.08);border-radius:10px;color:#fbd38d;font-size:13px;line-height:1.5;margin-top:12px}.sep{width:1px;height:24px;background:var(--border);margin:0 4px}
+@media(max-width:760px){.app{width:min(100% - 18px,1180px);padding-top:16px}.top{align-items:flex-start}.top-actions{display:none}.flash-wrap{height:390px}.options{grid-template-columns:1fr}.match-grid{grid-template-columns:1fr 1fr}.stats{grid-template-columns:1fr 1fr}.row{grid-template-columns:30px 1fr 1fr 42px}.face{padding:28px 18px}.content{font-size:20px}.editor-table{font-size:13px}.editor-table thead{display:none}.editor-table,.editor-table tbody,.editor-table tr,.editor-table td{display:block;width:100%}.editor-table tr{margin-bottom:10px}.editor-table td{border-radius:8px!important;margin:3px 0}.row-actions{justify-content:flex-end}}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top"><div class="brand"><h1>OpenStudy</h1><p>Import Quizlet exports and study them locally — including cards with pictures.</p></div><div class="top-actions"><button class="btn secondary" id="settingsBtn">Settings</button><button class="btn secondary" id="newBtn">New deck</button></div></header>
+<section class="panel upload" id="uploadPanel">
+  <div class="drop" id="drop" tabindex="0">
+    <h2>Drop a Quizlet export here</h2>
+    <p><b>HTML</b> is preferred when your set contains pictures. You can also select the HTML file together with its image files, upload a ZIP containing the HTML and images, or use Quizlet TSV/CSV/TXT/PDF exports.</p>
+    <button class="btn" id="chooseBtn">Choose files</button>
+    <input class="file-input" id="file" type="file" multiple accept=".html,.htm,.zip,.pdf,.txt,.tsv,.csv,.json,.png,.jpg,.jpeg,.gif,.webp,.svg,application/pdf,text/html,text/plain,application/json,application/zip,image/*">
+    <div class="hint">For a saved HTML page with local pictures: select the HTML and all its image files at the same time, or put them in a ZIP. External image URLs and data URLs are supported too.</div>
+  </div>
+  <div class="status" id="status"></div>
+</section>
+<section class="deckbar" id="deckbar"><div class="deck-info"><strong id="deckTitle">Untitled deck</strong><br><span id="deckMeta"></span></div><div class="deck-actions"><button class="btn secondary" id="editBtn">Edit cards</button><button class="btn secondary" id="settingsBtn2">Options</button><button class="btn secondary" id="exportBtn">Export deck</button><button class="btn ghost" id="newBtn2">Load another</button></div></section>
+<nav class="nav" id="nav"><button class="tab active" data-mode="cards">Flashcards</button><button class="tab" data-mode="learn">Learn</button><button class="tab" data-mode="write">Write</button><button class="tab" data-mode="match">Match</button><button class="tab" data-mode="test">Test</button><button class="tab" data-mode="browse">Browse</button><button class="tab" data-mode="progress">Progress</button></nav>
+<section class="view active" id="view-cards"><div class="toolbar"><span class="muted" id="fcProgress"></span><span class="muted">Space: flip · ←/→: navigate · S: star · R: read aloud</span></div><div class="flash-wrap" id="flashWrap"><div class="flash" id="flash"><div class="face"><span class="face-label">Term</span><div class="content" id="front"></div></div><div class="face back"><span class="face-label">Definition</span><div class="content" id="back"></div></div></div></div><div class="controls"><button class="btn secondary" id="prev">← Previous</button><div class="mid"><button class="btn secondary" id="shuffle">Shuffle</button><button class="btn ghost" id="starBtn">☆ Star</button><button class="btn ghost" id="speakBtn">🔊</button></div><button class="btn" id="next">Next →</button></div><div class="study-controls"><button class="btn secondary" id="againBtn">Again</button><button class="btn secondary" id="gotItBtn">Got it</button></div></section>
+<section class="view panel study-panel" id="view-learn"><div class="toolbar"><span class="muted" id="learnMeta"></span><span class="muted" id="learnMastery"></span></div><div class="progressline"><div id="learnBar"></div></div><div class="prompt" id="learnPrompt"></div><div class="options" id="learnOptions"></div><div class="feedback" id="learnFeedback"></div><button class="btn" id="learnContinue" style="display:none;margin-top:12px">Continue</button></section>
+<section class="view panel study-panel" id="view-write"><div class="toolbar"><span class="muted" id="writeMeta"></span><span class="muted">Type the answer; spelling does not have to be exact.</span></div><div class="prompt" id="writePrompt"></div><div class="check-answer"><input id="writeInput" autocomplete="off" placeholder="Type your answer…"><button class="btn" id="writeCheck">Check</button></div><div class="feedback" id="writeFeedback"></div><button class="btn" id="writeContinue" style="display:none;margin-top:12px">Continue</button></section>
+<section class="view panel match" id="view-match"><div class="toolbar"><span class="muted" id="matchMeta"></span><button class="btn secondary" id="matchRestart">Restart</button></div><div class="match-grid" id="matchGrid"></div></section>
+<section class="view panel test" id="view-test"><div id="testRunner"><div class="toolbar"><span class="muted" id="testMeta"></span></div><div class="progressline"><div id="testBar"></div></div><div class="prompt" id="testPrompt"></div><div class="options" id="testOptions"></div></div><div class="result" id="testResult" style="display:none"><h2>Test complete</h2><div class="score" id="testScore"></div><p class="muted" id="testResultText"></p><button class="btn" id="testAgain">Retake test</button></div></section>
+<section class="view panel browse" id="view-browse"><input class="search" id="browseSearch" placeholder="Search terms and definitions…"><div class="cardlist" id="cardList"></div></section>
+<section class="view" id="view-progress"><div class="stats" id="stats"></div><div class="panel progress-panel"><h3>Cards needing the most review</h3><div class="cardlist" id="weakList"></div></div></section>
+<section class="view panel editor" id="view-editor"><div class="toolbar"><div><h2 style="margin:0">Edit deck</h2><div class="muted">Fix parsing mistakes or remove cards before studying.</div></div><button class="btn" id="doneEdit">Done</button></div>
+<div class="editor-tools"><button class="btn secondary" id="addCard">+ Add card</button><button class="btn secondary" id="dedupe">Remove duplicates</button><span class="sep"></span><span class="muted">Pictures off by one?</span><button class="smallbtn" id="shiftAllUp">⬆ Shift all pictures up</button><button class="smallbtn" id="shiftAllDown">⬇ Shift all pictures down</button></div>
+<div id="editorTable"></div></section>
+</div>
+<div class="modal" id="settingsModal"><div class="modalbox"><h3>Study settings</h3><div class="field"><label>Answer direction</label><select id="direction"><option value="term-def">Term → Definition</option><option value="def-term">Definition → Term</option><option value="mixed">Mixed</option></select></div><div class="field"><label>Test length</label><select id="testLength"><option value="all">All cards</option><option value="10">10 cards</option><option value="20">20 cards</option><option value="30">30 cards</option></select></div><div class="field"><label>Match board size</label><select id="matchSize"><option value="6">6 pairs</option><option value="8">8 pairs</option><option value="10">10 pairs</option></select></div><div class="field"><label>Auto-speak flashcards</label><select id="autoSpeak"><option value="off">Off</option><option value="term">Term</option><option value="definition">Definition</option><option value="both">Both</option></select></div><div class="modal-actions"><button class="btn secondary" id="closeSettings">Cancel</button><button class="btn" id="saveSettings">Save</button></div></div></div>
+<div class="toast" id="toast"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+'use strict';
+const $=id=>document.getElementById(id);
+const STORAGE='openstudy-universal-v5';
+const state={deck:[],title:'',index:0,flipped:false,mode:'cards',learn:null,write:null,test:null,match:null,settings:{direction:'term-def',testLength:'all',matchSize:6,autoSpeak:'off'}};
+const PDF_WORKER_URL='https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+/* A worker script cannot be constructed from another origin — the same-origin
+   policy blocks `new Worker(https://cdn…)` in every browser, and from a
+   file:// page too. pdf.js does not recover from that: getDocument simply never
+   settles and the import hangs with no error. Fetch the worker once and hand
+   pdf.js a same-origin blob: URL instead. */
+let pdfWorkerReady=null;
+function ensurePDFWorker(){
+  if(!window.pdfjsLib)return Promise.reject(new Error('PDF support is unavailable. Check your internet connection.'));
+  if(pdfWorkerReady)return pdfWorkerReady;
+  pdfWorkerReady=(async()=>{
+    try{
+      const res=await fetch(PDF_WORKER_URL);
+      if(!res.ok)throw new Error('HTTP '+res.status);
+      pdfjsLib.GlobalWorkerOptions.workerSrc=URL.createObjectURL(new Blob([await res.text()],{type:'text/javascript'}));
+    }catch(e){
+      console.warn('Blob worker unavailable, using direct worker URL',e);
+      pdfjsLib.GlobalWorkerOptions.workerSrc=PDF_WORKER_URL;
+    }
+  })();
+  return pdfWorkerReady;
+}
+function setStatus(msg){const el=$('status');if(el)el.textContent=msg}
+function toast(msg){$('toast').textContent=msg;$('toast').classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>$('toast').classList.remove('show'),2600)}
+function clean(s){return String(s??'').replace(/\s+/g,' ').trim()}
+function esc(s){return String(s??'').replace(/[&<>"']/g,m=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]))}
+function shuffle(a){a=[...a];for(let i=a.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function median(nums){if(!nums.length)return 0;const s=[...nums].sort((a,b)=>a-b);return s[Math.floor(s.length/2)]}
+function normalizeImage(src,base,assetMap={}){if(!src)return '';src=src.trim();let key=decodeURIComponent(src).replace(/^\.\//,'').replace(/^\//,'');if(assetMap[key])return assetMap[key];let short=key.split('/').pop();if(assetMap[short])return assetMap[short];if(src.startsWith('//'))return location.protocol+src;if(/^(https?:|data:|blob:|file:)/i.test(src))return src;try{return new URL(src,base).href}catch{return src}}
+function sanitizeHTML(raw,base,assetMap={}){const doc=new DOMParser().parseFromString('<div>'+raw+'</div>','text/html'),root=doc.body.firstElementChild;if(!root)return '';const allowed=new Set(['B','STRONG','I','EM','U','S','BR','SUB','SUP','P','DIV','SPAN','UL','OL','LI','IMG','SMALL','H1','H2','H3']);root.querySelectorAll('*').forEach(el=>{if(!allowed.has(el.tagName)){el.replaceWith(...el.childNodes);return}[...el.attributes].forEach(a=>{if(a.name==='src'&&el.tagName==='IMG')el.setAttribute('src',normalizeImage(a.value,base,assetMap));else if(!['alt','title','src'].includes(a.name))el.removeAttribute(a.name)});if(el.tagName==='IMG'){el.setAttribute('loading','lazy');el.setAttribute('referrerpolicy','no-referrer')}});return root.innerHTML}
+function strip(h){const d=document.createElement('div');d.innerHTML=h;d.querySelectorAll('script,style').forEach(x=>x.remove());return d.textContent||''}
+function hasVisual(h){return /<img\b/i.test(h||'')}
+function imgTags(html){const d=document.createElement('div');d.innerHTML=html||'';const imgs=[...d.querySelectorAll('img')];const tags=imgs.map(i=>i.outerHTML);imgs.forEach(i=>i.remove());return {rest:d.innerHTML,tags}}
+function imgFingerprint(html){const d=document.createElement('div');d.innerHTML=html||'';return [...d.querySelectorAll('img')].map(i=>{const s=i.getAttribute('src')||'';return s.length+':'+s.slice(-72)}).join('|')}
+
+/* A card counts as usable when each side has text OR a picture. Quizlet sets
+   frequently have picture-only answers, and requiring text on both sides threw
+   those cards away entirely. */
+function makeCard(termHtml,defHtml,extra={}){
+  const termText=clean(extra.termText??strip(termHtml)),defText=clean(extra.defText??strip(defHtml));
+  if(!(termText||hasVisual(termHtml)))return null;
+  if(!(defText||hasVisual(defHtml)))return null;
+  return {termHtml,defHtml,termText,defText,star:!!extra.star,correct:+extra.correct||0,wrong:+extra.wrong||0}
+}
+function addPair(arr,a,b,base,assetMap={}){if(!a||!b||a===b)return;const x=sanitizeHTML(a.innerHTML||a.textContent||'',base,assetMap),y=sanitizeHTML(b.innerHTML||b.textContent||'',base,assetMap),c=makeCard(x,y);if(c)arr.push(c)}
+function finalizeCards(cards){
+  const out=[],seen=new Set();
+  for(const c of cards){
+    const termHtml=c.termHtml||esc(c.termText||c.term||c.question||''),defHtml=c.defHtml||esc(c.defText||c.def||c.definition||c.answer||'');
+    const card=makeCard(termHtml,defHtml,{termText:c.termText||c.term,defText:c.defText||c.def||c.definition||c.answer,star:c.star,correct:c.correct,wrong:c.wrong});
+    if(!card)continue;
+    // Include picture identity in the dedupe key, otherwise two picture-only
+    // cards with the same (empty) text collapse into one.
+    const key=[card.termText,card.defText,imgFingerprint(termHtml),imgFingerprint(defHtml)].join(' ').toLowerCase();
+    if(!seen.has(key)){seen.add(key);out.push(card)}
+  }
+  return out
+}
+function parseHTMLFile(text,filename,assetMap={}){
+ const doc=new DOMParser().parseFromString(text,'text/html'),base='https://local.openstudy/'+filename.split('/').pop(),cards=[];
+ doc.querySelectorAll('img[src]').forEach(img=>img.setAttribute('src',normalizeImage(img.getAttribute('src'),base,assetMap)));
+ const pairSelectors=[
+  ['[data-term]','[data-definition],[data-answer]'],['[data-question]','[data-answer]'],['.term','.definition'],['.Term','.Definition'],['.word','.definition'],['.question','.answer'],['[class*="Term"]','[class*="Definition"]'],['[class*="term"]','[class*="definition"]']
+ ];
+ for(const [aSel,bSel] of pairSelectors)doc.querySelectorAll(aSel).forEach(a=>{const p=a.closest('tr,li,article,section,.card,[class*="card"],div');const b=p?.querySelector(bSel);if(b&&b!==a)addPair(cards,a,b,base,assetMap)});
+ doc.querySelectorAll('table tr').forEach(tr=>{const cells=[...tr.querySelectorAll(':scope > th,:scope > td')].filter(x=>clean(x.textContent)||x.querySelector('img'));if(cells.length>=2)addPair(cards,cells[0],cells[1],base,assetMap)});
+ doc.querySelectorAll('dl').forEach(dl=>{const dts=[...dl.querySelectorAll(':scope > dt')],dds=[...dl.querySelectorAll(':scope > dd')];dts.forEach((dt,i)=>dds[i]&&addPair(cards,dt,dds[i],base,assetMap))});
+ [...doc.querySelectorAll('li,article,section,div')].forEach(c=>{if(c.querySelectorAll('li,article,section').length>5)return;const children=[...c.children].filter(e=>!['SCRIPT','STYLE','NOSCRIPT','BUTTON','NAV','HEADER','FOOTER'].includes(e.tagName)&&(clean(e.textContent)||e.querySelector('img')));if(children.length===2&&children[0]!==children[1])addPair(cards,children[0],children[1],base,assetMap)});
+ if(!cards.length){const raw=clean(doc.body?.innerText||'');for(const line of raw.split(/\n+/)){const m=line.match(/^(.+?)\s*(?:\t|\s+\|\s+|\s+—\s+|\s+-\s+)\s+(.+)$/);if(m){const c=makeCard(esc(clean(m[1])),esc(clean(m[2])));if(c)cards.push(c)}}}
+ const title=clean(doc.querySelector('title')?.textContent)||filename.replace(/\.(html?|htm)$/i,'');return {cards:finalizeCards(cards),title}
+}
+function parseDelimited(text,filename){const cards=[];for(const line of text.split(/\r?\n/)){if(!line.trim())continue;let p=line.includes('\t')?line.split('\t'):line.includes(',')?line.split(','):line.split(/\s+-\s+/);if(p.length>=2){let a=clean(p.shift()),b=clean(p.join(' - '));if(a&&b){const c=makeCard(esc(a),esc(b));if(c)cards.push(c)}}}return {cards:finalizeCards(cards),title:filename.replace(/\.[^.]+$/,'')}}
+
+/* ===================== PDF import =====================
+   Quizlet's "print" export renders one card per table row. Pictures are pulled
+   out by reading the page's image-drawing operators for their true placement,
+   then cropping them from a rendered page (which composites masks and
+   transparency correctly, unlike lifting the raw image object).
+*/
+const PDF_RENDER_SCALE=2;
+function mul(m,n){return [m[0]*n[0]+m[2]*n[1],m[1]*n[0]+m[3]*n[1],m[0]*n[2]+m[2]*n[3],m[1]*n[2]+m[3]*n[3],m[0]*n[4]+m[2]*n[5]+m[4],m[1]*n[4]+m[3]*n[5]+m[5]]}
+function txPoint(m,x,y){return [m[0]*x+m[2]*y+m[4],m[1]*x+m[3]*y+m[5]]}
+
+/* An image is placed by a CTM mapping the unit square into PDF user space,
+   whose origin is the BOTTOM-left with +y pointing UP, while text positions
+   here are top-down. convertToViewportPoint lands both in the same top-down
+   space. Skipping that flip mirrors every picture about the page centre, which
+   is the single biggest cause of photos landing on the wrong card. */
+function unitSquareToViewportRect(ctm,viewport){
+  const pts=[[0,0],[1,0],[0,1],[1,1]].map(([u,v])=>txPoint(ctm,u,v)).map(([x,y])=>viewport.convertToViewportPoint(x,y));
+  const xs=pts.map(p=>p[0]),ys=pts.map(p=>p[1]);
+  const x0=Math.min(...xs),x1=Math.max(...xs),y0=Math.min(...ys),y1=Math.max(...ys);
+  return {x0,y0,x1,y1,w:x1-x0,h:y1-y0,cx:(x0+x1)/2,cy:(y0+y1)/2};
+}
+async function scanPDFImages(page,viewport){
+  const out=[];
+  try{
+    const op=await page.getOperatorList(),OPS=pdfjsLib.OPS;
+    const imageFns=new Set([OPS.paintImageXObject,OPS.paintJpegXObject,OPS.paintImageMaskXObject,OPS.paintImageXObjectRepeat].filter(n=>typeof n==='number'));
+    let ctm=[1,0,0,1,0,0];const stack=[];
+    for(let i=0;i<op.fnArray.length;i++){
+      const fn=op.fnArray[i],args=op.argsArray[i];
+      if(fn===OPS.save){stack.push(ctm.slice());continue}
+      if(fn===OPS.restore){ctm=stack.pop()||[1,0,0,1,0,0];continue}
+      if(fn===OPS.transform&&args){ctm=mul(ctm,args);continue}
+      if(imageFns.has(fn)){const r=unitSquareToViewportRect(ctm,viewport);r.id=(args&&typeof args[0]==='string')?args[0]:null;out.push(r)}
+    }
+  }catch(e){console.warn('PDF image scan failed',e)}
+  // Drop page furniture: the header logo, hairlines, and full-page backgrounds.
+  return out.filter(r=>
+    r.w>=18&&r.h>=18&&
+    r.w<=viewport.width*0.92&&r.h<=viewport.height*0.92&&
+    r.y1>viewport.height*0.075&&r.y0<viewport.height-20
+  );
+}
+const MAX_PIC_EDGE=640;
+function canvasToRef(draw,w,h){
+  // Flashcards never need more than a few hundred pixels, and every picture is
+  // inlined into the deck as a data URL that has to fit in localStorage.
+  const k=Math.min(1,MAX_PIC_EDGE/Math.max(w,h));
+  const c=document.createElement('canvas');
+  c.width=Math.max(1,Math.round(w*k));c.height=Math.max(1,Math.round(h*k));
+  const ctx=c.getContext('2d',{alpha:false});
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,c.width,c.height);
+  draw(ctx,c.width,c.height);
+  return c.toDataURL('image/jpeg',0.85);
+}
+/* Resolve a decoded image object by id. pdf.js delivers these while building
+   the operator list, into either the page store or the shared one, so try both
+   and time out rather than waiting on a callback that may never fire. */
+function getPDFObject(page,id,timeoutMs=4000){
+  return new Promise(resolve=>{
+    if(!id||typeof id!=='string')return resolve(null);
+    let settled=false;
+    const finish=v=>{if(!settled){settled=true;resolve(v)}};
+    const timer=setTimeout(()=>finish(null),timeoutMs);
+    for(const store of [page.objs,page.commonObjs]){
+      try{
+        if(store&&typeof store.has==='function'&&store.has(id)){clearTimeout(timer);return finish(store.get(id))}
+      }catch(e){}
+    }
+    for(const store of [page.objs,page.commonObjs]){
+      try{ store&&store.get(id,v=>{clearTimeout(timer);finish(v)}) }catch(e){}
+    }
+  });
+}
+// Turn a decoded pdf.js image object into a data URL without rendering the page.
+function imageObjectToRef(obj){
+  if(!obj)return null;
+  try{
+    if(obj.bitmap)return canvasToRef((ctx,w,h)=>ctx.drawImage(obj.bitmap,0,0,w,h),obj.bitmap.width,obj.bitmap.height);
+    const w=obj.width,h=obj.height,src=obj.data;
+    if(!w||!h||!src)return null;
+    const px=w*h,rgba=new Uint8ClampedArray(px*4);
+    if(src.length===px*4)rgba.set(src);
+    else if(src.length===px*3){for(let i=0,j=0;i<px;i++){rgba[i*4]=src[j++];rgba[i*4+1]=src[j++];rgba[i*4+2]=src[j++];rgba[i*4+3]=255}}
+    else if(src.length===px){for(let i=0;i<px;i++){rgba[i*4]=rgba[i*4+1]=rgba[i*4+2]=src[i];rgba[i*4+3]=255}}
+    else return null;
+    const full=document.createElement('canvas');full.width=w;full.height=h;
+    full.getContext('2d').putImageData(new ImageData(rgba,w,h),0,0);
+    return canvasToRef((ctx,dw,dh)=>ctx.drawImage(full,0,0,dw,dh),w,h);
+  }catch(e){console.warn('PDF image decode failed',e);return null}
+}
+/* Fallback only: rasterise the page and cut each picture out of it. Correct for
+   masked or otherwise composited artwork, but it needs requestAnimationFrame,
+   which browsers pause in a background tab — so it is the second choice, not
+   the first. */
+async function renderPageCrops(page,viewport,boxes){
+  if(!boxes.length)return [];
+  const rv=page.getViewport({scale:PDF_RENDER_SCALE});
+  const canvas=document.createElement('canvas');
+  canvas.width=Math.ceil(rv.width);canvas.height=Math.ceil(rv.height);
+  const ctx=canvas.getContext('2d',{alpha:false});
+  ctx.fillStyle='#fff';ctx.fillRect(0,0,canvas.width,canvas.height);
+  await page.render({canvasContext:ctx,viewport:rv}).promise;
+  const out=[];
+  for(const b of boxes){
+    const sx=Math.max(0,Math.round(b.x0*PDF_RENDER_SCALE)),sy=Math.max(0,Math.round(b.y0*PDF_RENDER_SCALE));
+    const sw=Math.min(canvas.width-sx,Math.round(b.w*PDF_RENDER_SCALE)),sh=Math.min(canvas.height-sy,Math.round(b.h*PDF_RENDER_SCALE));
+    if(sw<12||sh<12)continue;
+    out.push({...b,ref:canvasToRef((c2,dw,dh)=>c2.drawImage(canvas,sx,sy,sw,sh,0,0,dw,dh),sw,sh)});
+  }
+  return out;
+}
+// Prefer the embedded image object; fall back to cropping a rendered page.
+async function extractPageImages(page,viewport,boxes){
+  const out=[],needsRender=[];
+  for(const b of boxes){
+    const ref=imageObjectToRef(await getPDFObject(page,b.id));
+    if(ref)out.push({...b,ref});else needsRender.push(b);
+  }
+  if(needsRender.length)out.push(...await renderPageCrops(page,viewport,needsRender));
+  return out.sort((a,b)=>a.y0-b.y0);
+}
+
+/*<<<PDF_LAYOUT_CORE>>>*/
+/* Quizlet's print export is a two-column table, one row per card: term on the
+   left, definition text then any picture on the right.
+
+   Two properties of that layout drive everything below.
+   (a) The term is vertically CENTRED in its row, so it routinely sits BELOW the
+       first line of its own definition. Anchoring a row at its term's top edge,
+       or matching a picture to the nearest term centre, both mis-assign: a tall
+       photo sits far below the term it belongs to and scores closer to the
+       following term.
+   (b) Rows are contiguous, so the real boundary between two cards is the widest
+       strip of whitespace lying between their two term centres. That is what
+       findRowBounds looks for. */
+
+// The column gutter, found by vertical projection: the widest x-band carrying
+// no glyphs near the middle of the page. A hard-coded x only fits one page size.
+function detectColumnSplit(words,width){
+  const BIN=4,n=Math.max(1,Math.ceil(width/BIN)),cov=new Uint8Array(n);
+  for(const w of words){
+    const a=Math.max(0,Math.floor(w.x0/BIN)),b=Math.min(n-1,Math.ceil(w.x1/BIN));
+    for(let i=a;i<=b;i++)cov[i]=1;
+  }
+  let best=null,run=null;
+  const consider=r=>{if(!r)return;const c=((r.a+r.b)/2+0.5)*BIN;if(c<width*0.3||c>width*0.7)return;if(!best||(r.b-r.a)>(best.b-best.a))best=r};
+  for(let i=0;i<n;i++){if(!cov[i]){run=run||{a:i,b:i};run.b=i}else{consider(run);run=null}}
+  consider(run);
+  return best?((best.a+best.b)/2+0.5)*BIN:width*0.48;
+}
+
+// Group words into visual lines by vertical overlap rather than centre
+// proximity, so one tall glyph cannot split a line in two.
+function groupPDFLines(words){
+  const lines=[];
+  for(const w of [...words].sort((a,b)=>a.top-b.top)){
+    const g=lines.find(g=>Math.min(g.bottom,w.bottom)-Math.max(g.top,w.top)>Math.min(g.bottom-g.top,w.h)*0.45);
+    if(g){g.words.push(w);g.top=Math.min(g.top,w.top);g.bottom=Math.max(g.bottom,w.bottom)}
+    else lines.push({top:w.top,bottom:w.bottom,words:[w]});
+  }
+  return lines.map(g=>({top:g.top,bottom:g.bottom,h:g.bottom-g.top,
+    x0:Math.min(...g.words.map(w=>w.x0)),
+    text:clean(g.words.sort((a,b)=>a.x0-b.x0).map(w=>w.t).join(' '))})).filter(l=>l.text).sort((a,b)=>a.top-b.top);
+}
+
+// A term that wraps onto a second line must not become a second card, or it
+// opens a bogus row and steals the real card's definition and picture. Wrapped
+// lines sit ~0.4 line-heights apart; separate rows are held apart by the
+// table's row padding, which is far wider.
+function mergeTermLines(lines,medH){
+  const terms=[];
+  for(const l of lines){
+    const prev=terms[terms.length-1];
+    if(prev&&l.top-prev.bottom<medH*0.55){prev.text=clean(prev.text+' '+l.text);prev.bottom=l.bottom}
+    else terms.push({text:l.text,top:l.top,bottom:l.bottom,h:l.h});
+  }
+  return terms;
+}
+
+/* Lay every page out on ONE continuous axis built from each page's actual
+   content extent, not its paper height. A row split by a page break — its
+   picture pushed to the top of the next page, above that page's first term —
+   then reads as an unbroken block, because the dead paper margins that would
+   otherwise look like a huge row gap are removed from the axis entirely. */
+function layoutPDFRows(pages){
+  const allWords=pages.flatMap(p=>p.words);
+  if(!allWords.length)return [];
+  const split=detectColumnSplit(allWords,pages[0].width);
+  const medH=median(allWords.map(w=>w.h))||10;
+
+  const perPage=pages.map(pg=>({
+    terms:mergeTermLines(groupPDFLines(pg.words.filter(w=>w.x0<split)),medH),
+    items:[
+      ...groupPDFLines(pg.words.filter(w=>w.x0>=split)).map(l=>({kind:'text',top:l.top,bottom:l.bottom,text:l.text})),
+      ...pg.images.map(im=>({kind:'image',top:im.y0,bottom:im.y1,cx:im.cx,ref:im.ref}))
+    ].sort((a,b)=>a.top-b.top)
+  }));
+
+  let flow=0;const terms=[],items=[];
+  for(const pg of perPage){
+    const all=[...pg.terms,...pg.items];
+    if(!all.length)continue;
+    const top=Math.min(...all.map(x=>x.top)),bottom=Math.max(...all.map(x=>x.bottom)),shift=flow-top;
+    for(const t of pg.terms)terms.push({...t,fTop:t.top+shift,fBottom:t.bottom+shift});
+    for(const it of pg.items)items.push({...it,fTop:it.top+shift,fBottom:it.bottom+shift});
+    flow+=bottom-top;
+  }
+  terms.sort((a,b)=>a.fTop-b.fTop);
+  items.sort((a,b)=>a.fTop-b.fTop);
+  if(!terms.length)return [];
+
+  // Whitespace gaps down the content column. The running maximum keeps nested
+  // or overlapping boxes from inventing a gap that is not there.
+  const gaps=[];let reach=-Infinity;
+  for(const it of items){
+    if(reach>-Infinity&&it.fTop>reach)gaps.push({size:it.fTop-reach,mid:(reach+it.fTop)/2});
+    reach=Math.max(reach,it.fBottom);
+  }
+  const centre=t=>(t.fTop+t.fBottom)/2;
+  const bounds=[];
+  for(let i=0;i+1<terms.length;i++){
+    const lo=centre(terms[i]),hi=centre(terms[i+1]);
+    let best=null;
+    for(const g of gaps)if(g.mid>lo&&g.mid<hi&&(!best||g.size>best.size))best=g;
+    bounds.push(best?best.mid:(lo+hi)/2);
+  }
+  const rowFor=y=>{let i=0;while(i<bounds.length&&y>bounds[i])i++;return i};
+  const rows=terms.map(t=>({term:t.text,defs:[],termImages:[],defImages:[]}));
+  for(const it of items){
+    const r=rows[rowFor(it.fTop)];
+    if(it.kind==='text')r.defs.push(it);
+    else (it.cx<split?r.termImages:r.defImages).push(it.ref);
+  }
+  return rows.map(r=>({term:r.term,def:clean(r.defs.map(d=>d.text).join(' ')),termImages:r.termImages,defImages:r.defImages}));
+}
+/*<<<END_PDF_LAYOUT_CORE>>>*/
+
+async function parsePDF(file){
+  await ensurePDFWorker();
+  setStatus('Opening PDF…');
+  const task=pdfjsLib.getDocument({data:await file.arrayBuffer()});
+  const pdf=await Promise.race([
+    task.promise,
+    new Promise((_,rej)=>setTimeout(()=>rej(new Error('Timed out opening the PDF. If this tab was in the background, bring it to the front and try again.')),45000))
+  ]);
+  const raw=[];let deckTitle='';
+  for(let p=1;p<=pdf.numPages;p++){
+    const page=await pdf.getPage(p);
+    const vp=page.getViewport({scale:1});
+    const tc=await page.getTextContent();
+    if(!deckTitle){const h=tc.items.map(i=>clean(i.str)).find(t=>t&&!/quizlet\.com|study online at/i.test(t));if(h)deckTitle=h}
+    const words=tc.items.map(it=>{
+      const t=clean(it.str);if(!t)return null;
+      const h=Math.abs(it.transform[3])||10;
+      const x0=it.transform[4],x1=x0+Math.abs(it.width||0);
+      const bottom=vp.height-it.transform[5],top=bottom-h;
+      return {t,x0,x1,top,bottom,h,cy:(top+bottom)/2};
+    }).filter(Boolean).filter(w=>
+      w.cy>vp.height*0.08&&w.cy<vp.height-24&&
+      !/quizlet\.com|study online at/i.test(w.t)&&
+      !/^\d+\s*\/\s*\d+$/.test(w.t)
+    );
+    raw.push({page,vp,words,boxes:await scanPDFImages(page,vp)});
+    setStatus(`Reading page ${p} of ${pdf.numPages}…`);
+  }
+  if(!raw.length)throw new Error('The PDF appears to be empty.');
+  if(!raw.some(r=>r.words.length))throw new Error('No selectable text found — this PDF looks like a scan. Quizlet\'s own export or a saved HTML page will import far better.');
+
+  // A picture drawn on most pages is page furniture, not a card image.
+  const idPages=new Map();
+  for(const r of raw){const seen=new Set();for(const b of r.boxes)if(b.id&&!seen.has(b.id)){seen.add(b.id);idPages.set(b.id,(idPages.get(b.id)||0)+1)}}
+  const templateIds=new Set(raw.length>1?[...idPages].filter(([,c])=>c>=Math.max(2,Math.ceil(raw.length*0.6))).map(([id])=>id):[]);
+
+  const pages=[];
+  for(let i=0;i<raw.length;i++){
+    const r=raw[i];
+    setStatus(`Extracting pictures from page ${i+1} of ${raw.length}…`);
+    const crops=await extractPageImages(r.page,r.vp,r.boxes.filter(b=>!(b.id&&templateIds.has(b.id))));
+    pages.push({words:r.words,width:r.vp.width,height:r.vp.height,images:crops});
+  }
+  const cards=[];
+  for(const row of layoutPDFRows(pages)){
+    let termHtml=esc(clean(row.term)),defHtml=esc(clean(row.def));
+    for(const ref of row.termImages)termHtml+=`<img src="${ref}" alt="Imported picture">`;
+    for(const ref of row.defImages)defHtml+=`<img src="${ref}" alt="Imported picture">`;
+    const c=makeCard(termHtml,defHtml);
+    if(c)cards.push(c);
+  }
+  if(!cards.length)throw new Error('No card rows were detected in this PDF.');
+  return {cards:finalizeCards(cards),title:deckTitle||file.name.replace(/\.pdf$/i,'')};
+}
+/* ===================== end PDF import ===================== */
+
+async function readAssets(files){const map={};for(const f of files){if(!/^image\//i.test(f.type)&&!/\.(png|jpe?g|gif|webp|svg)$/i.test(f.name))continue;const data=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f)});map[f.name]=data;map[f.name.split('/').pop()]=data}return map}
+async function parseZip(file){if(!window.JSZip)throw new Error('ZIP support is unavailable. Check your internet connection.');const zip=await JSZip.loadAsync(file),names=Object.keys(zip.files),htmlName=names.find(n=>/\.html?$/i.test(n)&&!zip.files[n].dir);if(!htmlName)throw new Error('ZIP does not contain an HTML file.');const map={};for(const n of names){if(zip.files[n].dir||!/\.(png|jpe?g|gif|webp|svg)$/i.test(n))continue;const blob=await zip.files[n].async('blob'),data=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(blob)});map[n]=data;map[n.split('/').pop()]=data}return parseHTMLFile(await zip.files[htmlName].async('string'),htmlName,map)}
+async function importFiles(files){
+  if(!files.length)return;
+  $('status').textContent='Reading '+files.map(f=>f.name).join(', ')+'…';
+  try{
+    const first=files.find(f=>/\.(html?|zip|pdf|json|txt|tsv|csv)$/i.test(f.name))||files[0];
+    let result;
+    if(/\.zip$/i.test(first.name))result=await parseZip(first);
+    else if(/\.pdf$/i.test(first.name))result=await parsePDF(first);
+    else if(/\.html?$/i.test(first.name)){const map=await readAssets(files.filter(f=>f!==first));result=parseHTMLFile(await first.text(),first.name,map)}
+    else if(/\.json$/i.test(first.name)){const j=JSON.parse(await first.text()),arr=Array.isArray(j)?j:(j.cards||j.terms||j.data||[]);result={cards:finalizeCards(arr),title:j.title||first.name.replace(/\.json$/i,'')}}
+    else result=parseDelimited(await first.text(),first.name);
+    if(!result.cards.length)throw new Error('No term/definition pairs were detected. If this is a saved Quizlet webpage, select the HTML plus its image files or upload the ZIP containing them.');
+    state.deck=result.cards;state.title=result.title||'Imported deck';state.index=0;state.flipped=false;
+    saveLocal();showDeck();$('status').textContent='';
+    const withPics=state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length;
+    toast(`Imported ${state.deck.length} cards${withPics?` · ${withPics} with pictures`:''}`);
+    if(withPics&&/\.pdf$/i.test(first.name))toast(`Imported ${state.deck.length} cards · ${withPics} with pictures. Check them in Browse — Edit cards can shift pictures if any are off.`);
+  }catch(e){console.error(e);$('status').textContent='Import failed: '+e.message}
+}
+function showDeck(){if(!state.deck.length)return;$('uploadPanel').style.display='none';$('deckbar').style.display='flex';$('nav').style.display='flex';$('deckTitle').textContent=state.title;$('deckMeta').textContent=`${state.deck.length} cards · ${state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length} with pictures`;switchMode('cards')}
+function answerFor(c){let d=state.settings.direction;if(d==='mixed')d=Math.random()<.5?'term-def':'def-term';return d==='term-def'?{prompt:c.termHtml,answer:c.defHtml,text:c.defText}:{prompt:c.defHtml,answer:c.termHtml,text:c.termText}}
+function renderCards(){if(!state.deck.length)return;const c=state.deck[state.index];$('front').innerHTML=c.termHtml;$('back').innerHTML=c.defHtml;$('fcProgress').textContent=`Card ${state.index+1} / ${state.deck.length}`;$('starBtn').textContent=c.star?'★ Starred':'☆ Star';$('flash').classList.toggle('flip',state.flipped);if(state.settings.autoSpeak!=='off')setTimeout(()=>speakCurrent(),120)}
+function flip(){state.flipped=!state.flipped;$('flash').classList.toggle('flip',state.flipped);if(state.settings.autoSpeak!=='off')speakCurrent()}
+function nextCard(){state.index=(state.index+1)%state.deck.length;state.flipped=false;renderCards()}function prevCard(){state.index=(state.index-1+state.deck.length)%state.deck.length;state.flipped=false;renderCards()}
+function shuffleDeck(){state.deck=shuffle(state.deck);state.index=0;state.flipped=false;saveLocal();renderCards()}
+function starCurrent(){state.deck[state.index].star=!state.deck[state.index].star;saveLocal();renderCards();if(state.mode==='browse'||state.mode==='progress')renderBrowse()}
+function recordCurrent(ok){const c=state.deck[state.index];if(ok)c.correct++;else c.wrong++;saveLocal();toast(ok?'Marked got it':'Marked for review');nextCard()}
+function speak(text){if(!('speechSynthesis'in window)||!text)return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=.9;window.speechSynthesis.speak(u)}
+function speakCurrent(){const c=state.deck[state.index],text=state.flipped?c.defText:c.termText;speak(text)}
+function switchMode(mode){state.mode=mode;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('view-'+mode).classList.add('active');if(mode==='cards')renderCards();if(mode==='learn')initLearn();if(mode==='write')initWrite();if(mode==='match')initMatch();if(mode==='test')initTest();if(mode==='browse')renderBrowse();if(mode==='progress')renderProgress()}
+function initLearn(){const pool=state.deck.filter(c=>c.wrong>=c.correct);state.learn={current:null,answered:false,pool:pool.length?pool:state.deck};renderLearn()}
+function renderLearn(){const c=shuffle(state.learn.pool)[0],a=answerFor(c);state.learn.current=c;state.learn.answered=false;$('learnPrompt').innerHTML=a.prompt;$('learnMeta').textContent=`${state.learn.pool.length} cards in review queue`;$('learnFeedback').textContent='';$('learnContinue').style.display='none';let opts=shuffle([c,...shuffle(state.deck.filter(x=>x!==c)).slice(0,3)]);$('learnOptions').innerHTML='';opts.forEach(x=>{const b=document.createElement('button');b.className='option';b.innerHTML=answerFor(x).answer;b.onclick=()=>handleLearn(b,x===c,c,a.text);$('learnOptions').appendChild(b)});const mastered=state.deck.filter(x=>x.correct>=3&&x.correct>x.wrong).length,pct=Math.round(mastered/state.deck.length*100);$('learnMastery').textContent=pct+'% mastered';$('learnBar').style.width=pct+'%'}
+function handleLearn(btn,correct,c,text){if(state.learn.answered)return;state.learn.answered=true;document.querySelectorAll('#learnOptions .option').forEach(b=>b.disabled=true);if(correct){btn.classList.add('correct');c.correct++;$('learnFeedback').textContent='Correct'}else{btn.classList.add('wrong');c.wrong++;$('learnFeedback').textContent='Incorrect — correct answer: '+(text||'(picture)')}saveLocal();$('learnContinue').style.display='inline-block'}
+// Write mode needs a typeable answer, so picture-only sides are excluded.
+function writablePool(){const p=state.deck.filter(c=>c.termText&&c.defText);return p.length?p:state.deck}
+function initWrite(){state.write={current:null,answered:false};renderWrite()}
+function renderWrite(){const c=shuffle(writablePool())[0],a=answerFor(c);state.write.current=c;state.write.answer=a.text;state.write.answered=false;$('writePrompt').innerHTML=a.prompt;$('writeMeta').textContent='Write the answer';$('writeInput').value='';$('writeInput').disabled=false;$('writeFeedback').textContent='';$('writeCheck').style.display='inline-block';$('writeContinue').style.display='none';setTimeout(()=>$('writeInput').focus(),50)}
+function similarity(a,b){a=clean(a).toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,'');b=clean(b).toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,'');if(a===b)return 1;const aa=a.split(/\s+/),bb=b.split(/\s+/),set=new Set(bb);return aa.filter(x=>set.has(x)).length/Math.max(aa.length,bb.length,1)}
+function checkWrite(){if(state.write.answered)return;const guess=$('writeInput').value,score=similarity(guess,state.write.answer),ok=score>=.65;state.write.answered=true;$('writeInput').disabled=true;$('writeCheck').style.display='none';if(ok){state.write.current.correct++;$('writeFeedback').textContent='Correct enough — '+state.write.answer}else{state.write.current.wrong++;$('writeFeedback').textContent='Not quite. Answer: '+state.write.answer}saveLocal();$('writeContinue').style.display='inline-block'}
+function initMatch(){if(!state.deck.length)return;const n=Math.min(+state.settings.matchSize,state.deck.length),subset=shuffle(state.deck).slice(0,n),tiles=[];subset.forEach((c,i)=>{tiles.push({id:i,type:'term',html:c.termHtml});tiles.push({id:i,type:'def',html:c.defHtml})});state.match={selected:null,left:n};const board=$('matchGrid');board.innerHTML='';shuffle(tiles).forEach(t=>{const el=document.createElement('div');el.className='tile';el.innerHTML=t.html;el.onclick=()=>matchClick(el,t);board.appendChild(el)});$('matchMeta').textContent=`${n} pairs`}
+function matchClick(el,t){if(el.classList.contains('matched'))return;if(!state.match.selected){state.match.selected={el,t};el.classList.add('selected');return}const s=state.match.selected;if(s.el===el){el.classList.remove('selected');state.match.selected=null;return}if(s.t.id===t.id&&s.t.type!==t.type){s.el.classList.add('matched');el.classList.add('matched');state.match.left--;state.match.selected=null;if(!state.match.left)toast('Match complete')}else{el.classList.add('wrong');s.el.classList.add('wrong');setTimeout(()=>{el.classList.remove('wrong');s.el.classList.remove('wrong','selected');state.match.selected=null},450)}}
+function initTest(){const pool=shuffle(state.deck),len=state.settings.testLength==='all'?pool.length:Math.min(+state.settings.testLength,pool.length);state.test={queue:pool.slice(0,len),i:0,score:0,answered:false};$('testRunner').style.display='block';$('testResult').style.display='none';renderTest()}
+function renderTest(){const t=state.test;if(t.i>=t.queue.length)return finishTest();const c=t.queue[t.i],a=answerFor(c);t.current=c;t.answerText=a.text;t.answered=false;$('testMeta').textContent=`Question ${t.i+1} of ${t.queue.length}`;$('testBar').style.width=(t.i/t.queue.length*100)+'%';$('testPrompt').innerHTML=a.prompt;$('testOptions').innerHTML='';shuffle([c,...shuffle(state.deck.filter(x=>x!==c)).slice(0,3)]).forEach(x=>{const b=document.createElement('button');b.className='option';b.innerHTML=answerFor(x).answer;b.dataset.correct=x===c?'1':'';b.onclick=()=>testAnswer(b,x===c,c);$('testOptions').appendChild(b)})}
+function testAnswer(btn,correct,c){if(state.test.answered)return;state.test.answered=true;document.querySelectorAll('#testOptions .option').forEach(b=>b.disabled=true);if(correct){btn.classList.add('correct');state.test.score++;c.correct++}else{btn.classList.add('wrong');c.wrong++;document.querySelectorAll('#testOptions .option[data-correct="1"]').forEach(b=>b.classList.add('correct'))}saveLocal();setTimeout(()=>{state.test.i++;renderTest()},650)}
+function finishTest(){const t=state.test,pct=t.queue.length?Math.round(t.score/t.queue.length*100):0;$('testRunner').style.display='none';$('testResult').style.display='block';$('testScore').textContent=`${t.score} / ${t.queue.length}`;$('testResultText').textContent=pct+'%';$('testBar').style.width='100%'}
+function renderBrowse(){const q=clean($('browseSearch').value).toLowerCase(),list=state.deck.map((c,i)=>({c,i})).filter(x=>!q||(x.c.termText+' '+x.c.defText).toLowerCase().includes(q));$('cardList').innerHTML=list.length?list.map(x=>`<div class="row"><div class="num">${x.i+1}</div><div>${x.c.termHtml}</div><div>${x.c.defHtml}</div><button class="star ${x.c.star?'on':''}" data-star="${x.i}">${x.c.star?'★':'☆'}</button></div>`).join(''):'<div class="empty">No cards match your search.</div>';document.querySelectorAll('[data-star]').forEach(b=>b.onclick=()=>toggleStar(+b.dataset.star))}
+function toggleStar(i){state.deck[i].star=!state.deck[i].star;saveLocal();renderBrowse()}
+function renderProgress(){const total=state.deck.length,attempts=state.deck.reduce((n,c)=>n+c.correct+c.wrong,0),correct=state.deck.reduce((n,c)=>n+c.correct,0),star=state.deck.filter(c=>c.star).length,master=state.deck.filter(c=>c.correct>=3&&c.correct>c.wrong).length,visual=state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length;$('stats').innerHTML=`<div class="stat"><b>${total}</b><span>Total cards</span></div><div class="stat"><b>${visual}</b><span>With pictures</span></div><div class="stat"><b>${star}</b><span>Starred</span></div><div class="stat"><b>${attempts?Math.round(correct/attempts*100):0}%</b><span>Accuracy</span></div><div class="stat"><b>${master}</b><span>Mastered</span></div>`;const weak=state.deck.map((c,i)=>({c,i,rate:(c.correct+c.wrong)?c.correct/(c.correct+c.wrong):0})).sort((a,b)=>a.rate-b.rate).slice(0,8);$('weakList').innerHTML=weak.map(x=>`<div class="row"><div class="num">${x.i+1}</div><div>${x.c.termHtml}</div><div>${x.c.defHtml}<br><small class="muted">${x.c.correct} correct · ${x.c.wrong} wrong</small></div><div></div></div>`).join('')}
+
+/* Manual repair for whatever the layout heuristics still get wrong. Per-card
+   nudges handle one-off mistakes; the global shift fixes a systematic
+   off-by-one across the whole deck in a single click. */
+function cardImages(c){const t=imgTags(c.termHtml),d=imgTags(c.defHtml);return {term:t.tags,def:d.tags,termRest:t.rest,defRest:d.rest}}
+function moveCardPictures(i,dir){
+  const j=i+dir;
+  if(j<0||j>=state.deck.length)return toast('No card in that direction');
+  const a=state.deck[i],b=state.deck[j];
+  const ai=cardImages(a);
+  if(!ai.term.length&&!ai.def.length)return toast('That card has no picture');
+  const bi=cardImages(b);
+  a.termHtml=ai.termRest;a.defHtml=ai.defRest;
+  b.termHtml=bi.termRest+bi.term.join('')+ai.term.join('');
+  b.defHtml=bi.defRest+bi.def.join('')+ai.def.join('');
+  [a,b].forEach(c=>{c.termText=clean(strip(c.termHtml));c.defText=clean(strip(c.defHtml))});
+  saveLocal();renderEditor();toast(`Picture moved to card ${j+1}`);
+}
+function shiftAllPictures(dir){
+  const n=state.deck.length;if(n<2)return;
+  const parts=state.deck.map(cardImages);
+  // Rotate rather than slide: a repair tool must never drop the picture that
+  // falls off the end, and it has to undo cleanly if the guess was wrong.
+  state.deck.forEach((c,i)=>{
+    const src=parts[(i-dir%n+n)%n];
+    c.termHtml=parts[i].termRest+src.term.join('');
+    c.defHtml=parts[i].defRest+src.def.join('');
+    c.termText=clean(strip(c.termHtml));c.defText=clean(strip(c.defHtml));
+  });
+  saveLocal();renderEditor();toast(`All pictures shifted ${dir>0?'down':'up'} one card`);
+}
+function renderEditor(){
+  const box=$('editorTable');
+  box.innerHTML=`<table class="editor-table"><thead><tr><th>#</th><th>Term</th><th>Definition</th><th></th></tr></thead><tbody>${state.deck.map((c,i)=>{
+    const pic=hasVisual(c.termHtml)||hasVisual(c.defHtml);
+    return `<tr><td class="num">${i+1}</td><td><div class="editable" contenteditable="true" data-edit="term" data-i="${i}">${c.termHtml}</div></td><td><div class="editable" contenteditable="true" data-edit="def" data-i="${i}">${c.defHtml}</div></td><td><div class="row-actions">${pic?`<button class="smallbtn" data-picup="${i}" title="Move this card's picture to the previous card">⬆ pic</button><button class="smallbtn" data-picdown="${i}" title="Move this card's picture to the next card">⬇ pic</button>`:''}<button class="smallbtn" data-del="${i}">Delete</button></div></td></tr>`;
+  }).join('')}</tbody></table>`;
+  document.querySelectorAll('[data-del]').forEach(b=>b.onclick=()=>{state.deck.splice(+b.dataset.del,1);saveLocal();renderEditor()});
+  document.querySelectorAll('[data-picup]').forEach(b=>b.onclick=()=>moveCardPictures(+b.dataset.picup,-1));
+  document.querySelectorAll('[data-picdown]').forEach(b=>b.onclick=()=>moveCardPictures(+b.dataset.picdown,1));
+  document.querySelectorAll('[data-edit]').forEach(el=>el.addEventListener('blur',()=>{const i=+el.dataset.i;if(el.dataset.edit==='term'){state.deck[i].termHtml=sanitizeHTML(el.innerHTML,'https://local.openstudy/');state.deck[i].termText=clean(strip(state.deck[i].termHtml))}else{state.deck[i].defHtml=sanitizeHTML(el.innerHTML,'https://local.openstudy/');state.deck[i].defText=clean(strip(state.deck[i].defHtml))}saveLocal()}));
+}
+function openEditor(){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('view-editor').classList.add('active');document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));renderEditor()}
+function saveLocal(){try{localStorage.setItem(STORAGE,JSON.stringify({title:state.title,deck:state.deck,settings:state.settings}))}catch(e){console.warn('Local save failed',e);toast('Deck too large to save locally — export it to keep a copy')}}
+function loadLocal(){try{const x=JSON.parse(localStorage.getItem(STORAGE)||'null');if(x?.deck?.length){state.title=x.title||'Saved deck';state.deck=finalizeCards(x.deck);state.settings={...state.settings,...x.settings};showDeck()}}catch(e){console.warn(e)}}
+function exportDeck(){const blob=new Blob([JSON.stringify({title:state.title,cards:state.deck},null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=(state.title||'openstudy-deck')+'.json';a.click();setTimeout(()=>URL.revokeObjectURL(a.href),1000)}
+function newDeck(){localStorage.removeItem(STORAGE);state.deck=[];$('deckbar').style.display='none';$('nav').style.display='none';document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('uploadPanel').style.display='block';$('file').value='';$('status').textContent='';toast('Ready for another deck')}
+function openSettings(){$('direction').value=state.settings.direction;$('testLength').value=state.settings.testLength;$('matchSize').value=state.settings.matchSize;$('autoSpeak').value=state.settings.autoSpeak;$('settingsModal').classList.add('show')}
+function closeSettings(){$('settingsModal').classList.remove('show')}
+function saveSettings(){state.settings.direction=$('direction').value;state.settings.testLength=$('testLength').value;state.settings.matchSize=+$('matchSize').value;state.settings.autoSpeak=$('autoSpeak').value;saveLocal();closeSettings();renderCards();toast('Settings saved')}
+$('chooseBtn').onclick=e=>{e.stopPropagation();$('file').click()};$('file').addEventListener('change',e=>importFiles([...e.target.files]));$('drop').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click()});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('drag')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('drag'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files])});$('settingsBtn').onclick=openSettings;$('settingsBtn2').onclick=openSettings;$('closeSettings').onclick=closeSettings;$('saveSettings').onclick=saveSettings;$('newBtn').onclick=newDeck;$('newBtn2').onclick=newDeck;$('exportBtn').onclick=exportDeck;$('editBtn').onclick=openEditor;$('doneEdit').onclick=()=>{showDeck();saveLocal()};$('addCard').onclick=()=>{state.deck.push(makeCard('<span>New term</span>','<span>New definition</span>'));saveLocal();renderEditor()};$('dedupe').onclick=()=>{state.deck=finalizeCards(state.deck);saveLocal();renderEditor();toast('Duplicates removed')};$('shiftAllUp').onclick=()=>shiftAllPictures(-1);$('shiftAllDown').onclick=()=>shiftAllPictures(1);$('flashWrap').onclick=flip;$('next').onclick=nextCard;$('prev').onclick=prevCard;$('shuffle').onclick=shuffleDeck;$('starBtn').onclick=e=>{e.stopPropagation();starCurrent()};$('speakBtn').onclick=e=>{e.stopPropagation();speakCurrent()};$('againBtn').onclick=()=>recordCurrent(false);$('gotItBtn').onclick=()=>recordCurrent(true);$('learnContinue').onclick=renderLearn;$('writeCheck').onclick=checkWrite;$('writeInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkWrite()});$('writeContinue').onclick=renderWrite;$('matchRestart').onclick=initMatch;$('testAgain').onclick=initTest;$('browseSearch').addEventListener('input',renderBrowse);document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)||document.activeElement.isContentEditable)return;if(!state.deck.length)return;if(e.code==='Space'&&state.mode==='cards'){e.preventDefault();flip()}if(e.key==='ArrowRight'&&state.mode==='cards')nextCard();if(e.key==='ArrowLeft'&&state.mode==='cards')prevCard();if(e.key.toLowerCase()==='s'&&state.mode==='cards')starCurrent();if(e.key.toLowerCase()==='r'&&state.mode==='cards')speakCurrent()});loadLocal();
+</script>
+</body>
+</html>
