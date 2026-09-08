@@ -233,7 +233,7 @@ button,input,select,textarea{font:inherit;color:inherit}
   box-shadow:var(--shadow), inset 0 1px 0 var(--glass-edge);
 }
 .nav-pill{
-  position:absolute;left:0;top:5px;border-radius:var(--cap);
+  position:absolute;left:0;top:0;border-radius:var(--cap);
   background:var(--content);box-shadow:0 1px 3px var(--glass-shade), inset 0 1px 0 var(--glass-edge);
   opacity:0;pointer-events:none;
   transition:transform .42s var(--spring),width .42s var(--spring),opacity .2s var(--ease);
@@ -343,6 +343,13 @@ button,input,select,textarea{font:inherit;color:inherit}
 @keyframes shake{25%{transform:translateX(-4px)}75%{transform:translateX(4px)}}
 .tile.matched{visibility:hidden}
 
+/* Match is a matching game, not a reading exercise: a tile shows a thumbnail
+   and a short label. Flex items refuse to shrink below their content, which is
+   why a full-width picture used to burst out of its tile. */
+.tile{display:grid;place-items:center;overflow:hidden;padding:12px}
+.tile-in{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:8px;min-width:0;max-width:100%}
+.tile-in img{max-width:100%;max-height:74px;object-fit:contain;border-radius:10px;margin:0;display:block}
+.tile-in span{display:block;min-width:0;max-width:100%;overflow-wrap:anywhere;line-height:1.35}
 /* ---------- results, stats, lists ---------- */
 .result{padding:46px 24px;text-align:center}
 .result h2{font-family:var(--display);font-weight:600;margin:0 0 4px}
@@ -424,6 +431,25 @@ button,input,select,textarea{font:inherit;color:inherit}
 .notice{padding:13px;border:1px solid var(--star);background:color-mix(in srgb,var(--star) 10%,transparent);border-radius:var(--r-in);font-size:13px;line-height:1.5;margin-top:12px}
 [hidden]{display:none!important}
 
+/* ---------- overflow menu ---------- */
+.more-wrap{position:relative}
+.more-menu{
+  position:absolute;right:0;top:calc(100% + 8px);z-index:12;min-width:216px;display:grid;gap:1px;padding:6px;
+  border-radius:var(--r);
+  background:var(--glass-strong);
+  -webkit-backdrop-filter:blur(22px) saturate(var(--sat));backdrop-filter:blur(22px) saturate(var(--sat));
+  border:1px solid var(--glass-edge-low);
+  box-shadow:var(--lift), inset 0 1px 0 var(--glass-edge);
+  animation:boxIn .22s var(--spring);
+}
+.more-menu button{
+  text-align:left;background:transparent;border:0;color:var(--text);
+  padding:9px 12px;border-radius:var(--r-in);cursor:pointer;font-size:13.5px;font-weight:500;
+  transition:background .15s,color .15s;
+}
+.more-menu button:hover{background:var(--accent-wash);color:var(--accent)}
+.deckbar{padding:12px 18px}
+.deck-info strong{font-size:18px}
 /* ---------- deck library + share ---------- */
 .lib-row{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:13px 2px;border-bottom:1px solid var(--hairline)}
 .lib-row:last-of-type{border-bottom:0}
@@ -438,7 +464,8 @@ button,input,select,textarea{font:inherit;color:inherit}
    specular highlight that tracks the pointer, and a material that responds when
    content passes beneath it. Both are decoration only — pointer-events stay
    off, and everything degrades to the flat surface without them. */
-.top,.deckbar,.nav{position:relative;isolation:isolate}
+.deckbar{position:relative}
+.top,.deckbar,.nav{isolation:isolate}
 .top::after,.deckbar::after,.nav::after{
   content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;
   background:radial-gradient(160px circle at var(--mx,50%) var(--my,0%),var(--glass-edge),transparent 62%);
@@ -455,6 +482,53 @@ body.scrolled .top,body.scrolled .nav{
 .top,.deckbar,.nav,.modalbox,.toast,.loading,.banner{
   box-shadow:var(--shadow), inset 0 1px 0 var(--glass-edge), inset 0 -1px 0 var(--glass-shade);
   transition:background .3s var(--ease),box-shadow .3s var(--ease);
+}
+
+/* ---------- lift and flex ----------
+   The part of Liquid Glass that makes it feel like a material rather than a
+   tint: anything you can touch rises toward the pointer, deepens its shadow as
+   it comes forward, then compresses under a press and springs back. Depth is
+   carried by shadow rather than a border, so nothing gains a hard edge. */
+.btn,.smallbtn,.tile,.option,.stat,.step,.more-menu button,.lib-row,.tab,.star,.face{
+  transition:transform .26s var(--spring),box-shadow .26s var(--ease),
+             background .18s var(--ease),border-color .18s var(--ease),color .18s var(--ease);
+}
+.btn:hover:not(:disabled),.smallbtn:hover{transform:translateY(-2px);box-shadow:var(--lift)}
+.btn:active:not(:disabled),.smallbtn:active{transform:translateY(0) scale(.95);box-shadow:var(--shadow);transition-duration:.08s}
+
+.tile:hover{transform:translateY(-4px);box-shadow:var(--lift)}
+.tile:active{transform:translateY(-1px) scale(.97);transition-duration:.08s}
+.tile.selected,.tile.selected:hover{transform:translateY(-3px) scale(1.02);box-shadow:var(--lift)}
+
+.option:hover:not(:disabled){transform:translateY(-2px);box-shadow:var(--shadow)}
+.option:active:not(:disabled){transform:scale(.985);transition-duration:.08s}
+
+.stat:hover{transform:translateY(-2px);box-shadow:var(--lift)}
+.step:hover{transform:translateY(-2px);box-shadow:var(--shadow)}
+.tab:hover:not(.active){transform:translateY(-1px)}
+.tab:active{transform:scale(.95);transition-duration:.08s}
+.star:active{transform:scale(.82);transition-duration:.08s}
+.lib-row:hover{background:var(--accent-wash)}
+.more-menu button:active{transform:scale(.97);transition-duration:.08s}
+
+/* The card comes forward on approach. It carries the flip on its own transform,
+   so the depth is expressed purely through shadow. */
+.flash-wrap:hover .face{box-shadow:var(--lift),0 44px 96px var(--glass-shade)}
+
+/* Specular highlight on every glass surface, not only the chrome. */
+.modalbox,.banner,.loading{position:relative}
+.modalbox,.banner,.loading,.more-menu{isolation:isolate}
+.modalbox::after,.banner::after,.loading::after,.more-menu::after{
+  content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;
+  background:radial-gradient(180px circle at var(--mx,50%) var(--my,0%),var(--glass-edge),transparent 62%);
+  opacity:0;transition:opacity .35s var(--ease);
+}
+.modalbox:hover::after,.banner:hover::after,.loading:hover::after,.more-menu:hover::after{opacity:.85}
+.modalbox>*,.banner>*,.more-menu>*{position:relative;z-index:1}
+
+@media (prefers-reduced-motion:reduce){
+  .btn:hover,.smallbtn:hover,.tile:hover,.option:hover,.stat:hover,.step:hover,
+  .tab:hover:not(.active),.btn:active,.tile:active,.option:active{transform:none}
 }
 
 /* Mike is not in any deck. Mike simply is. */
@@ -481,28 +555,69 @@ body.scrolled .top,body.scrolled .nav{
 }
 
 @media(max-width:760px){
-  .app{width:calc(100% - 20px);padding:12px 0 56px;gap:14px}
-  .top{position:static;padding:12px 14px}
-  .nav{position:static;width:100%;justify-content:flex-start;overflow-x:auto;flex-wrap:nowrap}
+  .app{width:calc(100% - 20px);padding:12px 0 56px;gap:12px}
+  .top{position:static;padding:11px 14px}
   .top-actions{display:none}
-  .flash-wrap{height:380px}
-  .face{padding:56px 22px 32px}
+
+  /* A label that breaks mid-phrase reads as broken layout, so controls never wrap
+     their own text; they shrink or scroll instead. */
+  .btn,.smallbtn,.tab{white-space:nowrap}
+  .kbd-hint{display:none}
+
+  /* All eight modes stay reachable by wrapping onto a second row rather than
+     scrolling out of sight, where Browse and Progress went undiscovered. */
+  .nav{position:static;width:100%;flex-wrap:wrap;overflow:visible;justify-content:flex-start;border-radius:var(--r)}
+  .nav-pill{border-radius:var(--cap)}
+  .tab{padding:8px 12px;font-size:13px}
+
+  .deckbar{padding:12px 14px;gap:10px}
+  .deck-info{flex:1 1 100%}
+  .deck-actions{width:100%;gap:6px}
+  .deck-actions .btn{flex:1 1 0;min-width:0;padding:9px 6px;font-size:13.5px}
+  .more-wrap{flex:1 1 0}
+  .more-wrap .btn{width:100%}
+  .more-menu{right:0;left:auto;min-width:0;width:min(260px,calc(100vw - 40px))}
+
+  /* Previous and Next take the full width side by side; the secondary tools sit
+     above them rather than being crushed between. */
+  .controls{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+  .controls .mid{grid-column:1/-1;justify-content:center;order:-1}
+  .controls>.btn{width:100%}
+  .rate-row{grid-template-columns:repeat(2,1fr);gap:6px}
+  .rate-row .btn{padding:10px 6px}
+  .study-controls{gap:6px}
+
+  .flash-wrap{height:360px}
+  .face{padding:52px 20px 30px}
+  .face::after,.face::before{left:22px;right:22px}
   .options{grid-template-columns:1fr}
   .match-grid{grid-template-columns:1fr 1fr}
   .stats{grid-template-columns:1fr 1fr}
-  .rate-row{grid-template-columns:repeat(2,1fr)}
-  .row{grid-template-columns:28px 1fr 1fr 38px;gap:10px}
+  .row{grid-template-columns:26px 1fr 1fr;gap:10px}
+  .row .star{grid-column:3;justify-self:end}
   .study-panel,.test,.browse,.editor,.progress-panel{padding:16px}
   .landing{padding:20px 12px 4px}
   .detail{padding:8px 12px 18px}
   .steps{grid-template-columns:1fr}
   .exp-opt{flex-direction:column;align-items:flex-start;gap:10px}
+  .lib-row{flex-direction:column;align-items:flex-start;gap:8px}
+  .banner{padding:12px 14px}
+  .modalbox{padding:20px;border-radius:var(--r)}
+  .toast{right:10px;left:10px;bottom:10px;max-width:none}
   .editor-table{font-size:13px}
   .editor-table thead{display:none}
   .editor-table,.editor-table tbody,.editor-table tr,.editor-table td{display:block;width:100%}
   .editor-table tr{border-top:1px solid var(--border);padding:6px 0}
   .editor-table td{border:0;padding:4px 0}
   .row-actions{justify-content:flex-end}
+}
+/* Coarse pointers get no hover lift: it sticks after a tap and reads as a stuck
+   control. Presses still respond. */
+@media (hover:none){
+  .btn:hover,.smallbtn:hover,.tile:hover,.option:hover,.stat:hover,.step:hover,
+  .tab:hover:not(.active),.flash-wrap:hover .face{transform:none;box-shadow:var(--shadow)}
+  .top:hover::after,.deckbar:hover::after,.nav:hover::after,
+  .modalbox:hover::after,.banner:hover::after,.loading:hover::after,.more-menu:hover::after{opacity:0}
 }
 </style>
 </head>
@@ -554,9 +669,22 @@ body.scrolled .top,body.scrolled .nav{
     </div>
   </div>
 </section>
-<section class="deckbar" id="deckbar"><div class="deck-info"><strong id="deckTitle">Untitled deck</strong><br><span id="deckMeta"></span></div><div class="deck-actions"><button class="btn secondary" id="editBtn">Edit cards</button><button class="btn secondary" id="settingsBtn2">Options</button><button class="btn secondary" id="libraryBtn">Decks</button><button class="btn secondary" id="shareBtn">Share</button><button class="btn secondary" id="exportBtn">Export deck</button><button class="btn ghost" id="reportBtn">Import look wrong?</button><button class="btn ghost" id="newBtn2">Load another</button></div></section>
+<section class="deckbar" id="deckbar"><div class="deck-info"><strong id="deckTitle">Untitled deck</strong><br><span id="deckMeta"></span></div><div class="deck-actions">
+  <button class="btn secondary" id="libraryBtn">Decks</button>
+  <button class="btn secondary" id="shareBtn">Share</button>
+  <button class="btn secondary" id="editBtn">Edit</button>
+  <div class="more-wrap">
+    <button class="btn ghost" id="moreBtn" aria-haspopup="true" aria-expanded="false">More</button>
+    <div class="more-menu" id="moreMenu" hidden>
+      <button id="exportBtn">Export deck</button>
+      <button id="settingsBtn2">Study options</button>
+      <button id="reportBtn">Import look wrong?</button>
+      <button id="newBtn2">Import another deck</button>
+    </div>
+  </div>
+</div></section>
 <nav class="nav" id="nav"><span class="nav-pill" id="navPill"></span><button class="tab active" data-mode="cards">Flashcards</button><button class="tab" data-mode="learn">Learn</button><button class="tab" data-mode="write">Write</button><button class="tab" data-mode="match">Match</button><button class="tab" data-mode="test">Test</button><button class="tab" data-mode="review">Review <span class="duebadge" id="dueBadge" hidden></span></button><button class="tab" data-mode="browse">Browse</button><button class="tab" data-mode="progress">Progress</button></nav>
-<section class="view active" id="view-cards"><div class="toolbar"><span class="muted" id="fcProgress"></span><span class="muted">Space: flip · ←/→: navigate · S: star · R: read aloud</span></div><div class="flash-wrap" id="flashWrap"><div class="flash" id="flash"><div class="face"><span class="face-label">Term</span><div class="content" id="front"></div></div><div class="face back"><span class="face-label">Definition</span><div class="content" id="back"></div></div></div></div><div class="controls"><button class="btn secondary" id="prev">← Previous</button><div class="mid"><button class="btn secondary" id="shuffle">Shuffle</button><button class="btn ghost" id="starBtn">☆ Star</button><button class="btn ghost" id="speakBtn">🔊</button></div><button class="btn" id="next">Next →</button></div><div class="rate-row" id="cardRate">
+<section class="view active" id="view-cards"><div class="toolbar"><span class="muted" id="fcProgress"></span><span class="muted kbd-hint">Space: flip · ←/→: navigate · S: star · R: read aloud</span></div><div class="flash-wrap" id="flashWrap"><div class="flash" id="flash"><div class="face"><span class="face-label">Term</span><div class="content" id="front"></div></div><div class="face back"><span class="face-label">Definition</span><div class="content" id="back"></div></div></div></div><div class="controls"><button class="btn secondary" id="prev">← Previous</button><div class="mid"><button class="btn secondary" id="shuffle">Shuffle</button><button class="btn ghost" id="starBtn">☆ Star</button><button class="btn ghost" id="speakBtn">🔊</button></div><button class="btn" id="next">Next →</button></div><div class="rate-row" id="cardRate">
   <button class="btn secondary" data-crate="1">Again<small></small></button>
   <button class="btn secondary" data-crate="2">Hard<small></small></button>
   <button class="btn" data-crate="3">Good<small></small></button>
@@ -1384,7 +1512,7 @@ function moveNavPill(){
   if(!act||!act.offsetWidth){pill.style.opacity='0';return}
   pill.style.width=act.offsetWidth+'px';
   pill.style.height=act.offsetHeight+'px';
-  pill.style.transform='translateX('+act.offsetLeft+'px)';
+  pill.style.transform='translate('+act.offsetLeft+'px,'+act.offsetTop+'px)';
   pill.style.opacity='1';
 }
 window.addEventListener('resize',()=>requestAnimationFrame(moveNavPill));
@@ -1464,7 +1592,15 @@ function checkWrite(){
   else{c.wrong++;c.sched=fsrsReview(c.sched,1);$('writeFeedback').textContent='Not quite. Answer: '+state.write.answer}
   saveLocal();$('writeContinue').style.display='inline-block';
 }
-function initMatch(){if(!state.deck.length)return;const n=Math.min(+state.settings.matchSize,state.deck.length),subset=shuffle(state.deck).slice(0,n),tiles=[];subset.forEach((c,i)=>{tiles.push({id:i,type:'term',html:c.termHtml});tiles.push({id:i,type:'def',html:c.defHtml})});state.match={selected:null,left:n};const board=$('matchGrid');board.innerHTML='';shuffle(tiles).forEach(t=>{const el=document.createElement('div');el.className='tile';el.innerHTML=t.html;el.onclick=()=>matchClick(el,t);board.appendChild(el)});$('matchMeta').textContent=`${n} pairs`}
+function tileHTML(html,text){
+  const box=document.createElement('div');box.innerHTML=html||'';
+  const img=box.querySelector('img');
+  const full=clean(text||box.textContent||'');
+  const short=full.length>90?full.slice(0,88).trimEnd()+'…':full;
+  return '<div class="tile-in">'+(img?'<img src="'+img.getAttribute('src')+'" alt="">':'')+
+         (short?'<span>'+esc(short)+'</span>':'')+'</div>';
+}
+function initMatch(){if(!state.deck.length)return;const n=Math.min(+state.settings.matchSize,state.deck.length),subset=shuffle(state.deck).slice(0,n),tiles=[];subset.forEach((c,i)=>{tiles.push({id:i,type:'term',html:tileHTML(c.termHtml,c.termText)});tiles.push({id:i,type:'def',html:tileHTML(c.defHtml,c.defText)})});state.match={selected:null,left:n};const board=$('matchGrid');board.innerHTML='';shuffle(tiles).forEach(t=>{const el=document.createElement('div');el.className='tile';el.innerHTML=t.html;el.onclick=()=>matchClick(el,t);board.appendChild(el)});$('matchMeta').textContent=`${n} pairs`}
 function matchClick(el,t){if(el.classList.contains('matched'))return;if(!state.match.selected){state.match.selected={el,t};el.classList.add('selected');return}const s=state.match.selected;if(s.el===el){el.classList.remove('selected');state.match.selected=null;return}if(s.t.id===t.id&&s.t.type!==t.type){s.el.classList.add('matched');el.classList.add('matched');state.match.left--;state.match.selected=null;if(!state.match.left)toast('Match complete')}else{el.classList.add('wrong');s.el.classList.add('wrong');setTimeout(()=>{el.classList.remove('wrong');s.el.classList.remove('wrong','selected');state.match.selected=null},450)}}
 function initTest(){const pool=shuffle(state.deck),len=state.settings.testLength==='all'?pool.length:Math.min(+state.settings.testLength,pool.length);state.test={queue:pool.slice(0,len),i:0,score:0,answered:false};$('testRunner').style.display='block';$('testResult').style.display='none';renderTest()}
 function renderTest(){const t=state.test;if(t.i>=t.queue.length)return finishTest();const c=t.queue[t.i],a=answerFor(c);t.current=c;t.answerText=a.text;t.answered=false;$('testMeta').textContent=`Question ${t.i+1} of ${t.queue.length}`;$('testBar').style.width=(t.i/t.queue.length*100)+'%';$('testPrompt').innerHTML=a.prompt;$('testOptions').innerHTML='';shuffle([c,...shuffle(state.deck.filter(x=>x!==c)).slice(0,3)]).forEach(x=>{const b=document.createElement('button');b.className='option';b.innerHTML=answerFor(x).answer;b.dataset.correct=x===c?'1':'';b.onclick=()=>testAnswer(b,x===c,c);$('testOptions').appendChild(b)})}
@@ -1839,6 +1975,18 @@ function renderLibrary(){
     await deleteDeckById(b.dataset.del);
   });
 }
+function toggleMore(force){
+  const menu=$('moreMenu'),btn=$('moreBtn');
+  if(!menu)return;
+  const show=force===undefined?menu.hidden:force;
+  menu.hidden=!show;
+  if(btn)btn.setAttribute('aria-expanded',String(show));
+}
+document.addEventListener('click',e=>{
+  if(e.target.closest&&e.target.closest('.more-wrap'))return;
+  toggleMore(false);
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape')toggleMore(false)});
 function openLibrary(){
   let m=$('libraryModal');
   if(!m){
@@ -2040,7 +2188,10 @@ function newDeck(){hideImportBanner();state.deck=[];state.deckId=null;$('deckbar
 function openSettings(){$('direction').value=state.settings.direction;$('testLength').value=state.settings.testLength;$('matchSize').value=state.settings.matchSize;$('autoSpeak').value=state.settings.autoSpeak;$('settingsModal').classList.add('show')}
 function closeSettings(){$('settingsModal').classList.remove('show')}
 function saveSettings(){state.settings.direction=$('direction').value;state.settings.testLength=$('testLength').value;state.settings.matchSize=+$('matchSize').value;state.settings.autoSpeak=$('autoSpeak').value;saveLocal();closeSettings();renderCards();toast('Settings saved')}
-$('chooseBtn').onclick=e=>{e.stopPropagation();$('file').click()};$('file').addEventListener('change',e=>importFiles([...e.target.files]));$('drop').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click()});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('drag')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('drag'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files])});$('settingsBtn').onclick=openSettings;$('settingsBtn2').onclick=openSettings;$('closeSettings').onclick=closeSettings;$('saveSettings').onclick=saveSettings;$('newBtn').onclick=newDeck;$('newBtn2').onclick=newDeck;$('exportBtn').onclick=exportDeck;$('libraryBtn').onclick=openLibrary;$('shareBtn').onclick=openShare;$('reportBtn').onclick=openReport;$('editBtn').onclick=openEditor;$('doneEdit').onclick=()=>{showDeck();saveLocal()};$('addCard').onclick=()=>{state.deck.push(makeCard('<span>New term</span>','<span>New definition</span>'));saveLocal();renderEditor()};$('dedupe').onclick=()=>{state.deck=finalizeCards(state.deck);saveLocal();renderEditor();toast('Duplicates removed')};$('shiftAllUp').onclick=()=>shiftAllPictures(-1);$('shiftAllDown').onclick=()=>shiftAllPictures(1);$('flashWrap').onclick=flip;$('next').onclick=nextCard;$('prev').onclick=prevCard;$('shuffle').onclick=shuffleDeck;$('starBtn').onclick=e=>{e.stopPropagation();starCurrent()};$('speakBtn').onclick=e=>{e.stopPropagation();speakCurrent()};document.querySelectorAll('[data-crate]').forEach(b=>b.onclick=()=>recordCurrent(+b.dataset.crate));
+$('chooseBtn').onclick=e=>{e.stopPropagation();$('file').click()};$('file').addEventListener('change',e=>importFiles([...e.target.files]));$('drop').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click()});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('drag')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('drag'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files])});const bind=(id,fn)=>{const el=$(id);if(el)el.onclick=fn};
+bind('settingsBtn',openSettings);bind('settingsBtn2',openSettings);
+bind('moreBtn',e=>{toggleMore()});$('closeSettings').onclick=closeSettings;$('saveSettings').onclick=saveSettings;bind('newBtn',newDeck);bind('newBtn2',newDeck);
+if($('moreMenu'))$('moreMenu').addEventListener('click',()=>toggleMore(false));bind('exportBtn',exportDeck);bind('libraryBtn',openLibrary);bind('shareBtn',openShare);bind('reportBtn',openReport);bind('editBtn',openEditor);$('doneEdit').onclick=()=>{showDeck();saveLocal()};$('addCard').onclick=()=>{state.deck.push(makeCard('<span>New term</span>','<span>New definition</span>'));saveLocal();renderEditor()};$('dedupe').onclick=()=>{state.deck=finalizeCards(state.deck);saveLocal();renderEditor();toast('Duplicates removed')};$('shiftAllUp').onclick=()=>shiftAllPictures(-1);$('shiftAllDown').onclick=()=>shiftAllPictures(1);$('flashWrap').onclick=flip;$('next').onclick=nextCard;$('prev').onclick=prevCard;$('shuffle').onclick=shuffleDeck;$('starBtn').onclick=e=>{e.stopPropagation();starCurrent()};$('speakBtn').onclick=e=>{e.stopPropagation();speakCurrent()};document.querySelectorAll('[data-crate]').forEach(b=>b.onclick=()=>recordCurrent(+b.dataset.crate));
 $('revealBtn').onclick=revealReview;
 document.querySelectorAll('[data-rate]').forEach(b=>b.onclick=()=>answerReview(+b.dataset.rate));$('learnContinue').onclick=renderLearn;$('writeCheck').onclick=checkWrite;$('writeInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkWrite()});$('writeContinue').onclick=renderWrite;$('matchRestart').onclick=initMatch;$('testAgain').onclick=initTest;$('browseSearch').addEventListener('input',renderBrowse);document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)||document.activeElement.isContentEditable)return;
   if(e.key.length===1){mikeBuf=(mikeBuf+e.key.toLowerCase()).slice(-4);if(mikeBuf==='mike'){mikeBuf='';toast(mikeLine());return}}
@@ -2073,7 +2224,7 @@ registerServiceWorker();
       el.style.setProperty('--my',((y-r.top)/r.height*100).toFixed(1)+'%');
     };
     document.addEventListener('pointermove',e=>{
-      const el=e.target&&e.target.closest&&e.target.closest('.top,.deckbar,.nav');
+      const el=e.target&&e.target.closest&&e.target.closest('.top,.deckbar,.nav,.modalbox,.banner,.loading,.more-menu');
       if(!el)return;
       pending={el,x:e.clientX,y:e.clientY};
       if(!queued){queued=true;requestAnimationFrame(paint)}
