@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="viewport" content="width=device-width,initial-scale=1.0,viewport-fit=cover">
 <title>OpenStudy</title>
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" href="icon-192.png" sizes="192x192" type="image/png">
@@ -29,7 +29,7 @@
    ============================================================ */
 :root{
   --paper:#E4DED0; --content:#FFFDF8; --content-2:#F3EFE4;
-  --text:#191713; --muted:#6B6559; --border:#D7D0C0; --hairline:#E6E0D2;
+  --text:#191713; --muted:#635C4F; --border:#D7D0C0; --hairline:#E6E0D2;
   --rule:#C6D4E2; --rule-red:#C2564A;
   --accent:#0E5C55; --accent-hover:#0B4A45; --accent-ink:#FFFDF8; --accent-wash:#0E5C5518;
   --good:#2F7A55; --bad:#A8392C; --star:#BE8A2E;
@@ -601,6 +601,39 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
 .review-bar b{display:block;font-size:15px;margin-bottom:2px}
 .review-bar span{font-size:13px;color:var(--muted);line-height:1.5}
 .review-actions{display:flex;gap:8px;flex-wrap:wrap;flex-shrink:0}
+
+/* ---------- Apple HIG: safe areas ----------
+   On a notched phone the status bar and the home indicator overlap the page.
+   Insets are added to the outer gutters and to anything pinned to an edge, so
+   nothing important sits under the hardware. */
+.app{
+  padding-left:max(0px,env(safe-area-inset-left));
+  padding-right:max(0px,env(safe-area-inset-right));
+  padding-bottom:calc(72px + env(safe-area-inset-bottom));
+}
+.top{top:calc(10px + env(safe-area-inset-top))}
+.nav{top:calc(78px + env(safe-area-inset-top))}
+.toast{bottom:calc(20px + env(safe-area-inset-bottom));right:calc(20px + env(safe-area-inset-right))}
+.modal{
+  padding-top:calc(20px + env(safe-area-inset-top));
+  padding-bottom:calc(20px + env(safe-area-inset-bottom));
+}
+
+/* ---------- Apple HIG: hit targets ----------
+   The guideline is 44pt square for anything you tap. On a mouse a 36px tab is
+   comfortable, so the floor is raised only where the pointer is a fingertip.
+   Padding grows rather than the font, so nothing is redrawn larger. */
+@media (pointer:coarse){
+  .btn,.smallbtn,.tab,.option,.star,.modal-actions button,.more-menu button,summary{
+    min-height:44px;
+  }
+  .btn,.smallbtn,.tab{display:inline-flex;align-items:center;justify-content:center}
+  .rate-row .btn{flex-direction:column;min-height:52px}
+  .star{min-width:44px}
+  .banner-actions .smallbtn,.row-actions .smallbtn,.lib-actions .smallbtn{min-height:44px;padding-inline:14px}
+  .share-opt input{width:22px;height:22px}
+  .nav{gap:4px}
+}
 
 /* Mike is not in any deck. Mike simply is. */
 .mike-row .num{color:var(--star)}
