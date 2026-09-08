@@ -121,7 +121,7 @@ body::before{
 }
 button,input,select,textarea{font:inherit;color:inherit}
 :focus-visible{outline:2px solid var(--accent);outline-offset:3px;border-radius:var(--r-in)}
-.app{width:min(1120px,calc(100% - 32px));margin:0 auto;padding:20px 0 72px;display:flex;flex-direction:column;gap:20px}
+.app{width:min(1120px,calc(100% - 32px));margin:0 auto;padding:var(--s5) 0 72px;display:flex;flex-direction:column;gap:var(--s5)}
 
 /* ---------- the glass material ---------- */
 /* A real edge catches light on top, loses it underneath, and casts the object
@@ -704,6 +704,7 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
   .face::after{opacity:.5}
 }
 
+#mainContent{position:absolute;width:1px;height:1px;overflow:hidden;pointer-events:none}
 /* ---------- skip link ----------
    A keyboard user should not have to walk the whole header to reach the deck. */
 .skip{position:absolute;left:-9999px;top:0;z-index:60;padding:12px 20px;border-radius:0 0 var(--r) 0;
@@ -734,7 +735,7 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
 }
 
 @media(max-width:760px){
-  .app{width:calc(100% - 20px);padding:12px 0 56px;gap:12px}
+  .app{width:calc(100% - var(--s6));padding:var(--s3) 0 56px;gap:var(--s3)}
   .top{position:static;padding:12px 16px}
   .top-actions{display:none}
 
