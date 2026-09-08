@@ -2974,7 +2974,22 @@ function registerServiceWorker(){
   if(window.self!==window.top)return;
   if(!/^https?:$/.test(location.protocol))return;
   window.addEventListener('load',()=>{
-    navigator.serviceWorker.register('sw.js').catch(e=>console.warn('service worker not registered',e));
+    // updateViaCache:none stops the browser serving a stale copy of the worker
+    // itself, and an explicit update() checks on every visit.
+    navigator.serviceWorker.register('sw.js',{updateViaCache:'none'})
+      .then(reg=>{
+        reg.update().catch(()=>{});
+        setInterval(()=>reg.update().catch(()=>{}),60*60*1000);
+      })
+      .catch(e=>console.warn('service worker not registered',e));
+  });
+  // When a newer worker takes over, reload once so the running page is not left
+  // on the previous build. Guarded so it can never loop.
+  let swReloading=false;
+  navigator.serviceWorker.addEventListener('controllerchange',()=>{
+    if(swReloading)return;
+    swReloading=true;
+    location.reload();
   });
 }
 
