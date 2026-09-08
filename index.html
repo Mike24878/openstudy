@@ -644,9 +644,9 @@ body.scrolled .top,body.scrolled .nav{
   </div>
   <div class="drop" id="drop" tabindex="0">
     <h2>Drop your export here</h2>
-    <p>HTML, ZIP, PDF, Word, PowerPoint, Excel, Markdown, CSV, TSV or JSON.</p>
+    <p>A photo, or HTML, ZIP, PDF, Word, PowerPoint, Excel, Anki, Markdown, CSV, TSV or JSON.</p>
     <button class="btn" id="chooseBtn">Choose files</button>
-    <input class="file-input" id="file" type="file" multiple accept=".html,.htm,.zip,.pdf,.docx,.pptx,.xlsx,.xls,.ods,.md,.txt,.tsv,.csv,.json,.png,.jpg,.jpeg,.gif,.webp,.svg,application/pdf,text/html,text/plain,application/json,application/zip,image/*">
+    <input class="file-input" id="file" type="file" multiple accept=".html,.htm,.zip,.pdf,.docx,.pptx,.xlsx,.xls,.ods,.md,.apkg,.txt,.tsv,.csv,.json,.png,.jpg,.jpeg,.gif,.webp,.svg,application/pdf,text/html,text/plain,application/json,application/zip,image/*">
     <div class="hint">Dropping a saved HTML page? Select its image files at the same time, or zip them together.</div>
   </div>
   <div class="loading" id="loading" hidden>
@@ -667,6 +667,8 @@ body.scrolled .top,body.scrolled .nav{
           <tr><td>Lecture slides</td><td class="yes">Yes</td><td>A PowerPoint .pptx &mdash; each slide&rsquo;s title becomes the term and its content the definition.</td></tr>
           <tr><td>A Word handout</td><td class="yes">Yes</td><td>A .docx. A two-column table imports best; otherwise each line is read as term and definition.</td></tr>
           <tr><td>A spreadsheet</td><td class="no">No</td><td>CSV, TSV or Excel (.xlsx). Terms in the first column, definitions in the second. Kahoot&rsquo;s own export is understood too.</td></tr>
+          <tr><td>A photo of a page</td><td class="no">No</td><td>A picture of a worksheet or whiteboard. The writing is read on your own device; it works best when each line reads &ldquo;term &ndash; definition&rdquo;.</td></tr>
+          <tr><td>An Anki deck</td><td class="yes">Yes</td><td>A .apkg exported with &ldquo;Support older Anki versions&rdquo; ticked. Pictures come across.</td></tr>
           <tr><td>Notes in Markdown</td><td class="no">No</td><td>A .md export from Notion, Obsidian or Google Docs &mdash; a table, or lines like &ldquo;term: definition&rdquo;.</td></tr>
           <tr><td>An OpenStudy deck</td><td class="yes">Yes</td><td>A .json file you exported from here, pictures included.</td></tr>
         </tbody>
@@ -1548,7 +1550,7 @@ function clozeFor(card){
   const term=clean(card.termText),def=clean(card.defText);
   if(!term||!def)return null;
   if(/_{3,}/.test(def))return {text:def.replace(/_{3,}/g,'_____'),answer:term};
-  const escaped=term.replace(/[.*+?^${}()|[\]\\]/g,'\\async function parseZip(file){');
+  const escaped=term.replace(/[.*+?^${}()|[\]\\]/g,ch=>'\\'+ch);
   const re=new RegExp('\\b'+escaped+'\\b','ig');
   if(!re.test(def))return null;
   return {text:def.replace(re,'_____'),answer:term};
@@ -1557,19 +1559,158 @@ function clozePool(){
   return state.deck.map(c=>({card:c,cloze:clozeFor(c)})).filter(x=>x.cloze);
 }
 
+/* ===================== photographs =====================
+   The literal form of the promise: a picture of a page becomes cards. Runs
+   entirely in the browser, so the nothing-is-uploaded property survives. The
+   engine and its language data are fetched on first use only — several
+   megabytes that most imports never pay for. */
+// A dropped photograph is an import in its own right, not an asset belonging
+// to an HTML page, so it must be recognised before the HTML branch claims it.
+const isImageFile=f=>/^image\//i.test(f.type||'')||/\.(png|jpe?g|gif|webp|bmp|heic|heif)$/i.test(f.name||'');
+const TESSERACT_URL='https://cdnjs.cloudflare.com/ajax/libs/tesseract.js/5.1.1/tesseract.min.js';
+async function parseImages(files){
+  setStatus('Loading the text recogniser…',0.04);
+  await yieldToPaint();
+  await loadScriptOnce(TESSERACT_URL);
+  if(!window.Tesseract)throw new Error('Could not load the text recogniser. Check your internet connection and try again.');
+  let worker;
+  try{
+    worker=await Tesseract.createWorker('eng',1,{
+      logger:m=>{
+        if(m&&m.status==='recognizing text')
+          setStatus('Reading the writing… '+Math.round((m.progress||0)*100)+'%',0.15+0.75*(m.progress||0));
+      }
+    });
+  }catch(e){
+    throw new Error('The text recogniser could not start. It needs a working connection the first time it runs.');
+  }
+  let text='';
+  try{
+    for(let i=0;i<files.length;i++){
+      setStatus('Reading picture '+(i+1)+' of '+files.length+'…',0.15+0.75*(i/files.length));
+      await yieldToPaint();
+      const {data}=await worker.recognize(files[i]);
+      text+=(data&&data.text?data.text:'')+'\n';
+    }
+  }finally{
+    try{await worker.terminate()}catch(e){}
+  }
+  const cards=[];
+  for(const row of parseTermRows(text)){
+    const c=makeCard(esc(clean(row[0])),esc(clean(row.slice(1).join(' '))));
+    if(c)cards.push(c);
+  }
+  if(!cards.length){
+    throw new Error('The writing was read, but no term and definition pairs were found in it. A photo imports best when each line reads "term - definition", or when terms and definitions sit in two columns.');
+  }
+  return {cards:finalizeCards(cards),
+          title:files[0].name.replace(/\.[^.]+$/,'')||'Photographed notes',
+          diag:{charsRecognised:text.replace(/\s+/g,' ').trim().length}};
+}
+
+/* ===================== Anki =====================
+   An .apkg is a zip around a SQLite collection. Importing it wins defectors;
+   the .tsv export in the other direction is the reason trying this is safe.
+   Anki's newer collections are zstd-compressed, which cannot be unpacked in a
+   browser, so that case is named rather than failed obscurely. */
+const SQLJS_BASE='https://cdnjs.cloudflare.com/ajax/libs/sql.js/1.10.3/';
+const ANKI_SEP=String.fromCharCode(0x1f);
+async function parseAnki(file){
+  if(!window.JSZip)throw new Error('ZIP support is unavailable. Check your internet connection.');
+  const zip=await JSZip.loadAsync(file);
+  const legacy=zip.file('collection.anki2')||zip.file('collection.anki21');
+  if(!legacy){
+    if(zip.file('collection.anki21b'))
+      throw new Error('That .apkg uses Anki’s newer compressed collection, which a browser cannot unpack. In Anki, re-export the deck with “Support older Anki versions” ticked and this will import.');
+    throw new Error('That .apkg contains no collection database.');
+  }
+  setStatus('Loading the Anki reader…',0.08);
+  await yieldToPaint();
+  await loadScriptOnce(SQLJS_BASE+'sql-wasm.js');
+  if(typeof initSqlJs!=='function')throw new Error('Could not load the Anki reader. Check your internet connection.');
+  const SQL=await initSqlJs({locateFile:f=>SQLJS_BASE+f});
+
+  setStatus('Reading the collection…',0.3);
+  await yieldToPaint();
+  const db=new SQL.Database(new Uint8Array(await legacy.async('arraybuffer')));
+
+  // Anki stores media under numeric names with a manifest mapping them back.
+  let manifest={};
+  const mediaFile=zip.file('media');
+  if(mediaFile){try{manifest=JSON.parse(await mediaFile.async('string'))||{}}catch(e){}}
+  const numberFor={};
+  Object.keys(manifest).forEach(num=>{numberFor[manifest[num]]=num});
+
+  let rows=[];
+  try{
+    const res=db.exec('SELECT flds FROM notes');
+    rows=(res&&res[0]&&res[0].values)||[];
+  }catch(e){
+    throw new Error('That collection could not be read: '+e.message);
+  }
+  if(!rows.length)throw new Error('That Anki deck has no notes in it.');
+
+  // Resolve the pictures actually referenced, not every file in the archive.
+  const wanted=new Set();
+  const imgRe=/<img[^>]+src\s*=\s*["']([^"']+)["'][^>]*>/gi;
+  for(const r of rows){
+    const flds=String(r[0]||'');
+    let m; imgRe.lastIndex=0;
+    while((m=imgRe.exec(flds)))wanted.add(decodeURIComponent(m[1]));
+  }
+  const resolved={};
+  let done=0;
+  for(const name of wanted){
+    const num=numberFor[name];
+    const entry=num!==undefined?zip.file(String(num)):zip.file(name);
+    if(!entry)continue;
+    try{
+      const blob=await entry.async('blob');
+      const url=await new Promise((res,rej)=>{const fr=new FileReader();fr.onload=()=>res(fr.result);fr.onerror=rej;fr.readAsDataURL(blob)});
+      resolved[name]=await shrinkImage(url);
+    }catch(e){console.warn('anki media '+name+' failed',e)}
+    if(++done%8===0){setStatus('Reading pictures… '+done+' of '+wanted.size,0.4+0.4*(done/wanted.size));await yieldToPaint()}
+  }
+
+  const fieldHTML=raw=>{
+    let out=String(raw||'').replace(/\[sound:[^\]]*\]/g,' ');
+    out=out.replace(imgRe,(tag,src)=>{
+      const hit=resolved[decodeURIComponent(src)];
+      return hit?'<img src="'+hit+'" alt="Imported picture">':'';
+    });
+    return sanitizeHTML(out,'https://local.openstudy/');
+  };
+
+  const cards=[];
+  for(const r of rows){
+    const fields=String(r[0]||'').split(ANKI_SEP);
+    const filled=fields.filter(f=>clean(strip(f))||/<img/i.test(f));
+    if(filled.length<2)continue;
+    const c=makeCard(fieldHTML(filled[0]),fieldHTML(filled[1]));
+    if(c)cards.push(c);
+  }
+  try{db.close()}catch(e){}
+  if(!cards.length)throw new Error('No notes in that deck had both a front and a back.');
+  return {cards:finalizeCards(cards),
+          title:file.name.replace(/\.apkg$/i,''),
+          diag:{imagesFound:wanted.size,imagesPlaced:Object.keys(resolved).length}};
+}
+
 async function parseZip(file){if(!window.JSZip)throw new Error('ZIP support is unavailable. Check your internet connection.');const zip=await JSZip.loadAsync(file),names=Object.keys(zip.files),htmlName=names.find(n=>/\.html?$/i.test(n)&&!zip.files[n].dir);if(!htmlName)throw new Error('ZIP does not contain an HTML file.');const map={};for(const n of names){if(zip.files[n].dir||!/\.(png|jpe?g|gif|webp|svg)$/i.test(n))continue;const blob=await zip.files[n].async('blob'),data=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(blob)});map[n]=data;map[n.split('/').pop()]=data}return parseHTMLFile(await zip.files[htmlName].async('string'),htmlName,map)}
 async function importFiles(files){
   if(!files.length)return;
   setStatus('Reading '+files.map(f=>f.name).join(', ')+'…');
   lastImport={when:new Date().toISOString(),files:files.map(f=>({name:f.name,size:f.size})),route:'?',cards:null,error:null};
   lastImportFile=files[0]||null;
-  startLoading(files.some(f=>/\.(pdf|zip|docx|pptx|xlsx|xls|ods)$/i.test(f.name)||f.size>150000));
+  startLoading(files.some(f=>/\.(pdf|zip|docx|pptx|xlsx|xls|ods|apkg)$/i.test(f.name)||isImageFile(f)||f.size>150000));
   await yieldToPaint();
   try{
-    const first=files.find(f=>/\.(html?|zip|pdf|json|txt|tsv|csv|docx|pptx|xlsx|xls|ods|mdx?)$/i.test(f.name))||files[0];
+    const first=files.find(f=>/\.(html?|zip|pdf|json|txt|tsv|csv|docx|pptx|xlsx|xls|ods|mdx?|apkg)$/i.test(f.name))||files[0];
     let result;
-    lastImport.route=/\.(xlsx|xls|ods)$/i.test(first.name)?'spreadsheet':/\.mdx?$/i.test(first.name)?'markdown':/\.docx$/i.test(first.name)?'docx':/\.pptx$/i.test(first.name)?'pptx':/\.zip$/i.test(first.name)?'zip':/\.pdf$/i.test(first.name)?'pdf':/\.html?$/i.test(first.name)?'html':/\.json$/i.test(first.name)?'json':'delimited';
-    if(/\.(xlsx|xls|ods)$/i.test(first.name))result=await parseSpreadsheet(first);
+    lastImport.route=/\.apkg$/i.test(first.name)?'anki':isImageFile(first)?'photo':/\.(xlsx|xls|ods)$/i.test(first.name)?'spreadsheet':/\.mdx?$/i.test(first.name)?'markdown':/\.docx$/i.test(first.name)?'docx':/\.pptx$/i.test(first.name)?'pptx':/\.zip$/i.test(first.name)?'zip':/\.pdf$/i.test(first.name)?'pdf':/\.html?$/i.test(first.name)?'html':/\.json$/i.test(first.name)?'json':'delimited';
+    if(/\.apkg$/i.test(first.name))result=await parseAnki(first);
+    else if(isImageFile(first))result=await parseImages(files.filter(isImageFile));
+    else if(/\.(xlsx|xls|ods)$/i.test(first.name))result=await parseSpreadsheet(first);
     else if(/\.mdx?$/i.test(first.name))result=parseMarkdown(await first.text(),first.name);
     else if(/\.docx$/i.test(first.name))result=await parseDOCX(first);
     else if(/\.pptx$/i.test(first.name))result=await parsePPTX(first);
