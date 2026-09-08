@@ -517,6 +517,18 @@ function renderEditor(){
 function openEditor(){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('view-editor').classList.add('active');document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));renderEditor()}
 function saveLocal(){try{localStorage.setItem(STORAGE,JSON.stringify({title:state.title,deck:state.deck,settings:state.settings}))}catch(e){console.warn('Local save failed',e);toast('Deck too large to save locally — export it to keep a copy')}}
 function loadLocal(){try{const x=JSON.parse(localStorage.getItem(STORAGE)||'null');if(x?.deck?.length){state.title=x.title||'Saved deck';state.deck=finalizeCards(x.deck);state.settings={...state.settings,...x.settings};showDeck()}}catch(e){console.warn(e)}}
+function showDeckJSON(json){
+  let m=$('exportModal');
+  if(!m){
+    m=document.createElement('div');m.id='exportModal';m.className='modal';
+    m.innerHTML='<div class="modalbox"><h3>Copy your deck</h3><p class="muted">This viewer blocks downloads. Copy the text below and save it as a .json file — you can re-import it here any time.</p><textarea id="exportText" spellcheck="false" style="width:100%;height:250px;background:#0d1426;color:var(--text);border:1px solid var(--border);border-radius:9px;padding:10px;font-family:ui-monospace,SFMono-Regular,Consolas,monospace;font-size:12px"></textarea><div class="modal-actions"><button class="btn secondary" id="exportClose">Close</button><button class="btn" id="exportCopy">Copy</button></div></div>';
+    document.body.appendChild(m);
+    m.querySelector('#exportClose').onclick=()=>m.classList.remove('show');
+    m.querySelector('#exportCopy').onclick=()=>{const t=$('exportText');t.focus();t.select();let ok=false;try{ok=document.execCommand('copy')}catch(e){}toast(ok?'Deck copied':'Press Ctrl+C to copy')};
+  }
+  $('exportText').value=json;
+  m.classList.add('show');
+}
 async function exportDeck(){
   const json=JSON.stringify({title:state.title,cards:state.deck},null,2);
   // An embedded viewer sandboxes the frame and silently drops download links,
@@ -524,6 +536,7 @@ async function exportDeck(){
   if(window.self!==window.top){
     try{await navigator.clipboard.writeText(json);toast('Deck copied to clipboard — paste it into a .json file to keep it');return}
     catch(e){console.warn('Clipboard unavailable',e)}
+    showDeckJSON(json);return;
   }
   const a=document.createElement('a');
   a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));
