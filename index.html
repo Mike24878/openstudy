@@ -36,8 +36,10 @@
   /* Thin and bright rather than milky: the point of the material is that you
      can see what is behind it. Heavy blur at high opacity hid everything and
      read as frosted plastic. */
-  --glass:rgba(255,255,255,.44);
-  --glass-strong:rgba(255,255,255,.66);
+  --glass:rgba(255,255,255,.44);        /* bars: airy, the page shows through */
+  --glass-strong:rgba(255,255,255,.94);  /* menus and sheets: thick enough to read on */
+  --mat-content:rgba(255,255,255,.88);   /* panels and cards: light, picks up the tint */
+  --blur-thick:30px; --blur-content:14px;
   --glass-edge:rgba(255,255,255,.95);
   --glass-edge-low:rgba(255,255,255,.45);
   --glass-shade:rgba(25,23,19,.09);
@@ -65,7 +67,8 @@
     --good:#32D74B; --bad:#FF6961; --star:#FFD426;
     --field:#1C1C1E;
     --glass:rgba(58,58,60,.42);
-    --glass-strong:rgba(58,58,60,.64);
+    --glass-strong:rgba(28,28,30,.95);
+    --mat-content:rgba(28,28,30,.90);
     --glass-edge:rgba(255,255,255,.34);
     --glass-edge-low:rgba(255,255,255,.14);
     --glass-shade:rgba(0,0,0,.45);
@@ -81,7 +84,8 @@
   --good:#32D74B; --bad:#FF6961; --star:#FFD426;
   --field:#1C1C1E;
   --glass:rgba(58,58,60,.42);
-  --glass-strong:rgba(58,58,60,.64);
+  --glass-strong:rgba(28,28,30,.95);
+  --mat-content:rgba(28,28,30,.90);
   --glass-edge:rgba(255,255,255,.34);
   --glass-edge-low:rgba(255,255,255,.14);
   --glass-shade:rgba(0,0,0,.45);
@@ -194,7 +198,12 @@ html.has-lens{
 .sep{width:1px;align-self:stretch;background:var(--border);margin:0 4px}
 
 /* Content containers stay opaque: never glass behind reading. */
-.panel{background:var(--content);border:1px solid var(--border);border-radius:var(--r-out);box-shadow:var(--shadow)}
+.panel{
+  background:var(--mat-content);
+  -webkit-backdrop-filter:blur(var(--blur-content)) saturate(140%);
+  backdrop-filter:blur(var(--blur-content)) saturate(140%);
+  border:1px solid var(--border);border-radius:var(--r-out);box-shadow:var(--shadow);
+}
 
 /* ---------- import ---------- */
 .upload{padding:8px}
@@ -289,7 +298,10 @@ html.has-lens{
 .flash.flip{transform:rotateY(180deg)}
 .face{
   position:absolute;inset:0;backface-visibility:hidden;border-radius:var(--r-out);
-  border:1px solid var(--border);background:var(--content);box-shadow:var(--lift);
+  border:1px solid var(--border);background:var(--mat-content);
+  -webkit-backdrop-filter:blur(var(--blur-content)) saturate(140%);
+  backdrop-filter:blur(var(--blur-content)) saturate(140%);
+  box-shadow:var(--lift);
   padding:64px 44px 40px;display:flex;flex-direction:column;align-items:center;justify-content:center;
   text-align:center;overflow:auto;
 }
@@ -499,10 +511,11 @@ html.has-lens{
 .top,.deckbar,.nav{isolation:isolate}
 .top::after,.deckbar::after,.nav::after{
   content:"";position:absolute;inset:0;border-radius:inherit;pointer-events:none;z-index:0;
-  background:radial-gradient(160px circle at var(--mx,50%) var(--my,0%),var(--glass-edge),transparent 62%);
+  background:radial-gradient(180px circle at var(--mx,50%) var(--my,0%),rgba(255,255,255,.55),transparent 66%);
   opacity:0;transition:opacity .35s var(--ease);
 }
-.top:hover::after,.deckbar:hover::after,.nav:hover::after{opacity:.9}
+.top:hover::after,.deckbar:hover::after{opacity:.5}
+.nav:hover::after{opacity:.28}
 .top>*,.deckbar>*{position:relative;z-index:1}
 
 /* Chrome firms up once content slides underneath it, the way a system bar does. */
@@ -518,8 +531,9 @@ body.scrolled .top,body.scrolled .nav{
   box-shadow:var(--glass-shadow);
   transition:background .3s var(--ease),box-shadow .3s var(--ease);
 }
-.modalbox,.toast,.loading{
-  -webkit-backdrop-filter:var(--glass-filter);backdrop-filter:var(--glass-filter);
+.modalbox,.toast,.loading,.more-menu{
+  -webkit-backdrop-filter:blur(var(--blur-thick)) saturate(180%);
+  backdrop-filter:blur(var(--blur-thick)) saturate(180%);
 }
 
 /* ---------- lift and flex ----------
@@ -561,7 +575,7 @@ body.scrolled .top,body.scrolled .nav{
   background:radial-gradient(180px circle at var(--mx,50%) var(--my,0%),var(--glass-edge),transparent 62%);
   opacity:0;transition:opacity .35s var(--ease);
 }
-.modalbox:hover::after,.banner:hover::after,.loading:hover::after,.more-menu:hover::after{opacity:.85}
+.modalbox:hover::after,.banner:hover::after,.loading:hover::after,.more-menu:hover::after{opacity:.4}
 .modalbox>*,.banner>*,.more-menu>*{position:relative;z-index:1}
 
 @media (prefers-reduced-motion:reduce){
