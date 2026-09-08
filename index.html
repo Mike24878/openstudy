@@ -103,12 +103,10 @@ body::before{
   /* Weighted toward the top, because that is where the chrome sits: glass only
      shows its character when there is colour directly behind it. */
   background:
-    radial-gradient(40% 30% at 10% 17%,color-mix(in srgb,var(--accent) 95%,transparent),transparent 62%),
-    radial-gradient(36% 26% at 55% 15%,color-mix(in srgb,var(--star) 85%,transparent),transparent 62%),
-    radial-gradient(34% 26% at 94% 19%,color-mix(in srgb,var(--accent) 78%,transparent),transparent 64%),
-    radial-gradient(42% 34% at 80% 84%,color-mix(in srgb,var(--accent) 55%,transparent),transparent 70%),
-    radial-gradient(34% 30% at 18% 80%,color-mix(in srgb,var(--rule-red) 38%,transparent),transparent 72%);
-  filter:blur(52px);opacity:.95;
+    radial-gradient(58% 40% at 6% 14%,color-mix(in srgb,var(--accent) 62%,transparent),transparent 70%),
+    radial-gradient(50% 34% at 78% 12%,color-mix(in srgb,var(--star) 34%,transparent),transparent 70%),
+    radial-gradient(60% 46% at 92% 88%,color-mix(in srgb,var(--accent) 34%,transparent),transparent 74%);
+  filter:blur(64px);opacity:.7;
   animation:drift 34s var(--ease) infinite alternate;
 }
 @keyframes drift{
@@ -250,7 +248,7 @@ html.has-lens{
 /* ---------- tab bar: a floating capsule with a pill that slides ---------- */
 .nav{
   position:sticky;top:78px;z-index:5;
-  display:none;gap:2px;flex-wrap:wrap;padding:5px;border-radius:var(--cap);width:fit-content;max-width:100%;
+  display:none;gap:3px;padding:5px;border-radius:var(--cap);width:100%;
   background:var(--glass);
   -webkit-backdrop-filter:var(--glass-filter);backdrop-filter:var(--glass-filter);
   border:1px solid var(--glass-edge-low);
@@ -258,19 +256,25 @@ html.has-lens{
 }
 .nav-pill{
   position:absolute;left:0;top:0;border-radius:var(--cap);
-  background:var(--content);box-shadow:0 1px 3px var(--glass-shade), inset 0 1px 0 var(--glass-edge);
+  background:var(--accent);
+  box-shadow:0 1px 2px color-mix(in srgb,var(--accent) 40%,transparent),
+             0 6px 16px color-mix(in srgb,var(--accent) 30%,transparent),
+             inset 0 1px 0 rgba(255,255,255,.28);
   opacity:0;pointer-events:none;
   transition:transform .42s var(--spring),width .42s var(--spring),opacity .2s var(--ease);
 }
 .tab{
-  position:relative;z-index:1;
-  padding:0 16px;min-height:var(--ctl);display:inline-flex;align-items:center;border-radius:var(--cap);border:0;background:transparent;color:var(--muted);
+  position:relative;z-index:1;flex:1 1 0;min-width:0;
+  padding:0 10px;min-height:var(--ctl);
+  display:inline-flex;align-items:center;justify-content:center;gap:5px;border-radius:var(--cap);border:0;background:transparent;color:var(--muted);
   font-weight:600;font-size:0.8438rem;cursor:pointer;
   transition:color .22s var(--ease),transform .22s var(--spring);
 }
-.tab:hover{color:var(--text)}
+.tab:hover:not(.active){color:var(--text);background:var(--accent-wash);border-radius:var(--cap)}
 .tab:active{transform:scale(.96)}
-.tab.active{color:var(--text)}
+.tab.active{color:var(--accent-ink);font-weight:650}
+.nav:not(.pill-ready) .tab.active{background:var(--accent);border-radius:var(--cap)}
+.tab.active .duebadge{background:var(--accent-ink);color:var(--accent)}
 .view{display:none}
 .view.active{display:block}
 .toolbar{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-bottom:16px}
@@ -724,7 +728,8 @@ body.flipping .top,body.flipping .nav,body.flipping .deckbar{
 
   /* All eight modes stay reachable by wrapping onto a second row rather than
      scrolling out of sight, where Browse and Progress went undiscovered. */
-  .nav{position:static;width:100%;flex-wrap:wrap;overflow:visible;justify-content:flex-start;border-radius:var(--r)}
+  .nav{position:static;width:100%;flex-wrap:wrap;overflow:visible;border-radius:var(--r);gap:3px}
+  .tab{flex:1 1 22%;padding:0 6px}
   .nav-pill{border-radius:var(--cap)}
   .tab{padding:8px 12px;font-size:0.8125rem}
 
@@ -1960,7 +1965,7 @@ async function importFiles(files){
 function showDeck(){
   if(!state.deck.length)return;
   // The browser tab is how someone finds this page among twenty others.
-  document.title=(state.title?state.title+' — OpenStudy':'OpenStudy');$('uploadPanel').style.display='none';$('deckbar').style.display='flex';$('nav').style.display='flex';requestAnimationFrame(moveNavPill);$('deckTitle').textContent=state.title;$('deckMeta').textContent=`${state.deck.length} cards · ${state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length} with pictures`;updateDueBadge();switchMode(dueDeck().length&&state.deck.some(c=>c.sched)?'review':'cards')}
+  document.title=(state.title?state.title+' — OpenStudy':'OpenStudy');$('uploadPanel').style.display='none';$('deckbar').style.display='flex';$('nav').style.display='flex';scheduleNavPill();$('deckTitle').textContent=state.title;$('deckMeta').textContent=`${state.deck.length} cards · ${state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length} with pictures`;updateDueBadge();switchMode(dueDeck().length&&state.deck.some(c=>c.sched)?'review':'cards')}
 function answerFor(c){let d=state.settings.direction;if(d==='mixed')d=Math.random()<.5?'term-def':'def-term';return d==='term-def'?{prompt:c.termHtml,answer:c.defHtml,text:c.defText}:{prompt:c.defHtml,answer:c.termHtml,text:c.termText}}
 /* Imported pictures carry loading="lazy", which is right for the long lists in
    Browse and the editor. It is wrong for the flashcard: the back face is turned
@@ -2043,7 +2048,7 @@ function recordCurrent(rating){
 function speak(text){if(!('speechSynthesis'in window)||!text)return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=.9;window.speechSynthesis.speak(u)}
 function speakCurrent(){const c=state.deck[state.index],text=state.flipped?c.defText:c.termText;speak(text)}
 function switchMode(mode){
-  cancelAdvance();state.mode=mode;updateDueBadge();requestAnimationFrame(moveNavPill);
+  cancelAdvance();state.mode=mode;updateDueBadge();
   document.querySelectorAll('.tab').forEach(b=>{
     const on=b.dataset.mode===mode;
     b.classList.toggle('active',on);
@@ -2058,7 +2063,8 @@ function switchMode(mode){
   panel.classList.add('active');
   panel.setAttribute('role','tabpanel');
   panel.setAttribute('aria-labelledby','tab-'+mode);
-  panel.setAttribute('tabindex','0');if(mode==='cards')renderCards();if(mode==='learn')initLearn();if(mode==='write')initWrite();if(mode==='match')initMatch();if(mode==='test')initTest();if(mode==='review')initReview();if(mode==='browse')renderBrowse();if(mode==='progress')renderProgress()}
+  panel.setAttribute('tabindex','0');
+  scheduleNavPill();if(mode==='cards')renderCards();if(mode==='learn')initLearn();if(mode==='write')initWrite();if(mode==='match')initMatch();if(mode==='test')initTest();if(mode==='review')initReview();if(mode==='browse')renderBrowse();if(mode==='progress')renderProgress()}
 /* ---------- spaced review ---------- */
 function dueDeck(now=Date.now()){return state.deck.filter(c=>isDue(c.sched,now))}
 function fmtInterval(d){
@@ -2093,17 +2099,30 @@ function moveNavPill(){
   const nav=$('nav'),pill=$('navPill');
   if(!nav||!pill)return;
   const act=nav.querySelector('.tab.active');
-  if(!act||!act.offsetWidth){pill.style.opacity='0';return}
-  pill.style.width=act.offsetWidth+'px';
-  pill.style.height=act.offsetHeight+'px';
-  pill.style.transform='translate('+act.offsetLeft+'px,'+act.offsetTop+'px)';
+  if(!act||!act.offsetWidth){nav.classList.remove('pill-ready');pill.style.opacity='0';return}
+  const navBox=nav.getBoundingClientRect(),tabBox=act.getBoundingClientRect();
+  const cs=getComputedStyle(nav);
+  const bl=parseFloat(cs.borderLeftWidth)||0, bt=parseFloat(cs.borderTopWidth)||0;
+  pill.style.width=tabBox.width+'px';
+  pill.style.height=tabBox.height+'px';
+  pill.style.transform='translate('+(tabBox.left-navBox.left-bl)+'px,'+(tabBox.top-navBox.top-bt)+'px)';
   pill.style.opacity='1';
+  nav.classList.add('pill-ready');
 }
-window.addEventListener('resize',()=>requestAnimationFrame(moveNavPill));
+function scheduleNavPill(){
+  moveNavPill();
+  requestAnimationFrame(moveNavPill);
+}
+window.addEventListener('resize',scheduleNavPill);
+window.addEventListener('load',scheduleNavPill);
+if(document.fonts&&document.fonts.ready)document.fonts.ready.then(scheduleNavPill).catch(()=>{});
+if(window.ResizeObserver){
+  try{ new ResizeObserver(()=>moveNavPill()).observe($('nav')) }catch(e){}
+}
 function updateDueBadge(){
   const b=$('dueBadge');if(!b)return;
   const n=dueDeck().length;
-  b.textContent=n;b.hidden=!n;requestAnimationFrame(moveNavPill);
+  b.textContent=n;b.hidden=!n;scheduleNavPill();
 }
 // One place decides how far ahead a rating pushes a card, so the setting
 // reaches the buttons' printed intervals and the actual schedule alike.
