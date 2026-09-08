@@ -216,6 +216,22 @@ button,input,select,textarea{font:inherit;color:inherit}
 .step b{display:block;font-size:14.5px;margin-bottom:3px}
 .step span{font-size:13px;color:var(--muted);line-height:1.5}
 @media(max-width:700px){.steps{grid-template-columns:1fr}.landing{padding:18px 12px 4px}.detail{padding:8px 12px 18px}}
+.banner{display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap;padding:12px 16px;border:1px solid var(--accent);background:var(--accent-wash);border-radius:var(--r);font-size:13.5px;line-height:1.5}
+.banner-actions{display:flex;gap:6px;flex-wrap:wrap}
+.exp-opt{display:flex;align-items:center;justify-content:space-between;gap:18px;padding:15px 0;border-bottom:1px solid var(--hairline)}
+.exp-opt:last-of-type{border-bottom:0}
+.exp-opt b{display:block;font-size:14.5px;margin-bottom:3px}
+.exp-opt span{font-size:13px;color:var(--muted);line-height:1.5}
+@media(max-width:600px){.exp-opt{flex-direction:column;align-items:flex-start;gap:10px}}
+/* ---------- scheduling controls ---------- */
+.rate-row{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-top:12px}
+.rate-row .btn{display:flex;flex-direction:column;align-items:center;gap:2px;padding:10px 8px}
+.rate-row small{font-family:var(--mono);font-size:10.5px;font-weight:500;opacity:.72}
+.reveal{padding:16px 0 4px;border-top:1px solid var(--hairline);margin-top:4px;font-family:var(--display);font-size:clamp(19px,2.6vw,25px);line-height:1.4}
+.reveal img{max-width:min(100%,420px);max-height:220px;object-fit:contain;border-radius:8px;margin:12px auto;display:block}
+.duebadge{display:inline-block;min-width:18px;padding:1px 6px;margin-left:5px;border-radius:99px;background:var(--accent);color:var(--accent-ink);font-family:var(--mono);font-size:10.5px;font-weight:600;vertical-align:middle}
+.leech{color:var(--bad);font-family:var(--mono);font-size:11px;font-weight:600}
+@media(max-width:700px){.rate-row{grid-template-columns:repeat(2,1fr)}}
 /* ---------- import report ---------- */
 #reportText{width:100%;height:210px;background:var(--field);color:var(--text);border:1px solid var(--border);border-radius:var(--r);padding:11px;font-family:var(--mono);font-size:12px;line-height:1.5;resize:vertical}
 .report-why{color:var(--muted);font-size:13.5px;margin:0 0 14px;line-height:1.55}
@@ -269,9 +285,9 @@ button,input,select,textarea{font:inherit;color:inherit}
   </div>
   <div class="drop" id="drop" tabindex="0">
     <h2>Drop your export here</h2>
-    <p>HTML, ZIP, PDF, CSV, TSV or JSON.</p>
+    <p>HTML, ZIP, PDF, Word, PowerPoint, CSV, TSV or JSON.</p>
     <button class="btn" id="chooseBtn">Choose files</button>
-    <input class="file-input" id="file" type="file" multiple accept=".html,.htm,.zip,.pdf,.txt,.tsv,.csv,.json,.png,.jpg,.jpeg,.gif,.webp,.svg,application/pdf,text/html,text/plain,application/json,application/zip,image/*">
+    <input class="file-input" id="file" type="file" multiple accept=".html,.htm,.zip,.pdf,.docx,.pptx,.txt,.tsv,.csv,.json,.png,.jpg,.jpeg,.gif,.webp,.svg,application/pdf,text/html,text/plain,application/json,application/zip,image/*">
     <div class="hint">Dropping a saved HTML page? Select its image files at the same time, or zip them together.</div>
   </div>
   <div class="loading" id="loading" hidden>
@@ -289,6 +305,8 @@ button,input,select,textarea{font:inherit;color:inherit}
           <tr><td>A Quizlet set</td><td class="yes">Best</td><td>On the set page, save the page as HTML, then drop the HTML together with its image files &mdash; or zip them.</td></tr>
           <tr><td>A printed set</td><td class="yes">Yes</td><td>Print the Quizlet set to PDF, then drop the PDF. Pictures are matched to their cards automatically.</td></tr>
           <tr><td>Exported text</td><td class="no">No</td><td>Quizlet&rsquo;s own Export, saved as .txt, .csv or .tsv. Fastest route when your set has no images.</td></tr>
+          <tr><td>Lecture slides</td><td class="yes">Yes</td><td>A PowerPoint .pptx &mdash; each slide&rsquo;s title becomes the term and its content the definition.</td></tr>
+          <tr><td>A Word handout</td><td class="yes">Yes</td><td>A .docx. A two-column table imports best; otherwise each line is read as term and definition.</td></tr>
           <tr><td>A spreadsheet</td><td class="no">No</td><td>Any CSV or TSV with the term in the first column and the definition in the second.</td></tr>
           <tr><td>An OpenStudy deck</td><td class="yes">Yes</td><td>A .json file you exported from here, pictures included.</td></tr>
         </tbody>
@@ -305,12 +323,31 @@ button,input,select,textarea{font:inherit;color:inherit}
   </div>
 </section>
 <section class="deckbar" id="deckbar"><div class="deck-info"><strong id="deckTitle">Untitled deck</strong><br><span id="deckMeta"></span></div><div class="deck-actions"><button class="btn secondary" id="editBtn">Edit cards</button><button class="btn secondary" id="settingsBtn2">Options</button><button class="btn secondary" id="exportBtn">Export deck</button><button class="btn ghost" id="reportBtn">Import look wrong?</button><button class="btn ghost" id="newBtn2">Load another</button></div></section>
-<nav class="nav" id="nav"><button class="tab active" data-mode="cards">Flashcards</button><button class="tab" data-mode="learn">Learn</button><button class="tab" data-mode="write">Write</button><button class="tab" data-mode="match">Match</button><button class="tab" data-mode="test">Test</button><button class="tab" data-mode="browse">Browse</button><button class="tab" data-mode="progress">Progress</button></nav>
-<section class="view active" id="view-cards"><div class="toolbar"><span class="muted" id="fcProgress"></span><span class="muted">Space: flip · ←/→: navigate · S: star · R: read aloud</span></div><div class="flash-wrap" id="flashWrap"><div class="flash" id="flash"><div class="face"><span class="face-label">Term</span><div class="content" id="front"></div></div><div class="face back"><span class="face-label">Definition</span><div class="content" id="back"></div></div></div></div><div class="controls"><button class="btn secondary" id="prev">← Previous</button><div class="mid"><button class="btn secondary" id="shuffle">Shuffle</button><button class="btn ghost" id="starBtn">☆ Star</button><button class="btn ghost" id="speakBtn">🔊</button></div><button class="btn" id="next">Next →</button></div><div class="study-controls"><button class="btn secondary" id="againBtn">Again</button><button class="btn secondary" id="gotItBtn">Got it</button></div></section>
+<nav class="nav" id="nav"><button class="tab active" data-mode="cards">Flashcards</button><button class="tab" data-mode="learn">Learn</button><button class="tab" data-mode="write">Write</button><button class="tab" data-mode="match">Match</button><button class="tab" data-mode="test">Test</button><button class="tab" data-mode="review">Review <span class="duebadge" id="dueBadge" hidden></span></button><button class="tab" data-mode="browse">Browse</button><button class="tab" data-mode="progress">Progress</button></nav>
+<section class="view active" id="view-cards"><div class="toolbar"><span class="muted" id="fcProgress"></span><span class="muted">Space: flip · ←/→: navigate · S: star · R: read aloud</span></div><div class="flash-wrap" id="flashWrap"><div class="flash" id="flash"><div class="face"><span class="face-label">Term</span><div class="content" id="front"></div></div><div class="face back"><span class="face-label">Definition</span><div class="content" id="back"></div></div></div></div><div class="controls"><button class="btn secondary" id="prev">← Previous</button><div class="mid"><button class="btn secondary" id="shuffle">Shuffle</button><button class="btn ghost" id="starBtn">☆ Star</button><button class="btn ghost" id="speakBtn">🔊</button></div><button class="btn" id="next">Next →</button></div><div class="rate-row" id="cardRate">
+  <button class="btn secondary" data-crate="1">Again<small></small></button>
+  <button class="btn secondary" data-crate="2">Hard<small></small></button>
+  <button class="btn" data-crate="3">Good<small></small></button>
+  <button class="btn secondary" data-crate="4">Easy<small></small></button>
+</div></section>
 <section class="view panel study-panel" id="view-learn"><div class="toolbar"><span class="muted" id="learnMeta"></span><span class="muted" id="learnMastery"></span></div><div class="progressline"><div id="learnBar"></div></div><div class="prompt" id="learnPrompt"></div><div class="options" id="learnOptions"></div><div class="feedback" id="learnFeedback"></div><button class="btn" id="learnContinue" style="display:none;margin-top:12px">Continue</button></section>
 <section class="view panel study-panel" id="view-write"><div class="toolbar"><span class="muted" id="writeMeta"></span><span class="muted">Type the answer; spelling does not have to be exact.</span></div><div class="prompt" id="writePrompt"></div><div class="check-answer"><input id="writeInput" autocomplete="off" placeholder="Type your answer…"><button class="btn" id="writeCheck">Check</button></div><div class="feedback" id="writeFeedback"></div><button class="btn" id="writeContinue" style="display:none;margin-top:12px">Continue</button></section>
 <section class="view panel match" id="view-match"><div class="toolbar"><span class="muted" id="matchMeta"></span><button class="btn secondary" id="matchRestart">Restart</button></div><div class="match-grid" id="matchGrid"></div></section>
 <section class="view panel test" id="view-test"><div id="testRunner"><div class="toolbar"><span class="muted" id="testMeta"></span></div><div class="progressline"><div id="testBar"></div></div><div class="prompt" id="testPrompt"></div><div class="options" id="testOptions"></div></div><div class="result" id="testResult" style="display:none"><h2>Test complete</h2><div class="score" id="testScore"></div><p class="muted" id="testResultText"></p><button class="btn" id="testAgain">Retake test</button></div></section>
+<section class="view panel study-panel" id="view-review">
+  <div class="toolbar"><span class="muted" id="reviewMeta"></span><span class="muted" id="reviewSub"></span></div>
+  <div class="progressline"><div id="reviewBar"></div></div>
+  <div class="prompt" id="reviewPrompt"></div>
+  <div class="reveal" id="reviewAnswer" hidden></div>
+  <div class="study-controls" id="reviewReveal"><button class="btn" id="revealBtn">Show answer</button></div>
+  <div class="rate-row" id="reviewRate" hidden>
+    <button class="btn secondary" data-rate="1">Again<small></small></button>
+    <button class="btn secondary" data-rate="2">Hard<small></small></button>
+    <button class="btn" data-rate="3">Good<small></small></button>
+    <button class="btn secondary" data-rate="4">Easy<small></small></button>
+  </div>
+  <div class="empty" id="reviewEmpty" hidden></div>
+</section>
 <section class="view panel browse" id="view-browse"><input class="search" id="browseSearch" placeholder="Search terms and definitions…"><div class="cardlist" id="cardList"></div></section>
 <section class="view" id="view-progress"><div class="stats" id="stats"></div><div class="panel progress-panel"><h3>Cards needing the most review</h3><div class="cardlist" id="weakList"></div></div></section>
 <section class="view panel editor" id="view-editor"><div class="toolbar"><div><h2 style="margin:0">Edit deck</h2><div class="muted">Fix parsing mistakes or remove cards before studying.</div></div><button class="btn" id="doneEdit">Done</button></div>
@@ -386,14 +423,14 @@ function makeCard(termHtml,defHtml,extra={}){
   const termText=clean(extra.termText??strip(termHtml)),defText=clean(extra.defText??strip(defHtml));
   if(!(termText||hasVisual(termHtml)))return null;
   if(!(defText||hasVisual(defHtml)))return null;
-  return {termHtml,defHtml,termText,defText,star:!!extra.star,correct:+extra.correct||0,wrong:+extra.wrong||0}
+  return {termHtml,defHtml,termText,defText,star:!!extra.star,correct:+extra.correct||0,wrong:+extra.wrong||0,sched:extra.sched||null}
 }
 function addPair(arr,a,b,base,assetMap={}){if(!a||!b||a===b)return;const x=sanitizeHTML(a.innerHTML||a.textContent||'',base,assetMap),y=sanitizeHTML(b.innerHTML||b.textContent||'',base,assetMap),c=makeCard(x,y);if(c)arr.push(c)}
 function finalizeCards(cards){
   const out=[],seen=new Set();
   for(const c of cards){
     const termHtml=c.termHtml||esc(c.termText||c.term||c.question||''),defHtml=c.defHtml||esc(c.defText||c.def||c.definition||c.answer||'');
-    const card=makeCard(termHtml,defHtml,{termText:c.termText||c.term,defText:c.defText||c.def||c.definition||c.answer,star:c.star,correct:c.correct,wrong:c.wrong});
+    const card=makeCard(termHtml,defHtml,{termText:c.termText||c.term,defText:c.defText||c.def||c.definition||c.answer,star:c.star,correct:c.correct,wrong:c.wrong,sched:c.sched});
     if(!card)continue;
     // Include picture identity in the dedupe key, otherwise two picture-only
     // cards with the same (empty) text collapse into one.
@@ -415,7 +452,171 @@ function parseHTMLFile(text,filename,assetMap={}){
  if(!cards.length){const raw=clean(doc.body?.innerText||'');for(const line of raw.split(/\n+/)){const m=line.match(/^(.+?)\s*(?:\t|\s+\|\s+|\s+—\s+|\s+-\s+)\s+(.+)$/);if(m){const c=makeCard(esc(clean(m[1])),esc(clean(m[2])));if(c)cards.push(c)}}}
  const title=clean(doc.querySelector('title')?.textContent)||filename.replace(/\.(html?|htm)$/i,'');return {cards:finalizeCards(cards),title}
 }
-function parseDelimited(text,filename){const cards=[];for(const line of text.split(/\r?\n/)){if(!line.trim())continue;let p=line.includes('\t')?line.split('\t'):line.includes(',')?line.split(','):line.split(/\s+-\s+/);if(p.length>=2){let a=clean(p.shift()),b=clean(p.join(' - '));if(a&&b){const c=makeCard(esc(a),esc(b));if(c)cards.push(c)}}}return {cards:finalizeCards(cards),title:filename.replace(/\.[^.]+$/,'')}}
+/*<<<STUDY_CORE>>>*/
+/* ---------- delimited text ----------
+   The old parser split on every comma and rejoined the remainder with " - ",
+   which silently mangled any definition containing a comma. This is a proper
+   RFC 4180 reader: quoted fields, escaped quotes, and newlines inside quotes. */
+function detectDelimiter(text){
+  const sample=text.slice(0,20000);
+  let tabs=0,commas=0,semis=0,q=false;
+  for(let i=0;i<sample.length;i++){
+    const c=sample[i];
+    if(c==='"'){q=!q;continue}
+    if(q)continue;
+    if(c==='\t')tabs++;else if(c===',')commas++;else if(c===';')semis++;
+  }
+  if(tabs>=commas&&tabs>=semis&&tabs>0)return '\t';
+  if(semis>commas&&semis>0)return ';';
+  if(commas>0)return ',';
+  return '\t';
+}
+function parseCSVRows(text,delim){
+  const rows=[];let row=[],field='',q=false;
+  for(let i=0;i<text.length;i++){
+    const c=text[i];
+    if(q){
+      if(c==='"'){ if(text[i+1]==='"'){field+='"';i++} else q=false }
+      else field+=c;
+    }else{
+      if(c==='"')q=true;
+      else if(c===delim){row.push(field);field=''}
+      else if(c==='\n'){row.push(field);rows.push(row);row=[];field=''}
+      else if(c!=='\r')field+=c;
+    }
+  }
+  if(field.length||row.length){row.push(field);rows.push(row)}
+  return rows.filter(r=>r.some(x=>x&&x.trim()));
+}
+// Quizlet's own export uses configurable separators; fall back to those when the
+// file is not comma- or tab-shaped.
+function parseTermRows(text){
+  const delim=detectDelimiter(text);
+  let rows=parseCSVRows(text,delim).filter(r=>r.length>=2);
+  if(rows.length)return rows;
+  const out=[];
+  for(const line of text.split(/\r?\n/)){
+    if(!line.trim())continue;
+    const m=line.match(/^(.+?)(?:\s+\|\s+|\s+—\s+|\s+-\s+|\s{2,})(.+)$/);
+    if(m)out.push([m[1],m[2]]);
+  }
+  return out;
+}
+
+/* ---------- answer grading ----------
+   Two regimes, because one threshold cannot serve both. A short answer is
+   graded on edit distance so a typo still passes; a long definition is graded
+   on token overlap, because nobody reproduces a sentence verbatim. The old
+   check used bag-of-words for everything at 0.65, which failed correct short
+   answers on word order and passed wrong ones that shared vocabulary. */
+function normalizeAnswer(s){
+  return String(s??'').toLowerCase()
+    .replace(/\(.*?\)/g,' ')
+    .replace(/\b(a|an|the)\b/g,' ')
+    .replace(/[^\p{L}\p{N}\s]/gu,' ')
+    .replace(/\s+/g,' ').trim();
+}
+function levenshtein(a,b){
+  if(a===b)return 0;
+  if(!a.length)return b.length;
+  if(!b.length)return a.length;
+  let prev=Array.from({length:b.length+1},(_,i)=>i);
+  for(let i=1;i<=a.length;i++){
+    const cur=[i];
+    for(let j=1;j<=b.length;j++){
+      cur[j]=Math.min(prev[j]+1,cur[j-1]+1,prev[j-1]+(a[i-1]===b[j-1]?0:1));
+    }
+    prev=cur;
+  }
+  return prev[b.length];
+}
+function tokenF1(a,b){
+  const A=a.split(' ').filter(Boolean),B=b.split(' ').filter(Boolean);
+  if(!A.length||!B.length)return 0;
+  const pool=[...B];let hit=0;
+  for(const t of A){const k=pool.indexOf(t);if(k>=0){hit++;pool.splice(k,1)}}
+  const p=hit/A.length,r=hit/B.length;
+  return p+r?2*p*r/(p+r):0;
+}
+function gradeAnswer(guess,answer){
+  const g=normalizeAnswer(guess);
+  if(!g)return {ok:false,score:0};
+  // Alternatives on slash or semicolon only — commas appear inside real definitions.
+  const alts=String(answer??'').split(/[\/;]/).map(normalizeAnswer).filter(Boolean);
+  if(!alts.length)return {ok:false,score:0};
+  let best=0;
+  for(const a of alts){
+    let sim;
+    if(g===a)sim=1;
+    else if(a.length<=24)sim=1-levenshtein(g,a)/Math.max(g.length,a.length);
+    else sim=tokenF1(g,a);
+    if(sim>best)best=sim;
+  }
+  const shortest=Math.min(...alts.map(a=>a.length));
+  const bar=shortest<=24?0.82:0.62;
+  return {ok:best>=bar,score:Math.max(0,best)};
+}
+
+/* ---------- scheduling (FSRS 4.5, default weights) ----------
+   Chosen over SM-2 because it models stability and difficulty separately and is
+   the current open standard. Weights are the published defaults; they are not
+   tuned to this user's review history. */
+const FSRS_W=[0.4872,1.4003,3.7145,13.8206,5.1618,1.2298,0.8975,0.0310,1.6474,0.1367,1.0461,2.1072,0.0793,0.3246,1.5870,0.2272,2.8755];
+const FSRS_DECAY=-0.5, FSRS_FACTOR=19/81, DAY=86400000;
+const clampD=d=>Math.min(10,Math.max(1,d));
+function fsrsRetrievability(elapsedDays,stability){
+  if(stability<=0)return 0;
+  return Math.pow(1+FSRS_FACTOR*elapsedDays/stability,FSRS_DECAY);
+}
+function fsrsInterval(stability,retention=0.9){
+  const days=stability/FSRS_FACTOR*(Math.pow(retention,1/FSRS_DECAY)-1);
+  return Math.min(365,Math.max(1,Math.round(days)));
+}
+// rating: 1 Again, 2 Hard, 3 Good, 4 Easy
+function fsrsReview(card,rating,now=Date.now(),retention=0.9){
+  const w=FSRS_W;
+  const c={s:card&&card.s||0,d:card&&card.d||0,reps:card&&card.reps||0,
+           lapses:card&&card.lapses||0,last:card&&card.last||0};
+  let s,d;
+  if(!c.reps||!c.s){
+    s=Math.max(0.1,w[rating-1]);
+    d=clampD(w[4]-Math.exp(w[5]*(rating-1))+1);
+  }else{
+    const elapsed=Math.max(0,(now-c.last)/DAY);
+    const r=fsrsRetrievability(elapsed,c.s);
+    d=clampD(c.d-w[6]*(rating-3));
+    // Mean-reverts toward D0(Easy), which must be clamped into range first:
+    // with the default weights it evaluates to about -33 and would otherwise
+    // drag every card to the difficulty floor.
+    const d0Easy=clampD(w[4]-Math.exp(w[5]*3)+1);
+    d=clampD(w[7]*d0Easy+(1-w[7])*d);
+    if(rating===1){
+      s=w[11]*Math.pow(c.d,-w[12])*(Math.pow(c.s+1,w[13])-1)*Math.exp(w[14]*(1-r));
+      s=Math.max(0.1,Math.min(s,c.s));
+    }else{
+      const hard=rating===2?w[15]:1, easy=rating===4?w[16]:1;
+      s=c.s*(1+Math.exp(w[8])*(11-d)*Math.pow(c.s,-w[9])*(Math.exp(w[10]*(1-r))-1)*hard*easy);
+      s=Math.max(0.1,s);
+    }
+  }
+  const iv=fsrsInterval(s,retention);
+  return {s,d,reps:c.reps+1,lapses:c.lapses+(rating===1?1:0),last:now,due:now+iv*DAY,interval:iv};
+}
+function isDue(card,now=Date.now()){ return !card||!card.due||card.due<=now }
+function dueCount(deck,now=Date.now()){ return deck.filter(c=>isDue(c.sched,now)).length }
+// A card failed many times is a leech: the card is the problem, not the learner.
+function isLeech(card,threshold=6){ return !!(card&&card.sched&&card.sched.lapses>=threshold) }
+/*<<<END_STUDY_CORE>>>*/
+function parseDelimited(text,filename){
+  const cards=[];
+  for(const row of parseTermRows(text)){
+    const a=clean(row[0]),b=clean(row.slice(1).join(' '));
+    if(!a||!b)continue;
+    const c=makeCard(esc(a),esc(b));
+    if(c)cards.push(c);
+  }
+  return {cards:finalizeCards(cards),title:filename.replace(/\.[^.]+$/,'')};
+}
 
 /* ===================== PDF import =====================
    Quizlet's "print" export renders one card per table row. Pictures are pulled
@@ -717,18 +918,170 @@ async function parsePDF(file){
 /* ===================== end PDF import ===================== */
 
 async function readAssets(files){const map={};for(const f of files){if(!/^image\//i.test(f.type)&&!/\.(png|jpe?g|gif|webp|svg)$/i.test(f.name))continue;const data=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(f)});map[f.name]=data;map[f.name.split('/').pop()]=data}return map}
+/* ===================== Office documents =====================
+   .docx and .pptx are both ZIP containers of XML. Lecture slides and handouts
+   are what students are actually given, so these matter more than another
+   flashcard site's export format. Everything is read locally, like the rest.
+
+   Tag lookups are namespace-agnostic: the prefixes (w:, a:, p:) are declared
+   per document and cannot be relied on. */
+function tagsOf(root,local){
+  try{
+    const list=root.getElementsByTagNameNS('*',local);
+    if(list&&list.length)return [...list];
+  }catch(e){}
+  const out=[];
+  (function walk(node){
+    if(node.nodeType===1&&(node.localName||node.nodeName.replace(/^.*:/,''))===local)out.push(node);
+    for(let c=node.firstChild;c;c=c.nextSibling)walk(c);
+  })(root);
+  return out;
+}
+function attrLocal(el,local){
+  if(!el||!el.attributes)return null;
+  for(const a of el.attributes){
+    if((a.localName||a.name.replace(/^.*:/,''))===local)return a.value;
+  }
+  return null;
+}
+function zipPathJoin(base,target){
+  const parts=[];
+  for(const seg of (base+target).split('/')){
+    if(seg==='..')parts.pop();
+    else if(seg&&seg!=='.')parts.push(seg);
+  }
+  return parts.join('/');
+}
+function xmlOf(text){return new DOMParser().parseFromString(text,'application/xml')}
+async function readRels(zip,path,baseDir){
+  const map={},f=zip.file(path);
+  if(!f)return map;
+  for(const r of tagsOf(xmlOf(await f.async('string')),'Relationship')){
+    const id=r.getAttribute('Id'),t=r.getAttribute('Target')||'';
+    if(!id||!t||/^https?:/i.test(t))continue;
+    map[id]=zipPathJoin(baseDir,t);
+  }
+  return map;
+}
+/* Office files embed images at print resolution; cap them like PDF crops so a
+   deck stays inside the browser's storage budget. */
+async function shrinkImage(dataURL){
+  try{
+    const img=new Image();
+    await new Promise((res,rej)=>{img.onload=res;img.onerror=rej;img.src=dataURL});
+    if(!img.width||!img.height)return dataURL;
+    if(Math.max(img.width,img.height)<=MAX_PIC_EDGE)return dataURL;
+    return canvasToRef((ctx,w,h)=>ctx.drawImage(img,0,0,w,h),img.width,img.height);
+  }catch(e){return dataURL}
+}
+async function loadRelMedia(zip,rels){
+  const out={};
+  for(const id of Object.keys(rels)){
+    const path=rels[id];
+    // EMF and WMF are vector formats no browser will render.
+    if(!/\.(png|jpe?g|gif|webp|bmp)$/i.test(path))continue;
+    const f=zip.file(path);
+    if(!f)continue;
+    try{
+      const blob=await f.async('blob');
+      const url=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(blob)});
+      out[id]=await shrinkImage(url);
+    }catch(e){console.warn('media '+path+' failed',e)}
+  }
+  return out;
+}
+const imgTag=src=>'<img src="'+src+'" alt="Imported picture">';
+const imgsIn=(el,media)=>tagsOf(el,'blip').map(b=>media[attrLocal(b,'embed')]).filter(Boolean);
+const HEADER_WORDS=/^(term|terms|word|words|question|questions|front|key|vocab|vocabulary)$/i;
+
+async function parseDOCX(file){
+  if(!window.JSZip)throw new Error('ZIP support is unavailable. Check your internet connection.');
+  const zip=await JSZip.loadAsync(file);
+  const doc=zip.file('word/document.xml');
+  if(!doc)throw new Error('That .docx has no document body.');
+  const xml=xmlOf(await doc.async('string'));
+  const media=await loadRelMedia(zip,await readRels(zip,'word/_rels/document.xml.rels','word/'));
+  const textOf=el=>clean(tagsOf(el,'t').map(t=>t.textContent).join(' '));
+  const cards=[];
+  tagsOf(xml,'tr').forEach((row,ri)=>{
+    const cells=tagsOf(row,'tc');
+    if(cells.length<2)return;
+    const a=textOf(cells[0]),b=textOf(cells[1]);
+    // Drop an obvious header row rather than importing it as a card.
+    if(ri===0&&HEADER_WORDS.test(a))return;
+    let termHtml=esc(a),defHtml=esc(b);
+    for(const src of imgsIn(cells[0],media))termHtml+=imgTag(src);
+    for(const src of imgsIn(cells[1],media))defHtml+=imgTag(src);
+    const c=makeCard(termHtml,defHtml);
+    if(c)cards.push(c);
+  });
+  if(!cards.length){
+    // No table: read the paragraphs as delimited lines instead.
+    const lines=tagsOf(xml,'p').map(p=>clean(tagsOf(p,'t').map(t=>t.textContent).join(''))).filter(Boolean);
+    for(const row of parseTermRows(lines.join('\n'))){
+      const c=makeCard(esc(clean(row[0])),esc(clean(row.slice(1).join(' '))));
+      if(c)cards.push(c);
+    }
+  }
+  if(!cards.length)throw new Error('No term and definition pairs found in that .docx. A two-column table imports best.');
+  return {cards:finalizeCards(cards),title:file.name.replace(/\.docx$/i,''),
+          diag:{imagesFound:Object.keys(media).length,
+                imagesPlaced:cards.filter(c=>hasVisual(c.termHtml+c.defHtml)).length}};
+}
+
+async function parsePPTX(file){
+  if(!window.JSZip)throw new Error('ZIP support is unavailable. Check your internet connection.');
+  const zip=await JSZip.loadAsync(file);
+  const slides=Object.keys(zip.files)
+    .filter(p=>/^ppt\/slides\/slide\d+\.xml$/.test(p))
+    .sort((a,b)=>(+a.match(/(\d+)\.xml$/)[1])-(+b.match(/(\d+)\.xml$/)[1]));
+  if(!slides.length)throw new Error('That .pptx has no slides.');
+  const cards=[];let imagesFound=0;
+  for(let i=0;i<slides.length;i++){
+    const name=slides[i];
+    setStatus('Reading slide '+(i+1)+' of '+slides.length+'…',0.1+0.85*((i+1)/slides.length));
+    await yieldToPaint();
+    const xml=xmlOf(await zip.file(name).async('string'));
+    const rels=await readRels(zip,name.replace(/slides\/(slide\d+\.xml)$/,'slides/_rels/$1.rels'),'ppt/slides/');
+    const media=await loadRelMedia(zip,rels);
+    imagesFound+=Object.keys(media).length;
+    // A slide's title is the term; everything else on it is the definition.
+    let title='';const body=[];
+    for(const sp of tagsOf(xml,'sp')){
+      const txt=clean(tagsOf(sp,'t').map(t=>t.textContent).join(' '));
+      if(!txt)continue;
+      const ph=tagsOf(sp,'ph')[0];
+      if(!title&&ph&&/title/i.test(ph.getAttribute('type')||''))title=txt;
+      else body.push(txt);
+    }
+    if(!title&&body.length)title=body.shift();
+    let defHtml=esc(body.join(' '));
+    for(const src of imgsIn(xml,media))defHtml+=imgTag(src);
+    const c=makeCard(esc(title),defHtml);
+    if(c)cards.push(c);
+  }
+  if(!cards.length)throw new Error('No slides with a title and content were found in that .pptx.');
+  return {cards:finalizeCards(cards),title:file.name.replace(/\.pptx$/i,''),
+          diag:{pages:slides.length,imagesFound,
+                imagesPlaced:cards.filter(c=>hasVisual(c.defHtml)).length}};
+}
+/* ===================== end Office documents ===================== */
+
 async function parseZip(file){if(!window.JSZip)throw new Error('ZIP support is unavailable. Check your internet connection.');const zip=await JSZip.loadAsync(file),names=Object.keys(zip.files),htmlName=names.find(n=>/\.html?$/i.test(n)&&!zip.files[n].dir);if(!htmlName)throw new Error('ZIP does not contain an HTML file.');const map={};for(const n of names){if(zip.files[n].dir||!/\.(png|jpe?g|gif|webp|svg)$/i.test(n))continue;const blob=await zip.files[n].async('blob'),data=await new Promise((res,rej)=>{const r=new FileReader();r.onload=()=>res(r.result);r.onerror=rej;r.readAsDataURL(blob)});map[n]=data;map[n.split('/').pop()]=data}return parseHTMLFile(await zip.files[htmlName].async('string'),htmlName,map)}
 async function importFiles(files){
   if(!files.length)return;
   setStatus('Reading '+files.map(f=>f.name).join(', ')+'…');
   lastImport={when:new Date().toISOString(),files:files.map(f=>({name:f.name,size:f.size})),route:'?',cards:null,error:null};
-  startLoading(files.some(f=>/.(pdf|zip)$/i.test(f.name)||f.size>150000));
+  lastImportFile=files[0]||null;
+  startLoading(files.some(f=>/.(pdf|zip|docx|pptx)$/i.test(f.name)||f.size>150000));
   await yieldToPaint();
   try{
-    const first=files.find(f=>/\.(html?|zip|pdf|json|txt|tsv|csv)$/i.test(f.name))||files[0];
+    const first=files.find(f=>/\.(html?|zip|pdf|json|txt|tsv|csv|docx|pptx)$/i.test(f.name))||files[0];
     let result;
-    lastImport.route=/\.zip$/i.test(first.name)?'zip':/\.pdf$/i.test(first.name)?'pdf':/\.html?$/i.test(first.name)?'html':/\.json$/i.test(first.name)?'json':'delimited';
-    if(/\.zip$/i.test(first.name))result=await parseZip(first);
+    lastImport.route=/\.docx$/i.test(first.name)?'docx':/\.pptx$/i.test(first.name)?'pptx':/\.zip$/i.test(first.name)?'zip':/\.pdf$/i.test(first.name)?'pdf':/\.html?$/i.test(first.name)?'html':/\.json$/i.test(first.name)?'json':'delimited';
+    if(/\.docx$/i.test(first.name))result=await parseDOCX(first);
+    else if(/\.pptx$/i.test(first.name))result=await parsePPTX(first);
+    else if(/\.zip$/i.test(first.name))result=await parseZip(first);
     else if(/\.pdf$/i.test(first.name))result=await parsePDF(first);
     else if(/\.html?$/i.test(first.name)){const map=await readAssets(files.filter(f=>f!==first));result=parseHTMLFile(await first.text(),first.name,map)}
     else if(/\.json$/i.test(first.name)){const j=JSON.parse(await first.text()),arr=Array.isArray(j)?j:(j.cards||j.terms||j.data||[]);result={cards:finalizeCards(arr),title:j.title||first.name.replace(/\.json$/i,'')}}
@@ -737,7 +1090,7 @@ async function importFiles(files){
     lastImport.cards=result.cards.length;
     if(result.diag)Object.assign(lastImport,result.diag);
     state.deck=result.cards;state.title=result.title||'Imported deck';state.index=0;state.flipped=false;
-    saveLocal();showDeck();$('status').textContent='';
+    saveLocal();showDeck();$('status').textContent='';showImportBanner(state.deck.length,withPicsCount());
     const withPics=state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length;
     toast(`Imported ${state.deck.length} cards${withPics?` · ${withPics} with pictures`:''}`);
     if(withPics&&/\.pdf$/i.test(first.name))toast(`Imported ${state.deck.length} cards · ${withPics} with pictures. Check them in Browse — Edit cards can shift pictures if any are off.`);
@@ -750,17 +1103,103 @@ async function importFiles(files){
   }
   finally{stopLoading()}
 }
-function showDeck(){if(!state.deck.length)return;$('uploadPanel').style.display='none';$('deckbar').style.display='flex';$('nav').style.display='flex';$('deckTitle').textContent=state.title;$('deckMeta').textContent=`${state.deck.length} cards · ${state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length} with pictures`;switchMode('cards')}
+function showDeck(){if(!state.deck.length)return;$('uploadPanel').style.display='none';$('deckbar').style.display='flex';$('nav').style.display='flex';$('deckTitle').textContent=state.title;$('deckMeta').textContent=`${state.deck.length} cards · ${state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length} with pictures`;updateDueBadge();switchMode(dueDeck().length&&state.deck.some(c=>c.sched)?'review':'cards')}
 function answerFor(c){let d=state.settings.direction;if(d==='mixed')d=Math.random()<.5?'term-def':'def-term';return d==='term-def'?{prompt:c.termHtml,answer:c.defHtml,text:c.defText}:{prompt:c.defHtml,answer:c.termHtml,text:c.termText}}
-function renderCards(){if(!state.deck.length)return;const c=state.deck[state.index];$('front').innerHTML=c.termHtml;$('back').innerHTML=c.defHtml;$('fcProgress').textContent=`Card ${state.index+1} / ${state.deck.length}`;$('starBtn').textContent=c.star?'★ Starred':'☆ Star';$('flash').classList.toggle('flip',state.flipped);if(state.settings.autoSpeak!=='off')setTimeout(()=>speakCurrent(),120)}
+function renderCards(){if(!state.deck.length)return;const c=state.deck[state.index];labelRateButtons($('cardRate'),c,'data-crate');$('front').innerHTML=c.termHtml;$('back').innerHTML=c.defHtml;$('fcProgress').textContent=`Card ${state.index+1} / ${state.deck.length}`;$('starBtn').textContent=c.star?'★ Starred':'☆ Star';$('flash').classList.toggle('flip',state.flipped);if(state.settings.autoSpeak!=='off')setTimeout(()=>speakCurrent(),120)}
 function flip(){state.flipped=!state.flipped;$('flash').classList.toggle('flip',state.flipped);if(state.settings.autoSpeak!=='off')speakCurrent()}
 function nextCard(){state.index=(state.index+1)%state.deck.length;state.flipped=false;renderCards()}function prevCard(){state.index=(state.index-1+state.deck.length)%state.deck.length;state.flipped=false;renderCards()}
 function shuffleDeck(){state.deck=shuffle(state.deck);state.index=0;state.flipped=false;saveLocal();renderCards()}
 function starCurrent(){state.deck[state.index].star=!state.deck[state.index].star;saveLocal();renderCards();if(state.mode==='browse'||state.mode==='progress')renderBrowse()}
-function recordCurrent(ok){const c=state.deck[state.index];if(ok)c.correct++;else c.wrong++;saveLocal();toast(ok?'Marked got it':'Marked for review');nextCard()}
+function recordCurrent(rating){
+  const c=state.deck[state.index];
+  rateCard(c,rating);
+  toast(rating===1?'Scheduled to come back soon':'Next review in '+fmtInterval(c.sched.interval));
+  nextCard();
+}
 function speak(text){if(!('speechSynthesis'in window)||!text)return;window.speechSynthesis.cancel();const u=new SpeechSynthesisUtterance(text);u.rate=.9;window.speechSynthesis.speak(u)}
 function speakCurrent(){const c=state.deck[state.index],text=state.flipped?c.defText:c.termText;speak(text)}
-function switchMode(mode){state.mode=mode;document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('view-'+mode).classList.add('active');if(mode==='cards')renderCards();if(mode==='learn')initLearn();if(mode==='write')initWrite();if(mode==='match')initMatch();if(mode==='test')initTest();if(mode==='browse')renderBrowse();if(mode==='progress')renderProgress()}
+function switchMode(mode){state.mode=mode;updateDueBadge();document.querySelectorAll('.tab').forEach(b=>b.classList.toggle('active',b.dataset.mode===mode));document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('view-'+mode).classList.add('active');if(mode==='cards')renderCards();if(mode==='learn')initLearn();if(mode==='write')initWrite();if(mode==='match')initMatch();if(mode==='test')initTest();if(mode==='review')initReview();if(mode==='browse')renderBrowse();if(mode==='progress')renderProgress()}
+/* ---------- spaced review ---------- */
+function dueDeck(now=Date.now()){return state.deck.filter(c=>isDue(c.sched,now))}
+function fmtInterval(d){
+  if(d<1)return '<1d';
+  if(d<30)return d+'d';
+  if(d<365)return Math.round(d/30)+'mo';
+  return (d/365).toFixed(1)+'y';
+}
+function nextDueText(){
+  const times=state.deck.map(c=>c.sched&&c.sched.due).filter(Boolean);
+  if(!times.length)return '';
+  const next=Math.min(...times),ms=next-Date.now();
+  if(ms<=0)return 'Ready now';
+  const hrs=ms/3600000;
+  return hrs<24?('Next card in '+Math.max(1,Math.round(hrs))+'h'):('Next card in '+Math.round(hrs/24)+'d');
+}
+function labelRateButtons(root,card,attr){
+  root.querySelectorAll('['+attr+']').forEach(b=>{
+    const r=+b.getAttribute(attr);
+    const s=b.querySelector('small');
+    if(s)s.textContent=fmtInterval(fsrsReview(card&&card.sched,r,Date.now()).interval);
+  });
+}
+function updateDueBadge(){
+  const b=$('dueBadge');if(!b)return;
+  const n=dueDeck().length;
+  b.textContent=n;b.hidden=!n;
+}
+function rateCard(card,rating){
+  card.sched=fsrsReview(card.sched,rating);
+  if(rating===1)card.wrong++;else card.correct++;
+  saveLocal();updateDueBadge();
+}
+function initReview(){
+  state.review={queue:shuffle(dueDeck()),done:0};
+  state.review.total=state.review.queue.length;
+  renderReview();
+}
+function renderReview(){
+  const r=state.review;
+  const empty=$('reviewEmpty');
+  const has=r.queue.length>0;
+  ['reviewPrompt','reviewReveal'].forEach(id=>{const e=$(id);if(e)e.hidden=!has});
+  $('reviewAnswer').hidden=true;$('reviewRate').hidden=true;
+  empty.hidden=has;
+  if(!has){
+    r.current=null;
+    $('reviewMeta').textContent='Nothing due';
+    $('reviewSub').textContent='';
+    $('reviewBar').style.width='100%';
+    empty.innerHTML='<strong>All caught up.</strong><br>'+(nextDueText()||'Study any mode to start scheduling cards.');
+    return;
+  }
+  const c=r.queue[0];
+  r.current=c;r.shown=false;
+  const a=answerFor(c);
+  r.answerHtml=a.answer;
+  $('reviewPrompt').innerHTML=a.prompt;
+  $('reviewMeta').textContent=r.queue.length+' due';
+  $('reviewSub').textContent=r.done?(r.done+' reviewed'):'';
+  $('reviewBar').style.width=(r.total?(r.done/r.total*100):0)+'%';
+  $('reviewReveal').hidden=false;
+  labelRateButtons($('reviewRate'),c,'data-rate');
+}
+function revealReview(){
+  const r=state.review;
+  if(!r||!r.current||r.shown)return;
+  r.shown=true;
+  $('reviewAnswer').innerHTML=r.answerHtml;
+  $('reviewAnswer').hidden=false;
+  $('reviewReveal').hidden=true;
+  $('reviewRate').hidden=false;
+}
+function answerReview(rating){
+  const r=state.review;
+  if(!r||!r.current||!r.shown)return;
+  rateCard(r.current,rating);
+  r.queue.shift();
+  r.done++;
+  renderReview();
+}
 function initLearn(){const pool=state.deck.filter(c=>c.wrong>=c.correct);state.learn={current:null,answered:false,pool:pool.length?pool:state.deck};renderLearn()}
 function renderLearn(){const c=shuffle(state.learn.pool)[0],a=answerFor(c);state.learn.current=c;state.learn.answered=false;$('learnPrompt').innerHTML=a.prompt;$('learnMeta').textContent=`${state.learn.pool.length} cards in review queue`;$('learnFeedback').textContent='';$('learnContinue').style.display='none';let opts=shuffle([c,...shuffle(state.deck.filter(x=>x!==c)).slice(0,3)]);$('learnOptions').innerHTML='';opts.forEach(x=>{const b=document.createElement('button');b.className='option';b.innerHTML=answerFor(x).answer;b.onclick=()=>handleLearn(b,x===c,c,a.text);$('learnOptions').appendChild(b)});const mastered=state.deck.filter(x=>x.correct>=3&&x.correct>x.wrong).length,pct=Math.round(mastered/state.deck.length*100);$('learnMastery').textContent=pct+'% mastered';$('learnBar').style.width=pct+'%'}
 function handleLearn(btn,correct,c,text){if(state.learn.answered)return;state.learn.answered=true;document.querySelectorAll('#learnOptions .option').forEach(b=>b.disabled=true);if(correct){btn.classList.add('correct');c.correct++;$('learnFeedback').textContent='Correct'}else{btn.classList.add('wrong');c.wrong++;$('learnFeedback').textContent='Incorrect — correct answer: '+(text||'(picture)')}saveLocal();$('learnContinue').style.display='inline-block'}
@@ -769,7 +1208,16 @@ function writablePool(){const p=state.deck.filter(c=>c.termText&&c.defText);retu
 function initWrite(){state.write={current:null,answered:false};renderWrite()}
 function renderWrite(){const c=shuffle(writablePool())[0],a=answerFor(c);state.write.current=c;state.write.answer=a.text;state.write.answered=false;$('writePrompt').innerHTML=a.prompt;$('writeMeta').textContent='Write the answer';$('writeInput').value='';$('writeInput').disabled=false;$('writeFeedback').textContent='';$('writeCheck').style.display='inline-block';$('writeContinue').style.display='none';setTimeout(()=>$('writeInput').focus(),50)}
 function similarity(a,b){a=clean(a).toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,'');b=clean(b).toLowerCase().replace(/[^\p{L}\p{N}\s]/gu,'');if(a===b)return 1;const aa=a.split(/\s+/),bb=b.split(/\s+/),set=new Set(bb);return aa.filter(x=>set.has(x)).length/Math.max(aa.length,bb.length,1)}
-function checkWrite(){if(state.write.answered)return;const guess=$('writeInput').value,score=similarity(guess,state.write.answer),ok=score>=.65;state.write.answered=true;$('writeInput').disabled=true;$('writeCheck').style.display='none';if(ok){state.write.current.correct++;$('writeFeedback').textContent='Correct enough — '+state.write.answer}else{state.write.current.wrong++;$('writeFeedback').textContent='Not quite. Answer: '+state.write.answer}saveLocal();$('writeContinue').style.display='inline-block'}
+function checkWrite(){
+  if(state.write.answered)return;
+  const {ok}=gradeAnswer($('writeInput').value,state.write.answer);
+  state.write.answered=true;
+  $('writeInput').disabled=true;$('writeCheck').style.display='none';
+  const c=state.write.current;
+  if(ok){c.correct++;c.sched=fsrsReview(c.sched,3);$('writeFeedback').textContent='Correct — '+state.write.answer}
+  else{c.wrong++;c.sched=fsrsReview(c.sched,1);$('writeFeedback').textContent='Not quite. Answer: '+state.write.answer}
+  saveLocal();$('writeContinue').style.display='inline-block';
+}
 function initMatch(){if(!state.deck.length)return;const n=Math.min(+state.settings.matchSize,state.deck.length),subset=shuffle(state.deck).slice(0,n),tiles=[];subset.forEach((c,i)=>{tiles.push({id:i,type:'term',html:c.termHtml});tiles.push({id:i,type:'def',html:c.defHtml})});state.match={selected:null,left:n};const board=$('matchGrid');board.innerHTML='';shuffle(tiles).forEach(t=>{const el=document.createElement('div');el.className='tile';el.innerHTML=t.html;el.onclick=()=>matchClick(el,t);board.appendChild(el)});$('matchMeta').textContent=`${n} pairs`}
 function matchClick(el,t){if(el.classList.contains('matched'))return;if(!state.match.selected){state.match.selected={el,t};el.classList.add('selected');return}const s=state.match.selected;if(s.el===el){el.classList.remove('selected');state.match.selected=null;return}if(s.t.id===t.id&&s.t.type!==t.type){s.el.classList.add('matched');el.classList.add('matched');state.match.left--;state.match.selected=null;if(!state.match.left)toast('Match complete')}else{el.classList.add('wrong');s.el.classList.add('wrong');setTimeout(()=>{el.classList.remove('wrong');s.el.classList.remove('wrong','selected');state.match.selected=null},450)}}
 function initTest(){const pool=shuffle(state.deck),len=state.settings.testLength==='all'?pool.length:Math.min(+state.settings.testLength,pool.length);state.test={queue:pool.slice(0,len),i:0,score:0,answered:false};$('testRunner').style.display='block';$('testResult').style.display='none';renderTest()}
@@ -781,7 +1229,12 @@ function finishTest(){const t=state.test,pct=t.queue.length?Math.round(t.score/t
    which no amount of analytics would provide. Set REPORT_ENDPOINT to a URL that
    accepts a POST to enable one-click sending; until then the report is copied
    and sent by hand. */
+/* Paste a Formspree form endpoint here to turn on one-click sending, e.g.
+   https://formspree.io/f/xxxxxxxx . Until then the report is copied by hand.
+   The source file travels with it: a broken import cannot be diagnosed without
+   the file that produced it. */
 const REPORT_ENDPOINT='';
+let lastImportFile=null;
 const REPORT_ISSUE_URL='https://github.com/Mike24878/openstudy/issues/new';
 let lastImport=null;
 function describeImport(){
@@ -813,6 +1266,7 @@ function openReport(){
       '<textarea id="reportText" spellcheck="false"></textarea>'+
       '<div class="modal-actions"><button class="btn secondary" id="reportClose">Close</button>'+
       '<button class="btn secondary" id="reportOpenIssue">Open an issue</button>'+
+      '<button class="btn secondary" id="reportSend" hidden>Send report</button>'+
       '<button class="btn" id="reportCopy">Copy report</button></div></div>';
     document.body.appendChild(m);
     m.querySelector('#reportClose').onclick=()=>m.classList.remove('show');
@@ -821,6 +1275,25 @@ function openReport(){
       try{await navigator.clipboard.writeText(t.value);toast('Report copied — please attach the file you imported')}
       catch(e){t.focus();t.select();let ok=false;try{ok=document.execCommand('copy')}catch(_){}
         toast(ok?'Report copied — please attach the file you imported':'Press Ctrl+C to copy')}
+    };
+    const sendBtn=m.querySelector('#reportSend');
+    sendBtn.hidden=!REPORT_ENDPOINT;
+    sendBtn.onclick=async()=>{
+      sendBtn.disabled=true;sendBtn.textContent='Sending\u2026';
+      try{
+        const fd=new FormData();
+        fd.append('report',$('reportText').value);
+        fd.append('route',(lastImport&&lastImport.route)||'unknown');
+        fd.append('cards',String((lastImport&&lastImport.cards)||0));
+        if(lastImportFile)fd.append('source',lastImportFile,lastImportFile.name);
+        const res=await fetch(REPORT_ENDPOINT,{method:'POST',body:fd,headers:{Accept:'application/json'}});
+        if(!res.ok)throw new Error('HTTP '+res.status);
+        toast('Report sent \u2014 thank you, this is genuinely useful');
+        m.classList.remove('show');
+      }catch(err){
+        console.warn('report send failed',err);
+        toast('Could not send. Copy the report instead and paste it to me.');
+      }finally{sendBtn.disabled=false;sendBtn.textContent='Send report'}
     };
     m.querySelector('#reportOpenIssue').onclick=()=>{
       const body=encodeURIComponent($('reportText').value).slice(0,6000);
@@ -877,7 +1350,8 @@ function emptyBrowseHTML(q){
 }
 function renderBrowse(){const q=clean($('browseSearch').value).toLowerCase(),list=state.deck.map((c,i)=>({c,i})).filter(x=>!q||(x.c.termText+' '+x.c.defText).toLowerCase().includes(q));$('cardList').innerHTML=list.length?list.map(x=>`<div class="row"><div class="num">${x.i+1}</div><div>${x.c.termHtml}</div><div>${x.c.defHtml}</div><button class="star ${x.c.star?'on':''}" data-star="${x.i}">${x.c.star?'★':'☆'}</button></div>`).join(''):emptyBrowseHTML(q);document.querySelectorAll('[data-star]').forEach(b=>b.onclick=()=>toggleStar(+b.dataset.star))}
 function toggleStar(i){state.deck[i].star=!state.deck[i].star;saveLocal();renderBrowse()}
-function renderProgress(){const total=state.deck.length,attempts=state.deck.reduce((n,c)=>n+c.correct+c.wrong,0),correct=state.deck.reduce((n,c)=>n+c.correct,0),star=state.deck.filter(c=>c.star).length,master=state.deck.filter(c=>c.correct>=3&&c.correct>c.wrong).length,visual=state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length;$('stats').innerHTML=`<div class="stat"><b>${total}</b><span>Total cards</span></div><div class="stat"><b>${visual}</b><span>With pictures</span></div><div class="stat"><b>${star}</b><span>Starred</span></div><div class="stat"><b>${attempts?Math.round(correct/attempts*100):0}%</b><span>Accuracy</span></div><div class="stat"><b>${master}</b><span>Mastered</span></div>`;const weak=state.deck.map((c,i)=>({c,i,rate:(c.correct+c.wrong)?c.correct/(c.correct+c.wrong):0})).sort((a,b)=>a.rate-b.rate).slice(0,8);$('weakList').innerHTML=weak.map(x=>`<div class="row"><div class="num">${x.i+1}</div><div>${x.c.termHtml}</div><div>${x.c.defHtml}<br><small class="muted">${x.c.correct} correct · ${x.c.wrong} wrong</small></div><div></div></div>`).join('')}
+function renderProgress(){const total=state.deck.length,attempts=state.deck.reduce((n,c)=>n+c.correct+c.wrong,0),correct=state.deck.reduce((n,c)=>n+c.correct,0),star=state.deck.filter(c=>c.star).length,master=state.deck.filter(c=>c.correct>=3&&c.correct>c.wrong).length,visual=state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length;const due=dueDeck().length,leeches=state.deck.filter(isLeech).length;
+  $('stats').innerHTML=`<div class="stat"><b>${total}</b><span>Total cards</span></div><div class="stat"><b>${due}</b><span>Due now</span></div><div class="stat"><b>${star}</b><span>Starred</span></div><div class="stat"><b>${attempts?Math.round(correct/attempts*100):0}%</b><span>Accuracy</span></div><div class="stat"><b>${leeches}</b><span>Sticking points</span></div>`;const weak=state.deck.map((c,i)=>({c,i,rate:(c.correct+c.wrong)?c.correct/(c.correct+c.wrong):0})).sort((a,b)=>a.rate-b.rate).slice(0,8);$('weakList').innerHTML=weak.map(x=>`<div class="row"><div class="num">${x.i+1}</div><div>${x.c.termHtml}</div><div>${x.c.defHtml}<br><small class="muted">${x.c.correct} correct · ${x.c.wrong} wrong${isLeech(x.c)?' · <span class="leech">sticking point</span>':''}${x.c.sched?' · next in '+fmtInterval(x.c.sched.interval):''}</small></div><div></div></div>`).join('')}
 
 /* Manual repair for whatever the layout heuristics still get wrong. Per-card
    nudges handle one-off mistakes; the global shift fixes a systematic
@@ -921,8 +1395,6 @@ function renderEditor(){
   document.querySelectorAll('[data-edit]').forEach(el=>el.addEventListener('blur',()=>{const i=+el.dataset.i;if(el.dataset.edit==='term'){state.deck[i].termHtml=sanitizeHTML(el.innerHTML,'https://local.openstudy/');state.deck[i].termText=clean(strip(state.deck[i].termHtml))}else{state.deck[i].defHtml=sanitizeHTML(el.innerHTML,'https://local.openstudy/');state.deck[i].defText=clean(strip(state.deck[i].defHtml))}saveLocal()}));
 }
 function openEditor(){document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('view-editor').classList.add('active');document.querySelectorAll('.tab').forEach(b=>b.classList.remove('active'));renderEditor()}
-function saveLocal(){try{localStorage.setItem(STORAGE,JSON.stringify({title:state.title,deck:state.deck,settings:state.settings}))}catch(e){console.warn('Local save failed',e);toast('Deck too large to save locally — export it to keep a copy')}}
-function loadLocal(){try{const x=JSON.parse(localStorage.getItem(STORAGE)||'null');if(x?.deck?.length){state.title=x.title||'Saved deck';state.deck=finalizeCards(x.deck);state.settings={...state.settings,...x.settings};showDeck()}}catch(e){console.warn(e)}}
 function showDeckJSON(json){
   let m=$('exportModal');
   if(!m){
@@ -935,29 +1407,182 @@ function showDeckJSON(json){
   $('exportText').value=json;
   m.classList.add('show');
 }
-async function exportDeck(){
-  const json=JSON.stringify({title:state.title,cards:state.deck},null,2);
-  // An embedded viewer sandboxes the frame and silently drops download links,
-  // so hand the deck over via the clipboard there rather than doing nothing.
+/* ===================== storage =====================
+   localStorage caps around 5 MB per origin, and a picture card costs roughly
+   11 KB, so a 450-card illustrated set would silently fail to save. IndexedDB
+   has no such practical ceiling and stores structured data directly. Anything
+   already in localStorage is migrated on first load; if IndexedDB is
+   unavailable (private windows, blocked site data) the old path still works. */
+const DB_NAME='openstudy',DB_STORE='decks',DB_KEY='current';
+let dbPromise=null;
+function idb(){
+  if(dbPromise)return dbPromise;
+  dbPromise=new Promise((res,rej)=>{
+    if(!window.indexedDB)return rej(new Error('IndexedDB unavailable'));
+    const req=indexedDB.open(DB_NAME,1);
+    req.onupgradeneeded=()=>{
+      const db=req.result;
+      if(!db.objectStoreNames.contains(DB_STORE))db.createObjectStore(DB_STORE);
+    };
+    req.onsuccess=()=>res(req.result);
+    req.onerror=()=>rej(req.error||new Error('IndexedDB open failed'));
+  }).catch(e=>{dbPromise=null;throw e});
+  return dbPromise;
+}
+function idbPut(value){
+  return idb().then(db=>new Promise((res,rej)=>{
+    const tx=db.transaction(DB_STORE,'readwrite');
+    tx.objectStore(DB_STORE).put(value,DB_KEY);
+    tx.oncomplete=()=>res(true);
+    tx.onerror=()=>rej(tx.error);
+    tx.onabort=()=>rej(tx.error||new Error('write aborted'));
+  }));
+}
+function idbGet(){
+  return idb().then(db=>new Promise((res,rej)=>{
+    const tx=db.transaction(DB_STORE,'readonly');
+    const q=tx.objectStore(DB_STORE).get(DB_KEY);
+    q.onsuccess=()=>res(q.result||null);
+    q.onerror=()=>rej(q.error);
+  }));
+}
+function idbClear(){
+  return idb().then(db=>new Promise((res,rej)=>{
+    const tx=db.transaction(DB_STORE,'readwrite');
+    tx.objectStore(DB_STORE).delete(DB_KEY);
+    tx.oncomplete=()=>res(true);
+    tx.onerror=()=>rej(tx.error);
+  })).catch(()=>false);
+}
+let saveTimer=null,warnedFull=false;
+// Study modes call this on every answer, so coalesce the writes.
+function saveLocal(){
+  clearTimeout(saveTimer);
+  saveTimer=setTimeout(persistNow,250);
+}
+async function persistNow(){
+  const payload={title:state.title,deck:state.deck,settings:state.settings};
+  try{
+    await idbPut(payload);
+    try{localStorage.removeItem(STORAGE)}catch(e){}
+    return true;
+  }catch(e){
+    try{
+      localStorage.setItem(STORAGE,JSON.stringify(payload));
+      return true;
+    }catch(e2){
+      if(!warnedFull){warnedFull=true;toast('This deck is too large for browser storage — export it to keep a copy')}
+      return false;
+    }
+  }
+}
+async function loadSaved(){
+  let saved=null;
+  try{saved=await idbGet()}catch(e){}
+  if(!saved){
+    try{saved=JSON.parse(localStorage.getItem(STORAGE)||'null')}catch(e){}
+    if(saved&&saved.deck&&saved.deck.length){
+      try{await idbPut(saved);localStorage.removeItem(STORAGE)}catch(e){}
+    }
+  }
+  if(saved&&saved.deck&&saved.deck.length){
+    state.title=saved.title||'Saved deck';
+    state.deck=finalizeCards(saved.deck);
+    state.settings={...state.settings,...saved.settings};
+    showDeck();
+  }
+}
+
+/* ===================== export =====================
+   Two formats, because they serve different purposes: the JSON round-trips a
+   deck with its pictures, the TSV is what Anki and Quizlet both read. Offering
+   the escape hatch is deliberate — "you can always leave" is what makes a small
+   tool safe to try. */
+function deckToTSV(){
+  return state.deck.map(c=>[c.termText,c.defText]
+    .map(t=>String(t||'').replace(/[\t\r\n]+/g,' ').trim()).join('\t')).join('\n');
+}
+function offerFile(text,filename,mime){
+  // Embedded viewers sandbox the frame and ignore download links entirely.
   if(window.self!==window.top){
-    try{await navigator.clipboard.writeText(json);toast('Deck copied to clipboard — paste it into a .json file to keep it');return}
-    catch(e){console.warn('Clipboard unavailable',e)}
-    showDeckJSON(json);return;
+    navigator.clipboard.writeText(text)
+      .then(()=>toast('Copied to the clipboard — paste it into a '+filename.split('.').pop()+' file'))
+      .catch(()=>showDeckJSON(text));
+    return;
   }
   const a=document.createElement('a');
-  a.href=URL.createObjectURL(new Blob([json],{type:'application/json'}));
-  a.download=(state.title||'openstudy-deck')+'.json';
+  a.href=URL.createObjectURL(new Blob([text],{type:mime}));
+  a.download=filename;
   a.click();
   setTimeout(()=>URL.revokeObjectURL(a.href),1000);
+  toast('Saved '+filename);
 }
-function newDeck(){localStorage.removeItem(STORAGE);state.deck=[];$('deckbar').style.display='none';$('nav').style.display='none';document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('uploadPanel').style.display='block';$('file').value='';$('status').textContent='';toast('Ready for another deck')}
+function exportDeck(){
+  let m=$('exportChooser');
+  if(!m){
+    m=document.createElement('div');
+    m.id='exportChooser';m.className='modal';
+    m.innerHTML='<div class="modalbox"><h3>Export this deck</h3>'+
+      '<div class="exp-opt"><div><b>OpenStudy file (.json)</b><span>Keeps pictures and your review schedule. Re-import it here any time.</span></div>'+
+      '<button class="btn" id="expJson">Save .json</button></div>'+
+      '<div class="exp-opt"><div><b>Plain text (.tsv)</b><span>Term and definition separated by a tab &mdash; what Anki and Quizlet both read. Pictures are not included.</span></div>'+
+      '<button class="btn secondary" id="expTsv">Save .tsv</button></div>'+
+      '<div class="modal-actions"><button class="btn ghost" id="expClose">Close</button></div></div>';
+    document.body.appendChild(m);
+    m.querySelector('#expClose').onclick=()=>m.classList.remove('show');
+    m.querySelector('#expJson').onclick=()=>{
+      offerFile(JSON.stringify({title:state.title,cards:state.deck},null,2),
+        (state.title||'openstudy-deck').replace(/[^\w.-]+/g,'-')+'.json','application/json');
+      m.classList.remove('show');
+    };
+    m.querySelector('#expTsv').onclick=()=>{
+      offerFile(deckToTSV(),(state.title||'openstudy-deck').replace(/[^\w.-]+/g,'-')+'.tsv','text/tab-separated-values');
+      m.classList.remove('show');
+    };
+  }
+  m.classList.add('show');
+}
+
+/* ===================== after an import =====================
+   Prompts a look at what actually came through. An import that fails loudly is
+   easy; the damaging case is one that looks fine with pictures on the wrong
+   cards, which is only caught by looking. */
+function withPicsCount(){return state.deck.filter(c=>hasVisual(c.termHtml)||hasVisual(c.defHtml)).length}
+function showImportBanner(cards,pics){
+  const host=$('deckbar');
+  if(!host)return;
+  let b=$('importBanner');
+  if(!b){
+    b=document.createElement('div');
+    b.id='importBanner';b.className='banner';
+    host.insertAdjacentElement('afterend',b);
+  }
+  b.innerHTML='<span>Imported <b>'+cards+'</b> cards'+(pics?', <b>'+pics+'</b> with pictures':'')+
+    '. Worth a quick look before you study.</span>'+
+    '<span class="banner-actions"><button class="smallbtn" id="bannerCheck">Check them</button>'+
+    '<button class="smallbtn" id="bannerFix">Fix pictures</button>'+
+    '<button class="smallbtn" id="bannerHide">Dismiss</button></span>';
+  b.hidden=false;
+  $('bannerCheck').onclick=()=>switchMode('browse');
+  $('bannerFix').onclick=openEditor;
+  $('bannerHide').onclick=()=>{b.hidden=true};
+}
+function hideImportBanner(){const b=$('importBanner');if(b)b.hidden=true}
+function newDeck(){localStorage.removeItem(STORAGE);idbClear();hideImportBanner();state.deck=[];$('deckbar').style.display='none';$('nav').style.display='none';document.querySelectorAll('.view').forEach(v=>v.classList.remove('active'));$('uploadPanel').style.display='block';$('file').value='';$('status').textContent='';toast('Ready for another deck')}
 function openSettings(){$('direction').value=state.settings.direction;$('testLength').value=state.settings.testLength;$('matchSize').value=state.settings.matchSize;$('autoSpeak').value=state.settings.autoSpeak;$('settingsModal').classList.add('show')}
 function closeSettings(){$('settingsModal').classList.remove('show')}
 function saveSettings(){state.settings.direction=$('direction').value;state.settings.testLength=$('testLength').value;state.settings.matchSize=+$('matchSize').value;state.settings.autoSpeak=$('autoSpeak').value;saveLocal();closeSettings();renderCards();toast('Settings saved')}
-$('chooseBtn').onclick=e=>{e.stopPropagation();$('file').click()};$('file').addEventListener('change',e=>importFiles([...e.target.files]));$('drop').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click()});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('drag')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('drag'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files])});$('settingsBtn').onclick=openSettings;$('settingsBtn2').onclick=openSettings;$('closeSettings').onclick=closeSettings;$('saveSettings').onclick=saveSettings;$('newBtn').onclick=newDeck;$('newBtn2').onclick=newDeck;$('exportBtn').onclick=exportDeck;$('reportBtn').onclick=openReport;$('editBtn').onclick=openEditor;$('doneEdit').onclick=()=>{showDeck();saveLocal()};$('addCard').onclick=()=>{state.deck.push(makeCard('<span>New term</span>','<span>New definition</span>'));saveLocal();renderEditor()};$('dedupe').onclick=()=>{state.deck=finalizeCards(state.deck);saveLocal();renderEditor();toast('Duplicates removed')};$('shiftAllUp').onclick=()=>shiftAllPictures(-1);$('shiftAllDown').onclick=()=>shiftAllPictures(1);$('flashWrap').onclick=flip;$('next').onclick=nextCard;$('prev').onclick=prevCard;$('shuffle').onclick=shuffleDeck;$('starBtn').onclick=e=>{e.stopPropagation();starCurrent()};$('speakBtn').onclick=e=>{e.stopPropagation();speakCurrent()};$('againBtn').onclick=()=>recordCurrent(false);$('gotItBtn').onclick=()=>recordCurrent(true);$('learnContinue').onclick=renderLearn;$('writeCheck').onclick=checkWrite;$('writeInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkWrite()});$('writeContinue').onclick=renderWrite;$('matchRestart').onclick=initMatch;$('testAgain').onclick=initTest;$('browseSearch').addEventListener('input',renderBrowse);document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)||document.activeElement.isContentEditable)return;
+$('chooseBtn').onclick=e=>{e.stopPropagation();$('file').click()};$('file').addEventListener('change',e=>importFiles([...e.target.files]));$('drop').addEventListener('click',e=>{if(e.target.tagName!=='BUTTON')$('file').click()});$('drop').addEventListener('dragover',e=>{e.preventDefault();$('drop').classList.add('drag')});$('drop').addEventListener('dragleave',()=>$('drop').classList.remove('drag'));$('drop').addEventListener('drop',e=>{e.preventDefault();$('drop').classList.remove('drag');importFiles([...e.dataTransfer.files])});$('settingsBtn').onclick=openSettings;$('settingsBtn2').onclick=openSettings;$('closeSettings').onclick=closeSettings;$('saveSettings').onclick=saveSettings;$('newBtn').onclick=newDeck;$('newBtn2').onclick=newDeck;$('exportBtn').onclick=exportDeck;$('reportBtn').onclick=openReport;$('editBtn').onclick=openEditor;$('doneEdit').onclick=()=>{showDeck();saveLocal()};$('addCard').onclick=()=>{state.deck.push(makeCard('<span>New term</span>','<span>New definition</span>'));saveLocal();renderEditor()};$('dedupe').onclick=()=>{state.deck=finalizeCards(state.deck);saveLocal();renderEditor();toast('Duplicates removed')};$('shiftAllUp').onclick=()=>shiftAllPictures(-1);$('shiftAllDown').onclick=()=>shiftAllPictures(1);$('flashWrap').onclick=flip;$('next').onclick=nextCard;$('prev').onclick=prevCard;$('shuffle').onclick=shuffleDeck;$('starBtn').onclick=e=>{e.stopPropagation();starCurrent()};$('speakBtn').onclick=e=>{e.stopPropagation();speakCurrent()};document.querySelectorAll('[data-crate]').forEach(b=>b.onclick=()=>recordCurrent(+b.dataset.crate));
+$('revealBtn').onclick=revealReview;
+document.querySelectorAll('[data-rate]').forEach(b=>b.onclick=()=>answerReview(+b.dataset.rate));$('learnContinue').onclick=renderLearn;$('writeCheck').onclick=checkWrite;$('writeInput').addEventListener('keydown',e=>{if(e.key==='Enter')checkWrite()});$('writeContinue').onclick=renderWrite;$('matchRestart').onclick=initMatch;$('testAgain').onclick=initTest;$('browseSearch').addEventListener('input',renderBrowse);document.querySelectorAll('.tab').forEach(b=>b.onclick=()=>switchMode(b.dataset.mode));window.addEventListener('keydown',e=>{if(['INPUT','TEXTAREA','SELECT'].includes(document.activeElement.tagName)||document.activeElement.isContentEditable)return;
   if(e.key.length===1){mikeBuf=(mikeBuf+e.key.toLowerCase()).slice(-4);if(mikeBuf==='mike'){mikeBuf='';toast(mikeLine());return}}
-  if(!state.deck.length)return;if(e.code==='Space'&&state.mode==='cards'){e.preventDefault();flip()}if(e.key==='ArrowRight'&&state.mode==='cards')nextCard();if(e.key==='ArrowLeft'&&state.mode==='cards')prevCard();if(e.key.toLowerCase()==='s'&&state.mode==='cards')starCurrent();if(e.key.toLowerCase()==='r'&&state.mode==='cards')speakCurrent()});let mikeBuf='';
-loadLocal();
+  if(!state.deck.length)return;
+  if(state.mode==='review'){
+    if(e.code==='Space'){e.preventDefault();revealReview();return}
+    if('1234'.includes(e.key)){answerReview(+e.key);return}
+  }
+  if(e.code==='Space'&&state.mode==='cards'){e.preventDefault();flip()}if(e.key==='ArrowRight'&&state.mode==='cards')nextCard();if(e.key==='ArrowLeft'&&state.mode==='cards')prevCard();if(e.key.toLowerCase()==='s'&&state.mode==='cards')starCurrent();if(e.key.toLowerCase()==='r'&&state.mode==='cards')speakCurrent()});let mikeBuf='';
+loadSaved();
 console.log('%cOpenStudy','font:600 14px ui-sans-serif','\u2014 with thanks to Mike, who did not need the help.');
 </script>
 </body>
